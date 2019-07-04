@@ -23,7 +23,7 @@ pipeline {
         stage('Deliver') {
             when {
                 expression {
-                    return true || env.BRANCH_NAME == env.TAG_NAME
+                    return env.BRANCH_NAME == env.TAG_NAME
                 } 
             }
             steps {
@@ -31,10 +31,10 @@ pipeline {
                     withCredentials([string(credentialsId: 'docker-password', variable: 'DOCKER_PASS')]) {
                         sh 'docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}'
                     }
-                    sh 'docker build --rm -f Dockerfile -t binarysearch/galaxyvictor .'
-                    sh 'docker push binarysearch/galaxyvictor'
+                    sh 'docker build --rm -f Dockerfile -t binarysearch/galaxyvictor:${TAG_NAME} .'
+                    sh 'docker push binarysearch/galaxyvictor:${TAG_NAME}'
                     sh 'docker container rm galaxyvictor -f || true'
-                    sh 'docker run -d --network=dev_enviroment_default --network-alias=galaxyvictor --name=galaxyvictor binarysearch/galaxyvictor'
+                    sh 'docker run -d --network=dev_enviroment_default --network-alias=galaxyvictor --name=galaxyvictor binarysearch/galaxyvictor:${TAG_NAME}'
                 }
             }
         }
