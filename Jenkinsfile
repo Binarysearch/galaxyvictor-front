@@ -6,6 +6,7 @@ pipeline {
     }
     environment {
         CI = 'true'
+        DOCKER_USER = 'binarysearch'
     }
     stages {
         stage('Build') {
@@ -27,9 +28,13 @@ pipeline {
             }
             steps {
                 script {
-                    sh 'docker build --rm -f Dockerfile -t galaxyvictor .'
+                    withCredentials([string(credentialsId: 'docker-password', variable: 'DOCKER_PASS')]) {
+                        sh 'docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}'
+                    }
+                    sh 'docker build --rm -f Dockerfile -t binarysearch/galaxyvictor .'
+                    sh 'docker push binarysearch/galaxyvictor'
                     sh 'docker container rm galaxyvictor -f || true'
-                    sh 'docker run -d --network=dev_enviroment_default --network-alias=galaxyvictor --name=galaxyvictor galaxyvictor'
+                    sh 'docker run -d --network=dev_enviroment_default --network-alias=galaxyvictor --name=galaxyvictor binarysearch/galaxyvictor'
                 }
             }
         }
