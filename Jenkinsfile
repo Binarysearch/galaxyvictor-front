@@ -34,7 +34,7 @@ pipeline {
                     sh 'docker build --rm -f Dockerfile -t binarysearch/galaxyvictor:${TAG_NAME} .'
                     sh 'docker push binarysearch/galaxyvictor:${TAG_NAME}'
                     sh 'docker container rm galaxyvictor -f || true'
-                    sh 'docker run -d --network=dev_enviroment_default --network-alias=galaxyvictor --name=galaxyvictor binarysearch/galaxyvictor:${TAG_NAME}'
+                    sh 'docker run -d -e API_HOST=https://api.galaxyvictor.com --network=dev_enviroment_default --network-alias=galaxyvictor --name=galaxyvictor binarysearch/galaxyvictor:${TAG_NAME}'
                 }
             }
         }
