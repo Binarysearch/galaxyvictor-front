@@ -3,6 +3,16 @@
     Welcome to {{ title }}!
   </h1>
 </div>
+
+<h3>App info:</h3>
 <div>App version: {{ appInfo.appVersion }}</div>
 <div>Api host: {{ appInfo.apiHost }}</div>
+
+<h3>Api info:</h3>
+<div>Api version: {{ apiInfo.apiVersion }}</div>
+<h4>Endpoints:</h4>
+<ul *ngIf="apiInfo">
+  <li *ngFor="let endpoint of apiInfo.endpoints">Id: '{{ endpoint.id }}' -- Path: '{{ endpoint.path }}'</li>
+</ul>
+
 <router-outlet></router-outlet>
