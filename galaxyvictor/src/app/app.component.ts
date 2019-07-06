@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { EndPointService } from './services/end-point.service';
+import { EndPointService, AppInfo } from './services/end-point.service';
 
 @Component({
   selector: 'app-root',
@@ -8,12 +8,12 @@ import { EndPointService } from './services/end-point.service';
 })
 export class AppComponent implements OnInit {
   title = 'galaxyvictor';
-  apiHost;
+  appInfo: AppInfo;
 
   constructor(private endPoint: EndPointService){}
 
   ngOnInit(){
-    this.endPoint.getApiHost().subscribe( apiHost => this.apiHost = apiHost);
+    this.endPoint.getAppInfo().subscribe( appInfo => this.appInfo = appInfo);
   }
 
 }

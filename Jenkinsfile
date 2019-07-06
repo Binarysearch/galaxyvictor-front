@@ -31,7 +31,7 @@ pipeline {
                     withCredentials([string(credentialsId: 'docker-password', variable: 'DOCKER_PASS')]) {
                         sh 'docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}'
                     }
-                    sh 'docker build --rm -f Dockerfile -t binarysearch/galaxyvictor:${TAG_NAME} .'
+                    sh 'docker build --rm --build-arg app_version_arg=${TAG_NAME} -f Dockerfile -t binarysearch/galaxyvictor:${TAG_NAME} .'
                     sh 'docker push binarysearch/galaxyvictor:${TAG_NAME}'
                     sh 'docker container rm galaxyvictor -f || true'
                     sh 'docker run -d -e API_HOST=https://api.galaxyvictor.com --network=dev_enviroment_default --network-alias=galaxyvictor --name=galaxyvictor binarysearch/galaxyvictor:${TAG_NAME}'
