@@ -13,7 +13,12 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent
       ],
-      providers: [{ provide: EndPointService, useValue: { getAppInfo() { return of({ appInfo: '', apiHost: '' }); }} }]
+      providers: [{
+        provide: EndPointService, useValue: {
+          getAppInfo() { return of({ appInfo: '', apiHost: '' }) },
+          getApiInfo() { return of({ appInfo: '', apiHost: '' }); }
+        } 
+      }]
     }).compileComponents();
   }));
 
