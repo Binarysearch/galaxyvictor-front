@@ -1,0 +1,8 @@
+.box{
+    border: 1px solid rgba(0,0,0,0.2);
+    display: inline-block;
+    margin: 1em;
+    padding: 1em;
+    background-color: rgba(0,0,0,0.1);
+    box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
+}
