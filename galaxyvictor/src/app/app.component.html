@@ -4,23 +4,13 @@
   </h1>
 </div>
 
-<div class='box'>
-  <h3>App info:</h3>
-  <div *ngIf="appInfo">
-    <div>App version: {{ appInfo.appVersion }}</div>
-    <div>Api host: {{ appInfo.apiHost }}</div>
-  </div>
-</div>
-<br>
-<div class='box'>
-  <h3>Api info:</h3>
-  <div *ngIf="apiInfo">
-    <div>Api version: {{ apiInfo.apiVersion }}</div>
-    <h4>Endpoints:</h4>
-    <ul>
-      <li *ngFor="let endpoint of apiInfo.endpoints">Id: '{{ endpoint.id }}' -- Path: '{{ endpoint.path }}'</li>
-    </ul>
-  </div>
-</div>
+
+<button routerLink="">Home</button>
+<button routerLink="/develop">Develop tools</button>
+<button routerLink="/admin">Admin tools</button>
+<button routerLink="/login">Login</button>
+<button routerLink="/register">Register</button>
+
+
 
 <router-outlet></router-outlet>

@@ -1,8 +1,6 @@
 import { TestBed, async } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
-import { EndPointService } from './services/end-point.service';
-import { of } from 'rxjs';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -13,12 +11,7 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent
       ],
-      providers: [{
-        provide: EndPointService, useValue: {
-          getAppInfo() { return of({ appInfo: '', apiHost: '' }) },
-          getApiInfo() { return of({ appInfo: '', apiHost: '' }); }
-        } 
-      }]
+      providers: []
     }).compileComponents();
   }));
 
