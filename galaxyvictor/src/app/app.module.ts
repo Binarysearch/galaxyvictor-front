@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http'
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { IndexComponent } from './components/index/index.component';
+import { DashboardModule } from '@binarysearch/dashboard'
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { IndexComponent } from './components/index/index.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    DashboardModule
   ],
   providers: [],
   bootstrap: [AppComponent]

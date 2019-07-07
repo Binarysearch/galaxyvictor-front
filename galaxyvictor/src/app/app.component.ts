@@ -8,6 +8,14 @@ import { Component, OnInit } from '@angular/core';
 export class AppComponent implements OnInit {
   title = 'galaxyvictor';
 
+  routes = [
+    { link: '/', title: 'Home'},
+    { link: '/develop', title: 'Develop'},
+    { link: '/admin', title: 'Admin'},
+    { link: '/login', title: 'Login'},
+    { link: '/register', title: 'Register'},
+  ];
+
   constructor(){}
 
   ngOnInit(){ }

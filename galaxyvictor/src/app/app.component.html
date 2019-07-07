@@ -5,12 +5,9 @@
 </div>
 
 
-<button routerLink="">Home</button>
-<button routerLink="/develop">Develop tools</button>
-<button routerLink="/admin">Admin tools</button>
-<button routerLink="/login">Login</button>
-<button routerLink="/register">Register</button>
+<bin-dashboard [content]="router" [routes]="routes"></bin-dashboard>
 
+<ng-template #router>
+  <router-outlet></router-outlet>
+</ng-template>
 
-
-<router-outlet></router-outlet>
