@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { APP_MAIN_ROUTES } from './app-routing.module';
 
 @Component({
   selector: 'app-root',
@@ -8,13 +9,8 @@ import { Component, OnInit } from '@angular/core';
 export class AppComponent implements OnInit {
   title = 'galaxyvictor';
 
-  routes = [
-    { link: '/', title: 'Home'},
-    { link: '/develop', title: 'Develop'},
-    { link: '/admin', title: 'Admin'},
-    { link: '/login', title: 'Login'},
-    { link: '/register', title: 'Register'},
-  ];
+  routes = APP_MAIN_ROUTES.map( route => ({ link: `/${route.path}`, title: route.title}));
+  
 
   constructor(){}
 
