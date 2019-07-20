@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { APP_MAIN_ROUTES } from './app-routing.module';
+
+export interface AppRoute {
+  path: string;
+  title: string;
+}
 
 @Component({
   selector: 'app-root',
@@ -7,10 +11,21 @@ import { APP_MAIN_ROUTES } from './app-routing.module';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'galaxyvictor';
-
-  routes = APP_MAIN_ROUTES.map( route => ({ link: `/${route.path}`, title: route.title}));
   
+  routes: AppRoute[] = [
+    { path: '/develop', title: 'Develop' },
+    { path: '/admin', title: 'Admin' },
+    { path: '/universe', title: 'Universe' },
+    { path: '/galaxy', title: 'Galaxy' },
+    { path: '/civilizations', title: 'Civilizations' },
+    { path: '/colonies', title: 'Colonies' },
+    { path: '/fleets', title: 'Fleets' },
+    { path: '/planets', title: 'Planets' },
+    { path: '/trade', title: 'Trade' },
+    { path: '/research', title: 'Research' },
+    { path: '/battles', title: 'Battles' },
+    { path: '/', title: 'Home' }
+  ];
 
   constructor(){}
 
