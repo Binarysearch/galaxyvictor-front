@@ -1,16 +1,93 @@
 import { TestBed } from '@angular/core/testing';
 
-import { EndPointService } from './end-point.service';
+import { EndPointService, AppInfo, ApiInfo } from './end-point.service';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
+import { APP_INFO_URL } from './end-point.service';
 
 describe('EndPointService', () => {
-  beforeEach(() => TestBed.configureTestingModule({
-    providers: [{ provide: HttpClient, useValue: { get(){ return of('host') } } }]
-  }));
+
+  let httpSpy: jasmine.SpyObj<HttpClient>;
+
+  const FAKE_APP_INFO: AppInfo = {
+    apiHost: 'some_host',
+    appVersion: '1.0.0'
+  } 
+
+  const FAKE_API_INFO: ApiInfo = {
+    apiVersion: '2.0.0',
+    endpoints: [
+      { id: 'id-1', path: 'path-1'}
+    ]
+  } 
+
+  beforeEach(() => {
+
+    TestBed.configureTestingModule({
+      providers: [{ provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['get']) }]
+    });
+
+    httpSpy = TestBed.get(HttpClient);
+
+  });
 
   it('should be created', () => {
     const service: EndPointService = TestBed.get(EndPointService);
     expect(service).toBeTruthy();
   });
+
+  it('should call http on 1st getAppInfo', (done: DoneFn) => {
+    const service: EndPointService = TestBed.get(EndPointService);
+
+    httpSpy.get.and.returnValue(of(FAKE_APP_INFO));
+
+
+    service.getAppInfo().subscribe((info: AppInfo) => {
+
+      expect(info).toEqual(FAKE_APP_INFO);
+      expect(httpSpy.get).toHaveBeenCalledWith(APP_INFO_URL);
+      done();
+      
+    });
+    
+  });
+
+  it('should not call http on 2nd getAppInfo', (done: DoneFn) => {
+    const service: EndPointService = TestBed.get(EndPointService);
+
+    httpSpy.get.and.returnValue(of(FAKE_APP_INFO));
+
+
+    service.getAppInfo().subscribe((info: AppInfo) => {
+
+      expect(info).toEqual(FAKE_APP_INFO);
+      expect(httpSpy.get).toHaveBeenCalledWith(APP_INFO_URL);
+
+      httpSpy.get.and.returnValue(of());
+
+      service.getAppInfo().subscribe((info: AppInfo) => {
+
+        expect(info).toEqual(FAKE_APP_INFO);
+        expect(httpSpy.get).toHaveBeenCalledTimes(1);
+        done();
+
+      });
+    });
+    
+  });
+
+  it('should call http on getApiInfo with host from getAppInfo', (done: DoneFn) => {
+    const service: EndPointService = TestBed.get(EndPointService);
+
+    httpSpy.get.withArgs(APP_INFO_URL).and.returnValue(of(FAKE_APP_INFO));
+    httpSpy.get.withArgs(FAKE_APP_INFO.apiHost).and.returnValue(of(FAKE_API_INFO));
+
+    service.getApiInfo();
+
+    expect(httpSpy.get).toHaveBeenCalledWith(APP_INFO_URL);
+    expect(httpSpy.get).toHaveBeenCalledWith(FAKE_APP_INFO.apiHost);
+    done();
+    
+  });
+
 });
