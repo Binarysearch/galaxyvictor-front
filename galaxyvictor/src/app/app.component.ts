@@ -14,8 +14,8 @@ export interface AppRoute {
 export class AppComponent {
   
   routes: AppRoute[] = [
-    { path: '/develop', title: 'Develop' },
-    { path: '/admin', title: 'Admin' },
+    { path: '/develop', title: 'Develop', faIcon: 'fas fa-file-code' },
+    { path: '/admin', title: 'Admin', faIcon: 'fas fa-tools' },
     { path: '/universe', title: 'Universe', faIcon: 'fab fa-galactic-republic' },
     { path: '/galaxy', title: 'Galaxy', faIcon: 'fa fa-atom' },
     { path: '/civilizations', title: 'Civilizations', faIcon: 'fab fa-galactic-senate' },
