@@ -26,8 +26,21 @@ export const APP_INFO_URL = '/app-info';
 export class EndPointService {
 
   private info: AppInfo;
+  private apiInfo: ApiInfo;
+  private endPointMap: Map<string, string>;
+  private readySubject: Subject<boolean> = new Subject();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    
+  }
+
+  private loadEndpoints() {
+    this.getApiInfo().subscribe(info => {
+      this.endPointMap = new Map();
+      info.endpoints.forEach(endPoint => this.endPointMap.set(endPoint.id, endPoint.path) );
+      this.readySubject.next(true);
+    });
+  }
 
   public getAppInfo(): Observable<AppInfo> {
     if (this.info) {
@@ -37,12 +50,24 @@ export class EndPointService {
   }
 
   public getApiInfo(): Observable<ApiInfo> {
+    if (this.apiInfo) {
+      return of(this.apiInfo);
+    }
     const subject: Subject<ApiInfo> = new Subject();
 
     this.getAppInfo().subscribe(appInfo => {
-      this.http.get<ApiInfo>(appInfo.apiHost).subscribe(apiInfo => subject.next(apiInfo));
+      this.http.get<ApiInfo>(appInfo.apiHost).pipe(tap( info => this.apiInfo = info )).subscribe(apiInfo => subject.next(apiInfo));
     });
 
     return subject.asObservable();
   }
+
+  public ready(): Observable<boolean> {
+    return this.readySubject.asObservable();
+  }
+
+  public getEndPointPath(id: string): string {
+    return this.endPointMap.get(id);
+  }
+
 }

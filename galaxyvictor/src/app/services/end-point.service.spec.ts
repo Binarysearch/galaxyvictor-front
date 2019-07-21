@@ -90,4 +90,23 @@ describe('EndPointService', () => {
     
   });
 
+  it('should not call http on 2nd getApiInfo', (done: DoneFn) => {
+    const service: EndPointService = TestBed.get(EndPointService);
+
+    httpSpy.get.withArgs(APP_INFO_URL).and.returnValue(of(FAKE_APP_INFO));
+    httpSpy.get.withArgs(FAKE_APP_INFO.apiHost).and.returnValue(of(FAKE_API_INFO));
+
+    service.getApiInfo();
+
+    expect(httpSpy.get).toHaveBeenCalledWith(APP_INFO_URL);
+    expect(httpSpy.get).toHaveBeenCalledWith(FAKE_APP_INFO.apiHost);
+
+    service.getApiInfo();
+
+    expect(httpSpy.get).toHaveBeenCalledTimes(2);
+
+    done();
+    
+  });
+
 });
