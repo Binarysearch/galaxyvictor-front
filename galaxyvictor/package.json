@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "test:app": "ng test --browsers ChromeHeadlessNoSandbox --no-watch"
+    "test:app": "ng test --browsers ChromeHeadlessNoSandbox --no-watch --code-coverage"
   },
   "private": true,
   "dependencies": {
@@ -20,7 +20,8 @@
     "@angular/platform-browser": "~8.0.0",
     "@angular/platform-browser-dynamic": "~8.0.0",
     "@angular/router": "~8.0.0",
-    "@binarysearch/dashboard": "0.0.4",
+    "@binarysearch/dashboard": "0.0.6",
+    "@fortawesome/fontawesome-free": "^5.9.0",
     "rxjs": "~6.4.0",
     "tslib": "^1.9.0",
     "zone.js": "~0.9.1"

@@ -1,4 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+
+@import "~@fortawesome/fontawesome-free/css/all.css";
+
 .box{
     border: 1px solid rgba(0,0,0,0.2);
     display: inline-block;
@@ -6,4 +8,8 @@
     padding: 1em;
     background-color: rgba(0,0,0,0.1);
     box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
+}
+body {
+    margin: 0;
+    padding: 0;
 }

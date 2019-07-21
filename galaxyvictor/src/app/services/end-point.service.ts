@@ -18,7 +18,7 @@ export interface Endpoint{
   path: string;
 }
 
-const APP_INFO_URL = '/app-info';
+export const APP_INFO_URL = '/app-info';
 
 @Injectable({
   providedIn: 'root'
