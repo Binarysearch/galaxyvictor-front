@@ -20,7 +20,7 @@ describe('RegisterService', () => {
 
   beforeEach(() => {
 
-    endPointSpy = jasmine.createSpyObj('EndPointService', ['getEnpointPath', 'ready']);
+    endPointSpy = jasmine.createSpyObj('EndPointService', ['getEndPointPath', 'ready']);
 
     endPointSpy.ready.and.returnValue(of(true));
     endPointSpy.getEndPointPath.withArgs(REGISTER_ENPOINT_ID).and.returnValue(FAKE_REGISTER_PATH);
