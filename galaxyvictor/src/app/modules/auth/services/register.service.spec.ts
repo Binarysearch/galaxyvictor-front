@@ -4,11 +4,15 @@ import { RegisterService, REGISTER_ENPOINT_ID } from './register.service';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { User } from '../../../model/user.interface';
+import { Session } from '../../../model/session.interface';
 import { EndPointService } from '../../../services/end-point.service';
 
-const FAKE_REGISTER_RESPONSE: User = {
-  id: '1',
-  email: 'example@email.com'
+const FAKE_REGISTER_RESPONSE: Session = {
+  user: {
+    id: '1',
+    email: 'example@email.com'
+  },
+  token: 'some_token'
 }
 
 const FAKE_REGISTER_PATH = '/path/to/resgister/api';

@@ -69,7 +69,10 @@ describe('RegisterComponent', () => {
       expect(fixture.componentInstance.password.value).toBe('somePassword');
       expect(fixture.componentInstance.repeatPassword.value).toBe('someOtherPassword');
 
-      registerServiceSpy.register.and.returnValue(of({ id: '', email: ''}));
+      registerServiceSpy.register.and.returnValue(of({
+        user: { id: '', email: ''},
+        token: 'some_token'
+      }));
 
       fixture.componentInstance.register();
 
