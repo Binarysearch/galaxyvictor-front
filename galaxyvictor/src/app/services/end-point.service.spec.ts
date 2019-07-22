@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { EndPointService, AppInfo, ApiInfo } from './end-point.service';
 import { HttpClient } from '@angular/common/http';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { APP_INFO_URL } from './end-point.service';
 
 describe('EndPointService', () => {
@@ -48,6 +48,22 @@ describe('EndPointService', () => {
       expect(httpSpy.get).toHaveBeenCalledWith(APP_INFO_URL);
       done();
       
+    });
+    
+  });
+
+  it('should bubble error from http on getAppInfo', (done: DoneFn) => {
+    const service: EndPointService = TestBed.get(EndPointService);
+
+    const someError = { err: 'error loading' };
+    httpSpy.get.and.returnValue(throwError(someError));
+
+    service.getAppInfo().subscribe((info: AppInfo) => {
+      
+    }, error => {
+      expect(error).toEqual(someError);
+      expect(httpSpy.get).toHaveBeenCalledWith(APP_INFO_URL);
+      done();
     });
     
   });
@@ -106,6 +122,22 @@ describe('EndPointService', () => {
     expect(httpSpy.get).toHaveBeenCalledTimes(2);
 
     done();
+    
+  });
+
+  it('should bubble error from http on getApiInfo', (done: DoneFn) => {
+    const service: EndPointService = TestBed.get(EndPointService);
+
+    const someError = { err: 'error loading' };
+    httpSpy.get.and.returnValue(throwError(someError));
+
+    service.getApiInfo().subscribe((info: ApiInfo) => {
+      
+    }, error => {
+      expect(error).toEqual(someError);
+      expect(httpSpy.get).toHaveBeenCalledWith(APP_INFO_URL);
+      done();
+    });
     
   });
 

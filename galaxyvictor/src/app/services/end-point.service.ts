@@ -34,11 +34,17 @@ export class EndPointService {
     
   }
 
-  private loadEndpoints() {
-    this.getApiInfo().subscribe(info => {
-      this.endPointMap = new Map();
-      info.endpoints.forEach(endPoint => this.endPointMap.set(endPoint.id, endPoint.path) );
-      this.readySubject.next(true);
+  public loadEndPoints(): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      this.getApiInfo().subscribe(info => {
+        this.endPointMap = new Map();
+        info.endpoints.forEach(endPoint => this.endPointMap.set(endPoint.id, endPoint.path) );
+        this.readySubject.next(true);
+        resolve();
+      }, (error) => {
+        console.error('Error loading endpoints', error);
+        resolve();
+      });
     });
   }
 
@@ -56,8 +62,10 @@ export class EndPointService {
     const subject: Subject<ApiInfo> = new Subject();
 
     this.getAppInfo().subscribe(appInfo => {
-      this.http.get<ApiInfo>(appInfo.apiHost).pipe(tap( info => this.apiInfo = info )).subscribe(apiInfo => subject.next(apiInfo));
-    });
+      this.http.get<ApiInfo>(appInfo.apiHost)
+        .pipe(tap( info => this.apiInfo = info ))
+        .subscribe(apiInfo => subject.next(apiInfo), error => subject.error(error));
+    }, error => subject.error(error));
 
     return subject.asObservable();
   }
