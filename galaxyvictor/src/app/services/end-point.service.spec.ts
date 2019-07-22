@@ -141,4 +141,63 @@ describe('EndPointService', () => {
     
   });
 
+  it('should call ready on loadendpoints', (done: DoneFn) => {
+    const service: EndPointService = TestBed.get(EndPointService);
+
+    httpSpy.get.withArgs(APP_INFO_URL).and.returnValue(of(FAKE_APP_INFO));
+    httpSpy.get.withArgs(FAKE_APP_INFO.apiHost).and.returnValue(of(FAKE_API_INFO));
+
+    service.getApiInfo();
+
+    service.ready().subscribe(isReady => {
+      expect(isReady).toEqual(true);
+      expect(httpSpy.get).toHaveBeenCalledWith(APP_INFO_URL);
+      expect(httpSpy.get).toHaveBeenCalledWith(FAKE_APP_INFO.apiHost);
+      done();
+    });
+    
+    service.loadEndPoints();
+    
+  });
+
+  it('should resolve on loadendpoints with error', (done: DoneFn) => {
+    const service: EndPointService = TestBed.get(EndPointService);
+    const someError = { err: 'error loading' };
+    httpSpy.get.withArgs(APP_INFO_URL).and.returnValue(of(FAKE_APP_INFO));
+    httpSpy.get.withArgs(FAKE_APP_INFO.apiHost).and.returnValue(throwError(someError));
+
+    service.getApiInfo();
+    
+    service.loadEndPoints().then(()=>{
+      expect(httpSpy.get).toHaveBeenCalledWith(APP_INFO_URL);
+      expect(httpSpy.get).toHaveBeenCalledWith(FAKE_APP_INFO.apiHost);
+      done();
+    });
+    
+  });
+
+  it('should get endpoint path', (done: DoneFn) => {
+    const service: EndPointService = TestBed.get(EndPointService);
+
+    httpSpy.get.withArgs(APP_INFO_URL).and.returnValue(of(FAKE_APP_INFO));
+    httpSpy.get.withArgs(FAKE_APP_INFO.apiHost).and.returnValue(of(FAKE_API_INFO));
+
+    service.getApiInfo();
+    
+    service.ready().subscribe(isReady => {
+      expect(isReady).toEqual(true);
+      expect(httpSpy.get).toHaveBeenCalledWith(APP_INFO_URL);
+      expect(httpSpy.get).toHaveBeenCalledWith(FAKE_APP_INFO.apiHost);
+      
+      const path = service.getEndPointPath(FAKE_API_INFO.endpoints[0].id);
+      expect(path).toEqual(FAKE_API_INFO.endpoints[0].path);
+      
+      done();
+    });
+    
+    service.loadEndPoints();
+
+  });
+
+
 });
