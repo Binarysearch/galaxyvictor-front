@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, Subject } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
 
 export interface AppInfo {
   apiHost: string;
@@ -26,23 +24,52 @@ export const APP_INFO_URL = '/app-info';
 export class EndPointService {
 
   private info: AppInfo;
+  private apiInfo: ApiInfo;
+  private endPointMap: Map<string, string>;
 
-  constructor(private http: HttpClient) { }
-
-  public getAppInfo(): Observable<AppInfo> {
-    if (this.info) {
-      return of(this.info);
-    }
-    return this.http.get<AppInfo>(APP_INFO_URL).pipe(tap( info => this.info = info ));
+  constructor(private http: HttpClient) {
+    
   }
 
-  public getApiInfo(): Observable<ApiInfo> {
-    const subject: Subject<ApiInfo> = new Subject();
+  public loadEndPoints(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      
+      this.http.get<AppInfo>(APP_INFO_URL).subscribe(appInfo => {
 
-    this.getAppInfo().subscribe(appInfo => {
-      this.http.get<ApiInfo>(appInfo.apiHost).subscribe(apiInfo => subject.next(apiInfo));
+        this.info = appInfo;
+
+        this.http.get<ApiInfo>(appInfo.apiHost)
+        .subscribe(apiInfo => {
+
+          this.apiInfo = apiInfo;
+          this.endPointMap = new Map();
+          apiInfo.endpoints.forEach(endPoint => {
+            this.endPointMap.set(endPoint.id, appInfo.apiHost + endPoint.path);
+          });
+
+          resolve();
+        }, (error) => {
+          console.error('Error loading endpoints', error);
+          reject(error);
+        });
+
+      }, (error) => {
+        console.error('Error loading endpoints', error);
+        reject(error);
+      });
     });
-
-    return subject.asObservable();
   }
+
+  public getAppInfo(): AppInfo {
+    return this.info;
+  }
+
+  public getApiInfo(): ApiInfo {
+    return this.apiInfo;
+  }
+
+  public getEndPointPath(id: string): string {
+    return this.endPointMap.get(id);
+  }
+
 }
