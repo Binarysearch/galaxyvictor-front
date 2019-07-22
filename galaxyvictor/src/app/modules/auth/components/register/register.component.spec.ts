@@ -6,24 +6,29 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RegisterService } from '../../services/register.service';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
+import { Router, RouterModule } from '@angular/router';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
   let registerServiceSpy: jasmine.SpyObj<RegisterService>;
+  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async(() => {
 
     registerServiceSpy = jasmine.createSpyObj('RegisterService', ['register']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
     TestBed.configureTestingModule({
       declarations: [ RegisterComponent ],
       imports: [
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        RouterModule
       ],
       providers: [
         TranslateService,
-        { provide: RegisterService, useValue: registerServiceSpy }
+        { provide: RegisterService, useValue: registerServiceSpy },
+        { provide: Router, useValue: routerSpy }
       ]
     })
     .compileComponents();
@@ -69,6 +74,7 @@ describe('RegisterComponent', () => {
       fixture.componentInstance.register();
 
       expect(registerServiceSpy.register).toHaveBeenCalledWith('someEmail', 'somePassword');
+      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/');
 
     });
   }));
