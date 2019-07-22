@@ -9,9 +9,7 @@ import { DashboardModule } from '@binarysearch/dashboard';
 import { EndPointService } from './services/end-point.service';
 
 export function initializer(endPointService: EndPointService): ()=>void {
-  return () => {
-    endPointService.loadEndPoints();
-  }
+  return () => endPointService.loadEndPoints();
 }
 
 @NgModule({

@@ -13,7 +13,7 @@ export class EndpointListComponent implements OnInit {
   constructor(private endPoint: EndPointService) { }
 
   ngOnInit() {
-    this.endPoint.getApiInfo().subscribe( apiInfo => this.apiInfo = apiInfo);
+    this.apiInfo = this.endPoint.getApiInfo();
   }
 
 }

@@ -20,9 +20,8 @@ describe('RegisterService', () => {
 
   beforeEach(() => {
 
-    endPointSpy = jasmine.createSpyObj('EndPointService', ['getEndPointPath', 'ready']);
+    endPointSpy = jasmine.createSpyObj('EndPointService', ['getEndPointPath']);
 
-    endPointSpy.ready.and.returnValue(of(true));
     endPointSpy.getEndPointPath.withArgs(REGISTER_ENPOINT_ID).and.returnValue(FAKE_REGISTER_PATH);
 
     TestBed.configureTestingModule({

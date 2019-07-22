@@ -20,9 +20,7 @@ export class RegisterService {
   registerUrl: string;
 
   constructor(private endPoint: EndPointService, private http: HttpClient) {
-    this.endPoint.ready().subscribe(() => {
-      this.registerUrl = this.endPoint.getEndPointPath(REGISTER_ENPOINT_ID);
-    });
+    this.registerUrl = this.endPoint.getEndPointPath(REGISTER_ENPOINT_ID);
   }
 
   public register(email: string, password: string): Observable<User> {
