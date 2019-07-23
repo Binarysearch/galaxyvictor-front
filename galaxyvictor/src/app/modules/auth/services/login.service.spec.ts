@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-
-import { RegisterService, REGISTER_ENPOINT_ID } from './register.service';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { Session } from '../../../model/session.interface';
 import { EndPointService } from '../../../services/end-point.service';
+
+import { LoginService, LOGIN_ENPOINT_ID } from './login.service';
 import { AuthService } from './auth.service';
 
-const FAKE_REGISTER_RESPONSE: Session = {
+const FAKE_LOGIN_RESPONSE: Session = {
   user: {
     id: '1',
     email: 'example@email.com'
@@ -15,9 +15,9 @@ const FAKE_REGISTER_RESPONSE: Session = {
   token: 'some_token'
 }
 
-const FAKE_REGISTER_PATH = '/path/to/resgister/api';
+const FAKE_LOGIN_PATH = '/path/to/resgister/api';
 
-describe('RegisterService', () => {
+describe('LoginService', () => {
 
   let httpSpy: jasmine.SpyObj<HttpClient>;
   let endPointSpy: jasmine.SpyObj<EndPointService>;
@@ -27,7 +27,7 @@ describe('RegisterService', () => {
 
     endPointSpy = jasmine.createSpyObj('EndPointService', ['getEndPointPath']);
 
-    endPointSpy.getEndPointPath.withArgs(REGISTER_ENPOINT_ID).and.returnValue(FAKE_REGISTER_PATH);
+    endPointSpy.getEndPointPath.withArgs(LOGIN_ENPOINT_ID).and.returnValue(FAKE_LOGIN_PATH);
 
     TestBed.configureTestingModule({
       providers: [
@@ -43,28 +43,26 @@ describe('RegisterService', () => {
   });
 
   it('should be created', () => {
-    const service: RegisterService = TestBed.get(RegisterService);
+    const service: LoginService = TestBed.get(LoginService);
     expect(service).toBeTruthy();
   });
 
   it('should call http with register endpoint on register', (done: DoneFn) => {
-    const service: RegisterService = TestBed.get(RegisterService);
+    const service: LoginService = TestBed.get(LoginService);
 
-    httpSpy.post.withArgs(FAKE_REGISTER_PATH, { email: 'email', password: '12345' })
-      .and.returnValue(of(FAKE_REGISTER_RESPONSE));
+    httpSpy.post.withArgs(FAKE_LOGIN_PATH, { email: 'email', password: '12345' })
+      .and.returnValue(of(FAKE_LOGIN_RESPONSE));
 
-    service.register('email', '12345').subscribe(response => {
+    service.login('email', '12345').subscribe(response => {
 
-      expect(response).toEqual(FAKE_REGISTER_RESPONSE);
+      expect(response).toEqual(FAKE_LOGIN_RESPONSE);
       done();
 
     });
 
-    expect(httpSpy.post).toHaveBeenCalledWith(FAKE_REGISTER_PATH, { email: 'email', password: '12345' });
-    expect(endPointSpy.getEndPointPath).toHaveBeenCalledWith(REGISTER_ENPOINT_ID);
-    expect(authServiceSpy.setSession).toHaveBeenCalledWith(FAKE_REGISTER_RESPONSE);
+    expect(httpSpy.post).toHaveBeenCalledWith(FAKE_LOGIN_PATH, { email: 'email', password: '12345' });
+    expect(endPointSpy.getEndPointPath).toHaveBeenCalledWith(LOGIN_ENPOINT_ID);
+    expect(authServiceSpy.setSession).toHaveBeenCalledWith(FAKE_LOGIN_RESPONSE);
 
   });
-
-
 });
