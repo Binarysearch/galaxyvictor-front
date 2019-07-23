@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { Session } from '../../../model/session.interface';
 import { EndPointService } from '../../../services/end-point.service';
+import { AuthService } from './auth.service';
 
 const FAKE_REGISTER_RESPONSE: Session = {
   user: {
@@ -20,6 +21,7 @@ describe('RegisterService', () => {
 
   let httpSpy: jasmine.SpyObj<HttpClient>;
   let endPointSpy: jasmine.SpyObj<EndPointService>;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
 
@@ -30,11 +32,13 @@ describe('RegisterService', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['post']) },
+        { provide: AuthService, useValue: jasmine.createSpyObj('AuthService', ['setSession']) },
         { provide: EndPointService, useValue: endPointSpy }
       ]
     });
 
     httpSpy = TestBed.get(HttpClient);
+    authServiceSpy = TestBed.get(AuthService);
 
   });
 
@@ -49,15 +53,16 @@ describe('RegisterService', () => {
     httpSpy.post.withArgs(FAKE_REGISTER_PATH, { email: 'email', password: '12345' })
       .and.returnValue(of(FAKE_REGISTER_RESPONSE));
 
-    service.register('email', '12345').subscribe(user => {
+    service.register('email', '12345').subscribe(response => {
 
-      expect(user).toEqual(FAKE_REGISTER_RESPONSE);
+      expect(response).toEqual(FAKE_REGISTER_RESPONSE);
       done();
 
     });
 
     expect(httpSpy.post).toHaveBeenCalledWith(FAKE_REGISTER_PATH, { email: 'email', password: '12345' });
     expect(endPointSpy.getEndPointPath).toHaveBeenCalledWith(REGISTER_ENPOINT_ID);
+    expect(authServiceSpy.setSession).toHaveBeenCalledWith(FAKE_REGISTER_RESPONSE);
 
   });
 

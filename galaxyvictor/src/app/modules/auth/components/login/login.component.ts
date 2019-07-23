@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Validators, FormBuilder, FormControl } from '@angular/forms';
 import { TranslateService } from '../../../../services/translate.service';
 import { LoginService } from '../../services/login.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -19,20 +20,16 @@ export class LoginComponent implements OnInit {
 
   errorMessage: string;
 
-  constructor(public loginService: LoginService, public ts: TranslateService, private fb: FormBuilder) { }
+  constructor(private router: Router ,public loginService: LoginService, public ts: TranslateService, private fb: FormBuilder) { }
 
   ngOnInit() {
 
   }
 
   login() {
-    this.loginService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe(null, error => {
-      if (error.status === 401) {
-        this.errorMessage = this.ts.strings.invalidLoginCredentials;
-        this.loginForm.patchValue({password: ''});
-
-        this.passwordInput.nativeElement.focus();
-      }
+    this.loginService.login(this.loginForm.value.email, this.loginForm.value.password)
+    .subscribe(() => {
+      this.router.navigateByUrl('/');
     });
   }
 
