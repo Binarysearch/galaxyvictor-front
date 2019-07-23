@@ -1,1 +1,28 @@
-<p>login works!</p>
+<div class="container">
+    <form class="gv-panel" [formGroup]="loginForm">
+      <div class='header'>
+        <h1 class='title'>{{ ts.strings.login }}</h1>
+      </div>
+      <div class='body'>
+        <div class="gv-input">
+          <label>{{ ts.strings.email }}</label>
+          <input type="email" formControlName="email" required>
+          <div class="error" *ngIf="email.errors && (email.touched && email.dirty)">
+            <div *ngIf="email.errors.email">Introduzca un email valido</div>
+            <div *ngIf="email.errors.required">Introduzca email</div>
+          </div>
+        </div>
+        <div class="gv-input">
+          <label>{{ ts.strings.password }}</label>
+          <input #password type="password" formControlName="password" required>
+          <div class="error" *ngIf="password.errors && (password.touched && password.dirty)">
+            <div *ngIf="password.errors.required">Introduzca contraseña</div>
+          </div>
+        </div>
+        <br>
+        <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+        <button [disabled]="!loginForm.valid" class="btn" (click)="login()">{{ ts.strings.send }}</button>
+      </div>
+    </form>
+  </div>
+  
