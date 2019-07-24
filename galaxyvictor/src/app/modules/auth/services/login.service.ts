@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { EndPointService } from '../../../services/end-point.service';
-import { Observable, throwError } from 'rxjs';
-import { User } from '../../../model/user.interface';
+import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 import { Session } from '../../../model/session.interface';

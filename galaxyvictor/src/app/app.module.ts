@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { IndexComponent } from './components/index/index.component';
 import { DashboardModule } from '@binarysearch/dashboard';
+import { NgSocketModule } from '@binarysearch/ng-socket';
 import { EndPointService } from './services/end-point.service';
 
 export function initializer(endPointService: EndPointService): ()=>void {
@@ -21,7 +22,8 @@ export function initializer(endPointService: EndPointService): ()=>void {
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    DashboardModule
+    DashboardModule,
+    NgSocketModule
   ],
   providers: [
     {
