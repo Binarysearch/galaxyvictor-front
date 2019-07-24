@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SocketService } from './services/socket.service';
 
 export interface AppRoute {
   path: string;
@@ -11,7 +12,7 @@ export interface AppRoute {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   
   routes: AppRoute[] = [
     { path: '/develop', title: 'Develop', faIcon: 'fas fa-file-code' },
@@ -28,6 +29,12 @@ export class AppComponent {
     { path: '/', title: 'Home', faIcon: 'fas fa-home' }
   ];
 
-  constructor(){}
+  constructor(private socket: SocketService){}
+
+  ngOnInit(): void {
+    this.socket.getMessages().subscribe(msg => {
+      console.log('MESSAGE', msg);
+    });
+  }
 
 }
