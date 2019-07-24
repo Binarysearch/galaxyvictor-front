@@ -10,7 +10,7 @@ describe('AuthService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should store session token', () => {
+  it('should store session in storage', (done) => {
     const service: AuthService = TestBed.get(AuthService);
    
     const sessionToSet = {
@@ -20,11 +20,30 @@ describe('AuthService', () => {
 
     service.setSession(sessionToSet);
 
-    const token = localStorage.getItem('galaxyvictor-token');
-    expect(token).toEqual('someToken');
+    const storedSession = localStorage.getItem('galaxyvictor-session');
+    expect(storedSession).toEqual(JSON.stringify(sessionToSet));
 
-    const session = service.getSession();
-    expect(session).toEqual(sessionToSet);
+    service.getSession().subscribe(session => {
+      expect(session).toEqual(sessionToSet);
+      done();
+    });
+  });
+
+  it('should get session from storage', (done) => {
+   
+    const sessionToSet = {
+      user: { id: '12', email: 'someEmail' },
+      token: 'someToken'
+    };
+
+    localStorage.setItem('galaxyvictor-session', JSON.stringify(sessionToSet));
+
+    const service: AuthService = TestBed.get(AuthService);
+
+    service.getSession().subscribe(session => {
+      expect(session).toEqual(sessionToSet);
+      done();
+    });
   });
 
 
