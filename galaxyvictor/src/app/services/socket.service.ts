@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { EndPointService } from './end-point.service';
 import { Observable, of, Subject } from 'rxjs';
-import { NgSocket } from './ng-socket';
 import { AuthService } from '../modules/auth/services/auth.service';
-import { map, tap } from 'rxjs/operators';
+import { WebSocketBuilderService } from './web-socket-builder.service';
 
 export const SOCKET_ENPOINT_ID = 'socket';
 
@@ -15,7 +14,11 @@ export class SocketService {
   private socket: WebSocket;
   private subject: Subject<string> = new Subject();
 
-  constructor(private endPoint: EndPointService, private auth: AuthService) {
+  constructor(
+    private endPoint: EndPointService,
+    private wsBuilder: WebSocketBuilderService,
+    private auth: AuthService
+  ) {
     this.connect();
   }
 
@@ -39,7 +42,7 @@ export class SocketService {
       // si hay sesion crear nuevo socket
       if (session) {
         console.log('NUEVO SOCKET...', session);
-        this.socket = new WebSocket(endpoint);
+        this.socket = this.wsBuilder.getSocket(endpoint);
         this.socket.onmessage = this.onMessage.bind(this);
         this.socket.onclose = this.onClose.bind(this);
         this.socket.onerror = this.onError.bind(this);
