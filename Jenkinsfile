@@ -28,6 +28,9 @@ pipeline {
             }
             steps {
                 script {
+                    withCredentials([string(credentialsId: 'docker-password', variable: 'DOCKER_PASS')]) {
+                        sh 'docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}'
+                    }
                     sh 'docker build --rm --build-arg app_version_arg=dev -f Dockerfile -t binarysearch/galaxyvictor:dev .'
                     sh 'docker push binarysearch/galaxyvictor:dev'
                     sh 'docker container rm galaxyvictor-dev -f || true'
