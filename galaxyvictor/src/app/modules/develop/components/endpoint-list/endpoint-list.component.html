@@ -3,8 +3,6 @@
     <div *ngIf="apiInfo">
         <div>Api version: {{ apiInfo.apiVersion }}</div>
         <h4>Endpoints:</h4>
-        <ul>
-        <li *ngFor="let endpoint of apiInfo.endpoints">Id: '{{ endpoint.id }}' -- Path: '{{ endpoint.path }}'</li>
-        </ul>
+        <crud-table [config]="config"></crud-table>
     </div>
 </div>
