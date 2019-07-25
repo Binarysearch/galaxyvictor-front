@@ -20,6 +20,21 @@ pipeline {
                 sh 'cd galaxyvictor && npm run test:app'
             }
         }
+        stage('Deliver dev') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == 'develop'
+                } 
+            }
+            steps {
+                script {
+                    sh 'docker build --rm --build-arg app_version_arg=dev -f Dockerfile -t binarysearch/galaxyvictor:dev .'
+                    sh 'docker push binarysearch/galaxyvictor:dev'
+                    sh 'docker container rm galaxyvictor-dev -f || true'
+                    sh 'docker run -d -e API_HOST=https://api-dev.galaxyvictor.com --network=dev_enviroment_default --network-alias=galaxyvictor-dev --name=galaxyvictor-dev binarysearch/galaxyvictor:dev'
+                }
+            }
+        }
         stage('Deliver') {
             when {
                 expression {
