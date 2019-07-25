@@ -3,7 +3,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { EndpointListComponent } from './endpoint-list.component';
 import { of } from 'rxjs';
 import { EndPointService, ApiInfo } from '../../../../services/end-point.service';
-import { CrudTablesModule } from '@binarysearch/crud-tables';
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'crud-table',
+  template: '<p>Mock Product Editor Component</p>'
+})
+class MockTableComponent{
+  @Input() config;
+}
 
 describe('EndpointListComponent', () => {
   let component: EndpointListComponent;
@@ -18,8 +26,8 @@ describe('EndpointListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EndpointListComponent ],
-      imports: [ CrudTablesModule ],
+      declarations: [ EndpointListComponent, MockTableComponent ],
+      imports: [  ],
       providers: [
         { provide: EndPointService, useValue: { getApiInfo(){ return of(FAKE_API_INFO) } } }
       ]

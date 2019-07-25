@@ -46,5 +46,18 @@ describe('AuthService', () => {
     });
   });
 
+  it('should return no session if nothing found in storage', (done) => {
+
+    localStorage.removeItem('galaxyvictor-session');
+
+    const service: AuthService = TestBed.get(AuthService);
+
+    service.getSession().subscribe(session => {
+      expect(session).toEqual(null);
+      done();
+    });
+    
+  });
+
 
 });
