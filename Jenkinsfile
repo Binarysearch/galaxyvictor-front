@@ -9,15 +9,19 @@ pipeline {
         DOCKER_USER = 'binarysearch'
     }
     stages {
+        stage('Install') {
+            steps {
+                sh 'npm install'
+            }
+        }
         stage('Build') {
             steps {
-                sh 'printenv'
-                sh 'cd galaxyvictor && npm install && npm run ng build --prod'
+                sh 'npm run ng build --prod'
             }
         }
         stage('Test') {
             steps {
-                sh 'cd galaxyvictor && npm run test:app'
+                sh 'npm run test:app'
             }
         }
         stage('Deliver dev') {
