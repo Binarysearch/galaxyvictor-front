@@ -6,7 +6,7 @@ import { EndPointService, ApiInfo } from '../../../../services/end-point.service
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'crud-table',
+  selector: 'p-table',
   template: '<p>Mock Product Editor Component</p>'
 })
 class MockTableComponent{
