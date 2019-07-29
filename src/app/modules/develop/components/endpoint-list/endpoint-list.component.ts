@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiInfo, EndPointService, Endpoint } from 'src/app/services/end-point.service';
-import { CrudTableConfig, LocalDataSource } from '@binarysearch/crud-tables';
+import { ApiInfo, EndPointService, Endpoint } from '../../../../services/end-point.service';
+import { TableConfig, LocalDataSource } from '@piros/table';
 
 @Component({
   selector: 'app-endpoint-list',
@@ -11,7 +11,7 @@ export class EndpointListComponent implements OnInit {
 
   apiInfo: ApiInfo;
 
-  config: CrudTableConfig<Endpoint>;
+  config: TableConfig<Endpoint>;
 
   constructor(private endPoint: EndPointService) { }
 

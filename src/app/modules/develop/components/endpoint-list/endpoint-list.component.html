@@ -1,8 +1,8 @@
 <div class='box'>
     <h3>Api info:</h3>
-    <div *ngIf="apiInfo">
+    <div class='api-info-container' *ngIf="apiInfo">
         <div>Api version: {{ apiInfo.apiVersion }}</div>
         <h4>Endpoints:</h4>
-        <crud-table [config]="config"></crud-table>
+        <p-table [config]="config"></p-table>
     </div>
 </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DsConfig, TopbarPosition } from '@binarysearch/dashboard';
+import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { SocketService } from './services/socket.service';
 
 export interface AppRoute {
