@@ -17,6 +17,8 @@ export class RegisterComponent implements OnInit {
     repeatPassword: ['']
   }, {validator: this.checkEqualPassword } );
 
+  errorMessage ='';
+  
   constructor(private router: Router ,private registerService: RegisterService, public ts: TranslateService, private fb: FormBuilder) { }
 
   ngOnInit() {
