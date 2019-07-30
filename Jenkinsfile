@@ -63,7 +63,7 @@ pipeline {
         stage('Compodoc') {
             when {
                 expression {
-                    return env.BRANCH_NAME == env.TAG_NAME
+                    return true || env.BRANCH_NAME == env.TAG_NAME
                 } 
             }
             steps {
