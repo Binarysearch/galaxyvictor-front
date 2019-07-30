@@ -69,6 +69,7 @@ pipeline {
             steps {
                 script {
                     sh 'npm install @compodoc/compodoc'
+                    sh 'compodoc -p ./tsconfig.app.json -d ./docs/'
                     withCredentials([string(credentialsId: 'docker-password', variable: 'DOCKER_PASS')]) {
                         sh 'docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}'
                     }
