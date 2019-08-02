@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
-import { SocketService } from './services/socket.service';
 
 export interface AppRoute {
   path: string;
@@ -13,7 +12,7 @@ export interface AppRoute {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit{
+export class AppComponent {
   
   config: DsConfig = {
     routes: [
@@ -34,12 +33,6 @@ export class AppComponent implements OnInit{
     ]
   }
 
-  constructor(private socket: SocketService){}
-
-  ngOnInit(): void {
-    this.socket.getMessages().subscribe(msg => {
-      console.log('MESSAGE', msg);
-    });
-  }
+  constructor(){}
 
 }
