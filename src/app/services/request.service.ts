@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from './socket.service';
+import { SocketService, SocketStatus } from './socket.service';
 import { Observable, Subject } from 'rxjs';
 import { map, filter, tap } from 'rxjs/operators';
 import * as uuid from 'uuid';
@@ -49,7 +49,15 @@ export class RequestService {
     const subject = new Subject<T>();
     this.subjects.set(request.id, subject);
 
-    this.socketService.send(JSON.stringify(request));
+    let subscription;
+    subscription = this.socketService.getStatus().subscribe(status => {
+      if (status === SocketStatus.SESSION_STARTED) {
+        this.socketService.send(JSON.stringify(request));
+        if (subscription) {
+          subscription.unsubscribe();
+        }
+      }
+    });
 
     if (timeout) {
       // cancela el subject y lanza error
