@@ -12,7 +12,7 @@ export interface AppRoute {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit{
+export class AppComponent {
   
   config: DsConfig = {
     routes: [
@@ -34,9 +34,5 @@ export class AppComponent implements OnInit{
   }
 
   constructor(){}
-
-  ngOnInit(): void {
-    console.log('APP ngOnInit()');
-  }
 
 }

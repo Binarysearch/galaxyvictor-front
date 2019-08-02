@@ -44,14 +44,26 @@ export class RequestService {
     });
   }
 
-  public request<T>(request: WsRequest): Observable<T> {
+  public request<T>(request: WsRequest, timeout?: number): Observable<T> {
     request.id = uuid.v4();
     const subject = new Subject<T>();
     this.subjects.set(request.id, subject);
 
     this.socketService.send(JSON.stringify(request));
 
+    if (timeout) {
+      // cancela el subject y lanza error
+      setTimeout(() => {
+        const subject = this.subjects.get(request.id);
+        this.subjects.delete(request.id);
+        subject.error(new Error(`Timeout ${timeout}ms has passed with no response`));
+      }, timeout);
+    }
+
     return subject.asObservable();
   }
 
+  public getSubjects(): Map<string, Subject<any>> {
+    return this.subjects;
+  }
 }
