@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SocketService, SOCKET_ENPOINT_ID } from './socket.service';
+import { SocketService, SOCKET_ENPOINT_ID, SocketStatus } from './socket.service';
 import { AuthService } from '../modules/auth/services/auth.service';
 import { EndPointService } from './end-point.service';
 import { of, Subject } from 'rxjs';
@@ -124,6 +124,40 @@ describe('SocketService', () => {
     expect(webSocketSpy.send).toHaveBeenCalledWith('someMessage');
   });
 
+  it('should throw exception when send message and socket is closed', () => {
+
+    const subject: Subject<Session> = new Subject();
+
+    authServiceSpy.getSession.and.returnValue(subject.asObservable());
+    webSocketBuilderServiceSpy.getSocket.and.returnValue(webSocketSpy);
+
+    const service: SocketService = TestBed.get(SocketService);
+    
+    const session = {
+      token: 'someToken',
+      user: {
+        id: 'someId',
+        email: 'someEmail'
+      }
+    };
+
+    subject.next(session);
+
+    webSocketSpy.onopen.call(this);
+    expect(webSocketSpy.send).toHaveBeenCalledWith('someToken');
+
+    //Object.defineProperty(webSocketSpy, 'readyState', { value:  WebSocket.OPEN });
+    
+    try {
+      service.send('someMessage');
+      fail('Socket should throw an exception when send message on not OPEN state');
+    } catch (error) {
+      expect(error.message).toEqual('SOCKET NO CONECTADO');
+    }
+
+    expect(webSocketSpy.send).toHaveBeenCalledTimes(1);
+  });
+
   it('should receive messages through getMessages', (done) => {
 
     const subject: Subject<Session> = new Subject();
@@ -148,12 +182,77 @@ describe('SocketService', () => {
     expect(webSocketSpy.send).toHaveBeenCalledWith('someToken');
 
     service.getMessages().subscribe( msg => {
-      expect(msg).toEqual('someIncomingMsg');
+      expect(msg).toEqual('"someIncomingMsg"');
       done();
     });
 
-    webSocketSpy.onmessage.call(this, {data: 'someIncomingMsg'});
-    //.apply({data: 'someIncomingMsg'});
+    webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+    webSocketSpy.onmessage.call(this, {data: '"someIncomingMsg"'});
+    
+  });
+
+  it('should change status on socket connect, session starting and started', (done) => {
+
+    const subject: Subject<Session> = new Subject();
+
+    authServiceSpy.getSession.and.returnValue(subject.asObservable());
+    webSocketBuilderServiceSpy.getSocket.and.returnValue(webSocketSpy);
+
+    const service: SocketService = TestBed.get(SocketService);
+    
+    const session = {
+      token: 'someToken',
+      user: {
+        id: 'someId',
+        email: 'someEmail'
+      }
+    };
+
+    const statuses = [
+      SocketStatus.CONNECTING,
+      SocketStatus.SESSION_STARTING,
+      SocketStatus.SESSION_STARTED,
+      SocketStatus.CLOSED,
+      SocketStatus.CONNECTING,
+      SocketStatus.SESSION_STARTING,
+      SocketStatus.SESSION_STARTED,
+      SocketStatus.ERROR,
+      SocketStatus.CLOSED,
+      SocketStatus.CONNECTING,
+      SocketStatus.SESSION_STARTING,
+      SocketStatus.CLOSED
+    ];
+
+    let i = 0;
+    service.getStatus().subscribe(status => {
+      expect(status).toEqual(statuses[i++]);
+      if (i == statuses.length) {
+        done();
+      }
+    });
+
+    subject.next(session);
+
+    webSocketSpy.onopen.call(this);
+
+    webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+
+    webSocketSpy.onclose.call(this);
+
+    subject.next(session);
+
+    webSocketSpy.onopen.call(this);
+
+    webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+   
+    webSocketSpy.onerror.call(this);
+
+    subject.next(session);
+
+    webSocketSpy.onopen.call(this);
+
+    webSocketSpy.onmessage.call(this, {data: '{ "type": "WebsocketExceptionDto" }'});
+
   });
 
 });

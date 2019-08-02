@@ -10,7 +10,8 @@ export enum SocketStatus {
   SESSION_STARTED = 'SESSION_STARTED',
   CLOSED = 'CLOSED',
   SESSION_STARTING = 'SESSION_STARTING',
-  CONNECTING = 'CONNECTING'
+  CONNECTING = 'CONNECTING',
+  ERROR = "ERROR"
 }
 
 @Injectable({
@@ -66,6 +67,7 @@ export class SocketService {
     this.socket.onerror = null;
     this.socket.onopen = null;
     this.socket.close();
+    this.socket = undefined;
     this.statusChangesSubject.next(SocketStatus.CLOSED);
   }
 
@@ -82,6 +84,7 @@ export class SocketService {
   }
 
   private onClose(event: CloseEvent) {
+    this.socket = undefined;
     this.statusChangesSubject.next(SocketStatus.CLOSED);
   }
 
@@ -104,6 +107,8 @@ export class SocketService {
 
   private onError(error: Event) {
     console.error('WEBSOCKET ERROR', error);
+    this.statusChangesSubject.next(SocketStatus.ERROR);
+    this.closeSocket();
   }
 
   public getStatus(): Observable<SocketStatus> {

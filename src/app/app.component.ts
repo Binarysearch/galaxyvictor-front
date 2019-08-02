@@ -35,8 +35,8 @@ export class AppComponent {
     ]
   }
 
-  constructor(private s: SocketService){
-    this.s.getStatus().subscribe(status => console.log('STATUS', status));
+  constructor(){
+    
   } 
 
 }
