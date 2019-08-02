@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
-import { SocketService } from './services/socket.service';
 
 export interface AppRoute {
   path: string;
@@ -34,12 +33,10 @@ export class AppComponent implements OnInit{
     ]
   }
 
-  constructor(private socket: SocketService){}
+  constructor(){}
 
   ngOnInit(): void {
-    this.socket.getMessages().subscribe(msg => {
-      console.log('MESSAGE', msg);
-    });
+    console.log('APP ngOnInit()');
   }
 
 }

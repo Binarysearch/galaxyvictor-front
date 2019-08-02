@@ -54,7 +54,7 @@ export class SocketService {
     });
   }
 
-  public getMessages(): Observable<String> {
+  public getMessages(): Observable<string> {
     return this.subject.asObservable();
   }
 
