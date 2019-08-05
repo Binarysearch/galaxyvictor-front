@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { RequestService } from './services/request.service';
 import { SocketService } from './services/socket.service';
+import { ApiService } from './services/api.service';
 
 export interface AppRoute {
   path: string;
@@ -15,8 +16,8 @@ export interface AppRoute {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  
-  config: DsConfig = {
+
+  sessionStartedConfig: DsConfig = {
     routes: [
       { path: '/', title: 'Home', faIcon: 'fas fa-home' },
       { path: '/develop', title: 'Develop', faIcon: 'fas fa-file-code' },
@@ -35,8 +36,24 @@ export class AppComponent {
     ]
   }
 
-  constructor(){
-    
+  sessionNotStartedConfig: DsConfig = {
+    routes: [
+      { path: '/', title: 'Home', faIcon: 'fas fa-home' },
+      { path: '/login', title: 'Login', faIcon: 'fas fa-sign-in-alt', topbarPosition: TopbarPosition.RIGHT },
+      { path: '/register', title: 'Register', faIcon: 'fas fa-user-plus', topbarPosition: TopbarPosition.RIGHT },
+    ]
+  }
+
+  config: DsConfig = this.sessionNotStartedConfig;
+
+  constructor(private api: ApiService) {
+    api.getReady().subscribe(ready => {
+      if (ready) {
+        this.config = this.sessionStartedConfig;
+      } else {
+        this.config = this.sessionNotStartedConfig;
+      }
+    });
   } 
 
 }

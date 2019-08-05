@@ -3,14 +3,16 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import { DashboardModule } from '@piros/dashboard';
 import { SocketService } from './services/socket.service';
+import { ApiService } from './services/api.service';
+import { of } from 'rxjs';
 
 describe('AppComponent', () => {
 
-  let socketServiceSpy: jasmine.SpyObj<SocketService>;
+  let apiServiceSpy: jasmine.SpyObj<ApiService>;
 
   beforeEach(async(() => {
 
-    socketServiceSpy = jasmine.createSpyObj('SocketService', ['getMessages']);
+    apiServiceSpy = jasmine.createSpyObj('ApiService', ['getReady']);
 
     TestBed.configureTestingModule({
       imports: [
@@ -21,9 +23,11 @@ describe('AppComponent', () => {
         AppComponent
       ],
       providers: [
-        { provide: SocketService, useValue: socketServiceSpy }
+        { provide: ApiService, useValue: apiServiceSpy }
       ]
     }).compileComponents();
+
+    apiServiceSpy.getReady.and.returnValue(of(true));
   }));
 
   it('should create the app', () => {
