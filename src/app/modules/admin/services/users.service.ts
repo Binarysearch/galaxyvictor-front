@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { RequestService } from 'src/app/services/request.service';
 import { Observable } from 'rxjs';
 import { User } from '../../../model/user.interface';
+import { ApiService } from 'src/app/services/api.service';
 
 export interface UserListDto {
   total: number;
@@ -13,9 +13,9 @@ export interface UserListDto {
 })
 export class UsersService {
 
-  constructor(private requestService: RequestService) { }
+  constructor(private api: ApiService) { }
 
   public getUsers(): Observable<UserListDto> {
-    return this.requestService.request<UserListDto>({ type: 'get-users', payload: '' });
+    return this.api.request<UserListDto>({ type: 'get-users', payload: '' });
   }
 }

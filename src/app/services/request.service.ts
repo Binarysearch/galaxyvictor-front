@@ -44,20 +44,12 @@ export class RequestService {
     });
   }
 
-  public request<T>(request: WsRequest, timeout?: number): Observable<T> {
+  public request<T>(request: WsRequest, timeout: number = 2000): Observable<T> {
     request.id = uuid.v4();
     const subject = new Subject<T>();
     this.subjects.set(request.id, subject);
 
-    let subscription;
-    subscription = this.socketService.getStatus().subscribe(status => {
-      if (status === SocketStatus.SESSION_STARTED) {
-        this.socketService.send(JSON.stringify(request));
-        if (subscription) {
-          subscription.unsubscribe();
-        }
-      }
-    });
+    this.socketService.send(JSON.stringify(request));
 
     if (timeout) {
       // cancela el subject y lanza error
