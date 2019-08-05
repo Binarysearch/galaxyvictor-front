@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from './socket.service';
+import { SocketService, SocketStatus } from './socket.service';
 import { Observable, Subject } from 'rxjs';
 import { map, filter, tap } from 'rxjs/operators';
 import * as uuid from 'uuid';
@@ -44,7 +44,7 @@ export class RequestService {
     });
   }
 
-  public request<T>(request: WsRequest, timeout?: number): Observable<T> {
+  public request<T>(request: WsRequest, timeout: number = 2000): Observable<T> {
     request.id = uuid.v4();
     const subject = new Subject<T>();
     this.subjects.set(request.id, subject);
