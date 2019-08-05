@@ -54,9 +54,11 @@ export class RequestService {
     if (timeout) {
       // cancela el subject y lanza error
       setTimeout(() => {
-        const subject = this.subjects.get(request.id);
-        this.subjects.delete(request.id);
-        subject.error(new Error(`Timeout ${timeout}ms has passed with no response`));
+        if (this.subjects.has(request.id)) {
+          const subject = this.subjects.get(request.id);
+          this.subjects.delete(request.id);
+          subject.error(new Error(`Timeout ${timeout}ms has passed with no response`));
+        }
       }, timeout);
     }
 
