@@ -58,7 +58,7 @@ describe('RequestService', () => {
     service.request({
       type: 'some-type',
       payload: 'some-payload'
-    }, 1000).subscribe(null,
+    }).subscribe(null,
       (err) => {
         // error
         expect(service.getSubjects().size).toEqual(0);

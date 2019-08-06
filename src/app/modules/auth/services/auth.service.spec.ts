@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, tick } from '@angular/core/testing';
 
 import { AuthService } from './auth.service';
 
@@ -40,10 +40,9 @@ describe('AuthService', () => {
 
     const service: AuthService = TestBed.get(AuthService);
 
-    service.getSession().subscribe(session => {
-      expect(session).toEqual(sessionToSet);
-      done();
-    });
+    const storedSession = service.loadFromStorage();
+    expect(storedSession).toEqual(sessionToSet);
+
   });
 
   it('should return no session if nothing found in storage', (done) => {

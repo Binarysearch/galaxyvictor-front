@@ -48,9 +48,9 @@ describe('ApiService', () => {
 
     requestServiceSpy.request.and.returnValue(of('something'));
 
-    service.request({ type: '', payload: '' }, 1000).subscribe(result => {
+    service.request({ type: '', payload: '' }).subscribe(result => {
       expect(result).toEqual('something');
-      expect(requestServiceSpy.request).toHaveBeenCalledWith({ type: '', payload: '' }, 1000);
+      expect(requestServiceSpy.request).toHaveBeenCalledWith({ type: '', payload: '' });
       done();
     });
     
