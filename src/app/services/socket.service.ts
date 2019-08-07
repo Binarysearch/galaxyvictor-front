@@ -13,6 +13,8 @@ export enum SocketStatus {
   CLOSED = 'CLOSED'
 }
 
+export const ON_ERROR_RETRY_TIMEOUT = 1000;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -109,7 +111,9 @@ export class SocketService {
 
   private onError(error: Event) {
     this.closeSocket();
-    this.connect();
+    setTimeout(() => {
+      this.connect();
+    }, ON_ERROR_RETRY_TIMEOUT);
   }
 
   public getStatus(): Observable<SocketStatus> {
