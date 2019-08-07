@@ -11,7 +11,8 @@ export enum SocketStatus {
   CLOSED = 'CLOSED',
   SESSION_STARTING = 'SESSION_STARTING',
   CONNECTING = 'CONNECTING',
-  ERROR = "ERROR"
+  ERROR = "ERROR",
+  INVALID_SESSION = "INVALID_SESSION"
 }
 
 @Injectable({
@@ -32,9 +33,6 @@ export class SocketService {
   }
 
   private connect(): void {
-    const endpoint = this.endPoint.getEndPointPath(SOCKET_ENPOINT_ID)
-    .replace('http', 'ws')
-    .replace('https', 'wss');
 
     this.auth.getSession().subscribe(session => {
 
@@ -47,6 +45,9 @@ export class SocketService {
       // si hay sesion crear nuevo socket
       if (session) {
         console.log('NUEVO SOCKET...', session);
+        const endpoint = this.endPoint.getEndPointPath(SOCKET_ENPOINT_ID)
+          .replace('http', 'ws')
+          .replace('https', 'wss');
         this.socket = this.wsBuilder.getSocket(endpoint);
         this.statusChangesSubject.next(SocketStatus.CONNECTING);
         this.socket.onmessage = this.onFirstMessage.bind(this);
@@ -96,6 +97,8 @@ export class SocketService {
       this.socket.onmessage = this.onMessage.bind(this);
       this.statusChangesSubject.next(SocketStatus.SESSION_STARTED);
     } else {
+      this.statusChangesSubject.next(SocketStatus.INVALID_SESSION);
+      this.auth.removeSessionFromStorage();
       this.closeSocket();
       console.error('Closed socket due to invalid start session response.', data);
     }

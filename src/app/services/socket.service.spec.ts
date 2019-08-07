@@ -21,7 +21,7 @@ describe('SocketService', () => {
 
     webSocketSpy = jasmine.createSpyObj('WebSocket', ['send', 'close' ]);
     endPointSpy = jasmine.createSpyObj('EndPointService', ['getEndPointPath']);
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['getSession']);
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['getSession', 'removeSessionFromStorage']);
     webSocketBuilderServiceSpy = jasmine.createSpyObj('WebSocketBuilderService', ['getSocket']);
 
     endPointSpy.getEndPointPath.withArgs(SOCKET_ENPOINT_ID).and.returnValue(FAKE_SOCKET_PATH);
@@ -220,6 +220,7 @@ describe('SocketService', () => {
       SocketStatus.CLOSED,
       SocketStatus.CONNECTING,
       SocketStatus.SESSION_STARTING,
+      SocketStatus.INVALID_SESSION,
       SocketStatus.CLOSED
     ];
 

@@ -1,17 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Session } from '../../../model/session.interface';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private sessionSubject: BehaviorSubject<Session>;
+  private sessionSubject: ReplaySubject<Session> = new ReplaySubject(1);
 
-  constructor() {
-    this.sessionSubject = new BehaviorSubject(this.loadFromStorage());
-  }
+  constructor() { }
 
   public setSession(session: Session) {
     this.sessionSubject.next(session);
@@ -22,12 +20,16 @@ export class AuthService {
     return this.sessionSubject.asObservable();
   }
 
-  private loadFromStorage(): Session {
+  public loadFromStorage(): Session {
     const sessionString = localStorage.getItem('galaxyvictor-session');
     if (sessionString) {
       return JSON.parse(sessionString);
     } else {
       return null;
     }
+  }
+
+  public removeSessionFromStorage() {
+    localStorage.removeItem('galaxyvictor-session');
   }
 }

@@ -20,8 +20,8 @@ export class ApiService {
     );
   }
 
-  public request<T>(request: WsRequest, timeout?: number): Observable<T> {
-    return this.requestService.request<T>(request, timeout);
+  public request<T>(request: WsRequest): Observable<T> {
+    return this.requestService.request<T>(request);
   }
   
 }

@@ -16,6 +16,8 @@ export interface WsResponse<T> {
   payload: T;
 }
 
+export const REQUEST_TIMEOUT = 5000;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -44,23 +46,20 @@ export class RequestService {
     });
   }
 
-  public request<T>(request: WsRequest, timeout: number = 2000): Observable<T> {
+  public request<T>(request: WsRequest): Observable<T> {
     request.id = uuid.v4();
     const subject = new Subject<T>();
     this.subjects.set(request.id, subject);
 
     this.socketService.send(JSON.stringify(request));
 
-    if (timeout) {
-      // cancela el subject y lanza error
-      setTimeout(() => {
-        if (this.subjects.has(request.id)) {
-          const subject = this.subjects.get(request.id);
-          this.subjects.delete(request.id);
-          subject.error(new Error(`Timeout ${timeout}ms has passed with no response`));
-        }
-      }, timeout);
-    }
+    setTimeout(() => {
+      if (this.subjects.has(request.id)) {
+        const subject = this.subjects.get(request.id);
+        this.subjects.delete(request.id);
+        subject.error(new Error(`Timeout ${REQUEST_TIMEOUT}ms has passed with no response`));
+      }
+    }, REQUEST_TIMEOUT);
 
     return subject.asObservable();
   }

@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, tick } from '@angular/core/testing';
 
 import { AuthService } from './auth.service';
 
@@ -29,7 +29,7 @@ describe('AuthService', () => {
     });
   });
 
-  it('should get session from storage', (done) => {
+  it('should get session from storage', () => {
    
     const sessionToSet = {
       user: { id: '12', email: 'someEmail' },
@@ -40,23 +40,9 @@ describe('AuthService', () => {
 
     const service: AuthService = TestBed.get(AuthService);
 
-    service.getSession().subscribe(session => {
-      expect(session).toEqual(sessionToSet);
-      done();
-    });
-  });
+    const storedSession = service.loadFromStorage();
+    expect(storedSession).toEqual(sessionToSet);
 
-  it('should return no session if nothing found in storage', (done) => {
-
-    localStorage.removeItem('galaxyvictor-session');
-
-    const service: AuthService = TestBed.get(AuthService);
-
-    service.getSession().subscribe(session => {
-      expect(session).toEqual(null);
-      done();
-    });
-    
   });
 
 
