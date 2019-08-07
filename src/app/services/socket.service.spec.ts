@@ -210,18 +210,15 @@ describe('SocketService', () => {
 
     const statuses = [
       SocketStatus.CONNECTING,
-      SocketStatus.SESSION_STARTING,
+      SocketStatus.SESSION_STARTED,
+      SocketStatus.CONNECTING,
+      SocketStatus.SESSION_STARTED,
+      SocketStatus.CONNECTING,
+      SocketStatus.CLOSED,
+      SocketStatus.CONNECTING,
       SocketStatus.SESSION_STARTED,
       SocketStatus.CLOSED,
       SocketStatus.CONNECTING,
-      SocketStatus.SESSION_STARTING,
-      SocketStatus.SESSION_STARTED,
-      SocketStatus.ERROR,
-      SocketStatus.CLOSED,
-      SocketStatus.CONNECTING,
-      SocketStatus.SESSION_STARTING,
-      SocketStatus.CLOSED,
-      SocketStatus.INVALID_SESSION
     ];
 
     let i = 0;
@@ -233,24 +230,52 @@ describe('SocketService', () => {
     });
 
     subject.next(session);
+    //connecting
 
     webSocketSpy.onopen.call(this);
-
     webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+    //session started
+
+    webSocketSpy.onclose.call(this);
+    //no change
 
     subject.next(session);
+    //connecting
 
     webSocketSpy.onopen.call(this);
-
     webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+    //session started
    
     webSocketSpy.onerror.call(this);
+    //no change
 
     subject.next(session);
+    webSocketSpy.onopen.call(this);
+    webSocketSpy.onmessage.call(this, {data: '{ "type": "WebsocketExceptionDto" }'});
+    //closed
+
+    subject.next(session);
+    //connecting
 
     webSocketSpy.onopen.call(this);
+    webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+    //session started
 
-    webSocketSpy.onmessage.call(this, {data: '{ "type": "WebsocketExceptionDto" }'});
+    subject.next(null);
+    //closed
+
+    subject.next(session);
+    //connecting
+    
+    webSocketSpy.onopen.call(this);
+    //no changes
+
+    webSocketSpy.onerror.call(this);
+    //no changes
+
+    webSocketSpy.onclose.call(this);
+    //no changes
+
 
   });
 
