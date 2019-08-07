@@ -1,0 +1,331 @@
+
+@import "~@fortawesome/fontawesome-free/css/all.css";
+
+:root{
+  --header-height: 32px;
+  --footer-height: 22px;
+  --aside-menu-width: 280px;
+  --border-radius: 4px;
+  --box-shadow-color: rgba(1, 0, 75, 0.4);
+  --error-background: rgba(255, 0, 0, 0.5);
+
+  /** COLORS **/
+  --hue: 210; /* Blue */
+
+  --text-color-normal: hsla(var(--hue), 65%, 75%, 0.8);
+  --text-color-accent: hsla(var(--hue), 85%, 95%, 0.9);
+  --panel-background-color: hsla(var(--hue), 100%, 15%, 0.9);
+
+  --input-color-placeholder: hsla(var(--hue), 75%, 75%, 0.5);
+  --input-color-focus: hsla(var(--hue), 75%, 75%, 0.9);
+
+  --input-background-color: hsla(var(--hue), 75%, 75%, 0.1);
+  --input-background-color-focus: hsla(var(--hue), 75%, 75%, 0.2);
+
+  --disabled-input-background-color: hsla(var(--hue), 75%, 75%, 0.04);
+  --disabled-input-border-color: hsla(var(--hue), 75%, 75%, 0.06);
+
+  --border-color: hsla(var(--hue), 85%, 85%, 0.2);
+  --border-color-focus: hsla(var(--hue), 85%, 85%, 0.3);
+
+  --button-color: hsla(var(--hue), 15%, 100%, 1);
+  --button-color-hover: hsla(var(--hue), 15%, 100%, 0.6);
+  --button-background-color: hsla(var(--hue), 85%, 85%, 0.6);
+  --button-background-color-hover: hsla(var(--hue), 85%, 85%, 0.4);
+  --disabled-button-background-color: hsla(var(--hue), 85%, 85%, 0.2);
+  --disabled-button-border-color: hsla(var(--hue), 75%, 75%, 0.1);
+  --disabled-button-color: hsla(var(--hue), 25%, 100%, 0.4);
+
+}
+
+.ds-topbar.f{
+  height: var(--header-height);
+  background-color: var(--panel-background-color);
+  font-size: calc(var(--header-height) / 2);
+}
+
+.ds-topbar-link.f a span{
+  margin-right: 0.15em;
+}
+
+.ds-topbar-link.f:active a{
+  color: var(--text-color-accent);
+}
+
+.ds-topbar-link.f a{
+  color: var(--text-color-normal);
+  text-decoration: none;
+}
+
+.p-table-container {
+  background-color: white;
+}
+
+td, th{
+  padding: 0.5em;
+  color: rgba(120, 0, 0, 0.9)
+}
+
+body{
+  margin:0;
+  user-select: none;
+  font: normal 100 14px/1.2em "Exo 2", Arial, sans-serif;
+  color: var(--text-color-normal);
+  background-color: rgb(0, 0, 0);
+}
+
+/**********           PANEL            *******/
+.gv-panel {
+  box-sizing: border-box;
+  display: inline-block;
+  font: normal 100 14px/1.2em "Exo 2", Arial, sans-serif;
+  letter-spacing: .06em;
+  background-color: var(--panel-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color-normal);
+  padding: 0 1em 1em;
+  box-shadow: 0px 0px 5px var(--box-shadow-color);
+}
+.gv-panel .header {
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--border-color);
+}
+.gv-panel .title {
+  box-sizing: border-box;
+  font: normal 100 1.429em/1em "Exo 2", Arial, sans-serif;
+  text-transform: uppercase;
+  padding: .4em 0;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gv-panel .body {
+  box-sizing: border-box;
+  padding: 1em;
+}
+.gv-panel .divider {
+  box-sizing: border-box;
+  height: .6em;
+  margin-top: .6em;
+  border-top: 1px solid var(--border-color);
+}
+.gv-panel .footer {
+  box-sizing: border-box;
+  height: 2em;
+  font-size: .8em;
+  color: var(--border-color);
+}
+
+
+/***********     END PANEL           **********/
+
+/*********           INPUTS      **************/
+
+.gv-input {
+  font: normal 100 16px/1.2em "Exo 2", Arial, sans-serif;
+  letter-spacing: .06em;
+  color: var(--text-color-normal);
+  margin: 0;
+  padding: 0;
+}
+.gv-input label {
+  font: normal 100 1em/1.8em "Exo 2", Arial, sans-serif;
+  margin: 0 0 4em 0;
+}
+.gv-input label.required:after {
+  display: relative;
+  content: '*';
+  padding-left: .2em;
+  color: rgba(255, 120, 120, 0.8);
+  font: normal 100 1em/1.8em "Exo 2", Arial, sans-serif;
+}
+
+.gv-input input[type="text"] {
+  font: normal 100 1em/2.4em "Exo 2", Arial, sans-serif;
+  background-color: var(--input-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color-normal);
+  height: 2.4em;
+  box-sizing: border-box;
+  padding: 0 .8em;
+  letter-spacing: .06em;
+  width: 100%;
+}
+.gv-input input[type="text"]:focus {
+  background-color: var(--input-background-color-focus);
+  border: 1px solid var(--border-color-focus);
+  color: var(--input-color-focus);
+  outline: none;
+}
+.gv-input input[type="text"]::-webkit-input-placeholder {
+  color: var(--input-color-placeholder);
+  font: normal 100 1em/2.4em "Exo 2", Arial, sans-serif;
+}
+.gv-input input[type="text"]:-moz-placeholder {
+  color: var(--input-color-placeholder);
+  font: normal 100 1em/2.4em "Exo 2", Arial, sans-serif;
+}
+.gv-input input[type="text"][disabled] {
+  background-color: var(--disabled-input-background-color);
+  border: 1px solid var(--disabled-input-border-color);
+  color: var(--border-color);
+  cursor: not-allowed;
+}
+.gv-input input[type="text"][disabled]::-webkit-input-placeholder {
+  color: var(--border-color);
+}
+.gv-input input[type="text"][disabled]:-moz-placeholder {
+  color: var(--border-color);
+}
+
+.gv-input input[type="email"] {
+  font: normal 100 1em/2.4em "Exo 2", Arial, sans-serif;
+  background-color: var(--input-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color-normal);
+  height: 2.4em;
+  box-sizing: border-box;
+  padding: 0 .8em;
+  letter-spacing: .06em;
+  width: 100%;
+}
+.gv-input input[type="email"]:focus {
+  background-color: var(--input-background-color-focus);
+  border: 1px solid var(--border-color-focus);
+  color: rgba(120, 200, 255, 0.9);
+  outline: none;
+}
+.gv-input input[type="email"]::-webkit-input-placeholder {
+  color: var(--input-color-placeholder);
+  font: normal 100 1em/2.4em "Exo 2", Arial, sans-serif;
+}
+.gv-input input[type="email"]:-moz-placeholder {
+  color: var(--input-color-placeholder);
+  font: normal 100 1em/2.4em "Exo 2", Arial, sans-serif;
+}
+.gv-input input[type="email"][disabled] {
+  background-color: var(--disabled-input-background-color);
+  border: 1px solid var(--disabled-input-border-color);
+  color: var(--border-color);
+  cursor: not-allowed;
+}
+.gv-input input[type="email"][disabled]::-webkit-input-placeholder {
+  color: var(--border-color);
+}
+.gv-input input[type="email"][disabled]:-moz-placeholder {
+  color: var(--border-color);
+}
+
+.gv-input input[type="password"] {
+  font: normal 100 1em/2.4em "Exo 2", Arial, sans-serif;
+  background-color: var(--input-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color-normal);
+  height: 2.4em;
+  box-sizing: border-box;
+  padding: 0 .8em;
+  letter-spacing: .06em;
+  width: 100%;
+}
+.gv-input input[type="password"]:focus {
+  background-color: var(--input-background-color-focus);
+  border: 1px solid var(--border-color-focus);
+  color: rgba(120, 200, 255, 0.9);
+  outline: none;
+}
+.gv-input input[type="password"]::-webkit-input-placeholder {
+  color: var(--input-color-placeholder);
+  font: normal 100 1em/2.4em "Exo 2", Arial, sans-serif;
+}
+.gv-input input[type="password"]:-moz-placeholder {
+  color: var(--input-color-placeholder);
+  font: normal 100 1em/2.4em "Exo 2", Arial, sans-serif;
+}
+.gv-input input[type="password"][disabled] {
+  background-color: var(--disabled-input-background-color);
+  border: 1px solid var(--disabled-input-border-color);
+  color: var(--border-color);
+  cursor: not-allowed;
+}
+.gv-input input[type="password"][disabled]::-webkit-input-placeholder {
+  color: var(--border-color);
+}
+.gv-input input[type="password"][disabled]:-moz-placeholder {
+  color: var(--border-color);
+}
+
+.gv-input .help {
+  display: block;
+  font: normal 100 0.8em/1.2em "Exo 2", Arial, sans-serif;
+  padding: .6em 0;
+  color: var(--input-help-color);
+}
+.gv-input .error {
+  display: block;
+  font: normal 100 0.8em/1.2em "Exo 2", Arial, sans-serif;
+  text-transform: uppercase;
+  padding: .6em 0;
+  color: rgba(255, 120, 120, 0.8);
+}
+
+/*********       END INPUTS          *************/
+
+/*********         BUTTONS          *************/
+
+
+.btn {
+  font: normal 300 14px/1.2em "Exo 2", Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--button-color);
+  margin: 1px;
+  padding: .4em 1em;
+  border: 1px solid var(--border-color);
+  background-color: var(--button-background-color);
+  cursor: pointer;
+}
+.btn:hover {
+  background-color: var(--button-background-color-hover);
+  color: var(--button-color-hover);
+}
+.btn[disabled] {
+  background-color: var(--disabled-button-background-color);
+  border: 1px solid var(--disabled-button-border-color);
+  color: var(--disabled-button-color);
+  cursor: not-allowed;
+}
+
+.btn.red {
+  background-color: rgba(120, 0, 0, 0.9);
+  border: 1px solid rgba(255, 120, 120, 0.4);
+  color: rgba(255, 255, 255, 0.8);
+}
+.btn.red:hover {
+  background-color: rgba(120, 0, 0, 0.9);
+  color: rgba(255, 255, 255, 0.8);
+}
+.btn.red[disabled] {
+  background-color: rgba(120, 0, 0, 0.2);
+  border: 1px solid rgba(255, 120, 120, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/*********       END BUTTONS          *************/
+
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
