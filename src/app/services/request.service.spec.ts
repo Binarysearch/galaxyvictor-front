@@ -51,26 +51,4 @@ describe('RequestService', () => {
 
     expect(service.getSubjects().size).toEqual(0);
   });
-
-  it('should remove subject and throw error on timeout', (done: DoneFn) => {
-    const service: RequestService = TestBed.get(RequestService);
-    
-    service.request({
-      type: 'some-type',
-      payload: 'some-payload'
-    }).subscribe(null,
-      (err) => {
-        // error
-        expect(service.getSubjects().size).toEqual(0);
-        expect(err.message).toEqual(`Timeout 1000ms has passed with no response`);
-        done();
-    });
-    
-    const arg = socketServiceSpy.send.calls.argsFor(0)[0];
-    const id = JSON.parse(arg).id;
-
-    
-  });
-
-
 });

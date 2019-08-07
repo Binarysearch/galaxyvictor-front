@@ -29,7 +29,7 @@ describe('AuthService', () => {
     });
   });
 
-  it('should get session from storage', (done) => {
+  it('should get session from storage', () => {
    
     const sessionToSet = {
       user: { id: '12', email: 'someEmail' },
@@ -43,19 +43,6 @@ describe('AuthService', () => {
     const storedSession = service.loadFromStorage();
     expect(storedSession).toEqual(sessionToSet);
 
-  });
-
-  it('should return no session if nothing found in storage', (done) => {
-
-    localStorage.removeItem('galaxyvictor-session');
-
-    const service: AuthService = TestBed.get(AuthService);
-
-    service.getSession().subscribe(session => {
-      expect(session).toEqual(null);
-      done();
-    });
-    
   });
 
 
