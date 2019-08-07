@@ -16,7 +16,7 @@ export interface WsResponse<T> {
   payload: T;
 }
 
-export const REQUEST_TIMEOUT = 5000;
+export const REQUEST_TIMEOUT = 25000;
 
 @Injectable({
   providedIn: 'root'
