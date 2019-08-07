@@ -4,12 +4,12 @@ import { DevelopIndexComponent } from './components/develop-index/develop-index.
 import { EndpointListComponent } from './components/endpoint-list/endpoint-list.component';
 
 const routes: Routes = [
-  { path: '', component: DevelopIndexComponent },
-  { path: 'endpoints', component: EndpointListComponent }
+  { path: 'develop', component: DevelopIndexComponent },
+  { path: 'develop/endpoints', component: EndpointListComponent }
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
 export class DevelopRoutingModule { }
