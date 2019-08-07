@@ -24,6 +24,8 @@ export class SocketService {
   private subject: Subject<string> = new Subject();
   private statusChangesSubject: ReplaySubject<SocketStatus> = new ReplaySubject(1);
   private session: Session;
+  private status: SocketStatus;
+  private queuedMessages: string[] = [];
 
   constructor(
     private endPoint: EndPointService,
@@ -41,10 +43,11 @@ export class SocketService {
       this.closeSocket();
 
       if (session) {
-        this.statusChangesSubject.next(SocketStatus.CONNECTING);
+        this.setStatus(SocketStatus.CONNECTING);
         this.connect();
       } else {
-        this.statusChangesSubject.next(SocketStatus.CLOSED);
+        this.queuedMessages = [];
+        this.setStatus(SocketStatus.CLOSED);
       }
     });
   }
@@ -79,7 +82,9 @@ export class SocketService {
 
   public send(msg: string) {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        this.socket.send(msg);
+      this.socket.send(msg);
+    } else if(this.status === SocketStatus.SESSION_STARTED){
+      this.queuedMessages.push(msg);
     } else {
       throw new Error('SOCKET NO CONECTADO');
     }
@@ -96,13 +101,25 @@ export class SocketService {
     
     if (data.type && data.type === 'SessionStartedDto') {
       this.socket.onmessage = this.onMessage.bind(this);
-      this.statusChangesSubject.next(SocketStatus.SESSION_STARTED);
+      this.setStatus(SocketStatus.SESSION_STARTED);
+
+      this.queuedMessages.forEach(msg => {
+        this.socket.send(msg);
+      });
+      this.queuedMessages = [];
+
     } else {
       this.closeSocket();
-      this.statusChangesSubject.next(SocketStatus.CLOSED);
+      this.queuedMessages = [];
+      this.setStatus(SocketStatus.CLOSED);
       this.auth.removeSessionFromStorage();
       console.error('Closed socket due to invalid start session response.', data);
     }
+  }
+
+  private setStatus(status: SocketStatus) {
+    this.status = status;
+    this.statusChangesSubject.next(this.status);
   }
 
   private onMessage(msg: MessageEvent) {
