@@ -8,12 +8,9 @@ import { Session } from '../model/session.interface';
 export const SOCKET_ENPOINT_ID = 'socket';
 
 export enum SocketStatus {
-  SESSION_STARTED = 'SESSION_STARTED',
-  CLOSED = 'CLOSED',
-  SESSION_STARTING = 'SESSION_STARTING',
   CONNECTING = 'CONNECTING',
-  ERROR = "ERROR",
-  INVALID_SESSION = "INVALID_SESSION"
+  SESSION_STARTED = 'SESSION_STARTED',
+  CLOSED = 'CLOSED'
 }
 
 @Injectable({
@@ -24,62 +21,54 @@ export class SocketService {
   private socket: WebSocket;
   private subject: Subject<string> = new Subject();
   private statusChangesSubject: ReplaySubject<SocketStatus> = new ReplaySubject(1);
-  private lastSession: Session;
+  private session: Session;
 
   constructor(
     private endPoint: EndPointService,
     private wsBuilder: WebSocketBuilderService,
     private auth: AuthService
   ) {
-    this.init();
+    this.subscribeToSessionChanges();
   }
 
-  private init(): void {
-
+  private subscribeToSessionChanges(): void {
     this.auth.getSession().subscribe(session => {
 
-      this.lastSession = session;
-
-      //si hay socket desconectar
-      if(this.socket){
-        console.log('CERRANDO SOCKET...');
-        this.closeSocket();
-      }
-
-      // si hay sesion crear nuevo socket
-      if (session) {
-        this.connect(session);
-      } else {
-        this.statusChangesSubject.next(SocketStatus.INVALID_SESSION);
-      }
+      this.session = session;
       
+      this.closeSocket();
+
+      if (session) {
+        this.statusChangesSubject.next(SocketStatus.CONNECTING);
+        this.connect();
+      } else {
+        this.statusChangesSubject.next(SocketStatus.CLOSED);
+      }
     });
   }
 
-  private connect(session: Session) {
-    console.log('NUEVO SOCKET...', session);
+  private connect() {
     const endpoint = this.endPoint.getEndPointPath(SOCKET_ENPOINT_ID)
       .replace('http', 'ws')
       .replace('https', 'wss');
     this.socket = this.wsBuilder.getSocket(endpoint);
-    this.statusChangesSubject.next(SocketStatus.CONNECTING);
     this.socket.onmessage = this.onFirstMessage.bind(this);
     this.socket.onclose = this.onClose.bind(this);
     this.socket.onerror = this.onError.bind(this);
     this.socket.onopen = () => {
-      this.statusChangesSubject.next(SocketStatus.SESSION_STARTING);
-      this.socket.send(session.token);
+      this.socket.send(this.session.token);
     };
   }
 
   private closeSocket() {
-    this.socket.onmessage = null;
-    this.socket.onclose = null;
-    this.socket.onerror = null;
-    this.socket.onopen = null;
-    this.socket.close();
-    this.socket = undefined;
-    this.statusChangesSubject.next(SocketStatus.CLOSED);
+    if (this.socket) {
+      this.socket.onmessage = null;
+      this.socket.onclose = null;
+      this.socket.onerror = null;
+      this.socket.onopen = null;
+      this.socket.close();
+      this.socket = undefined;
+    }
   }
 
   public getMessages(): Observable<string> {
@@ -96,8 +85,7 @@ export class SocketService {
 
   private onClose(event: CloseEvent) {
     this.socket = undefined;
-    this.statusChangesSubject.next(SocketStatus.CLOSED);
-    this.reconnect();
+    this.connect();
   }
 
   private onFirstMessage(msg: MessageEvent) {
@@ -109,7 +97,7 @@ export class SocketService {
       this.statusChangesSubject.next(SocketStatus.SESSION_STARTED);
     } else {
       this.closeSocket();
-      this.statusChangesSubject.next(SocketStatus.INVALID_SESSION);
+      this.statusChangesSubject.next(SocketStatus.CLOSED);
       this.auth.removeSessionFromStorage();
       console.error('Closed socket due to invalid start session response.', data);
     }
@@ -120,14 +108,8 @@ export class SocketService {
   }
 
   private onError(error: Event) {
-    console.error('WEBSOCKET ERROR', error);
-    this.statusChangesSubject.next(SocketStatus.ERROR);
     this.closeSocket();
-    this.reconnect();
-  }
-
-  private reconnect(): void {
-    this.connect(this.lastSession);
+    this.connect();
   }
 
   public getStatus(): Observable<SocketStatus> {
