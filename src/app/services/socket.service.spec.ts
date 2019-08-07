@@ -220,8 +220,8 @@ describe('SocketService', () => {
       SocketStatus.CLOSED,
       SocketStatus.CONNECTING,
       SocketStatus.SESSION_STARTING,
-      SocketStatus.INVALID_SESSION,
-      SocketStatus.CLOSED
+      SocketStatus.CLOSED,
+      SocketStatus.INVALID_SESSION
     ];
 
     let i = 0;
@@ -237,8 +237,6 @@ describe('SocketService', () => {
     webSocketSpy.onopen.call(this);
 
     webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
-
-    webSocketSpy.onclose.call(this);
 
     subject.next(session);
 
