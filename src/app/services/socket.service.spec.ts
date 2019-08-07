@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, tick, fakeAsync } from '@angular/core/testing';
 
-import { SocketService, SOCKET_ENPOINT_ID, SocketStatus } from './socket.service';
+import { SocketService, SOCKET_ENPOINT_ID, SocketStatus, ON_ERROR_RETRY_TIMEOUT } from './socket.service';
 import { AuthService } from '../modules/auth/services/auth.service';
 import { EndPointService } from './end-point.service';
 import { of, Subject } from 'rxjs';
@@ -191,69 +191,93 @@ describe('SocketService', () => {
     
   });
 
-  it('should change status on socket connect, session starting and started', (done) => {
+  it('should change status on socket connect, session starting and started', fakeAsync(
+    () => {
 
-    const subject: Subject<Session> = new Subject();
-
-    authServiceSpy.getSession.and.returnValue(subject.asObservable());
-    webSocketBuilderServiceSpy.getSocket.and.returnValue(webSocketSpy);
-
-    const service: SocketService = TestBed.get(SocketService);
-    
-    const session = {
-      token: 'someToken',
-      user: {
-        id: 'someId',
-        email: 'someEmail'
-      }
-    };
-
-    const statuses = [
-      SocketStatus.CONNECTING,
-      SocketStatus.SESSION_STARTING,
-      SocketStatus.SESSION_STARTED,
-      SocketStatus.CLOSED,
-      SocketStatus.CONNECTING,
-      SocketStatus.SESSION_STARTING,
-      SocketStatus.SESSION_STARTED,
-      SocketStatus.ERROR,
-      SocketStatus.CLOSED,
-      SocketStatus.CONNECTING,
-      SocketStatus.SESSION_STARTING,
-      SocketStatus.INVALID_SESSION,
-      SocketStatus.CLOSED
-    ];
-
-    let i = 0;
-    service.getStatus().subscribe(status => {
-      expect(status).toEqual(statuses[i++]);
-      if (i == statuses.length) {
-        done();
-      }
-    });
-
-    subject.next(session);
-
-    webSocketSpy.onopen.call(this);
-
-    webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
-
-    webSocketSpy.onclose.call(this);
-
-    subject.next(session);
-
-    webSocketSpy.onopen.call(this);
-
-    webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
-   
-    webSocketSpy.onerror.call(this);
-
-    subject.next(session);
-
-    webSocketSpy.onopen.call(this);
-
-    webSocketSpy.onmessage.call(this, {data: '{ "type": "WebsocketExceptionDto" }'});
-
-  });
+      const subject: Subject<Session> = new Subject();
+  
+      authServiceSpy.getSession.and.returnValue(subject.asObservable());
+      webSocketBuilderServiceSpy.getSocket.and.returnValue(webSocketSpy);
+  
+      const service: SocketService = TestBed.get(SocketService);
+      
+      const session = {
+        token: 'someToken',
+        user: {
+          id: 'someId',
+          email: 'someEmail'
+        }
+      };
+  
+      const statuses = [
+        SocketStatus.CONNECTING,
+        SocketStatus.SESSION_STARTED,
+        SocketStatus.CONNECTING,
+        SocketStatus.SESSION_STARTED,
+        SocketStatus.CONNECTING,
+        SocketStatus.CLOSED,
+        SocketStatus.CONNECTING,
+        SocketStatus.SESSION_STARTED,
+        SocketStatus.CLOSED,
+        SocketStatus.CONNECTING,
+      ];
+  
+      let i = 0;
+      service.getStatus().subscribe(status => {
+        expect(status).toEqual(statuses[i++]);
+      });
+  
+      subject.next(session);
+      //connecting
+  
+      webSocketSpy.onopen.call(this);
+      webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+      //session started
+  
+      webSocketSpy.onclose.call(this);
+      //no change
+  
+      subject.next(session);
+      //connecting
+  
+      webSocketSpy.onopen.call(this);
+      webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+      //session started
+     
+      webSocketSpy.onerror.call(this);
+      tick(ON_ERROR_RETRY_TIMEOUT);
+      //no change
+  
+      subject.next(session);
+      webSocketSpy.onopen.call(this);
+      webSocketSpy.onmessage.call(this, {data: '{ "type": "WebsocketExceptionDto" }'});
+      //closed
+  
+      subject.next(session);
+      //connecting
+  
+      webSocketSpy.onopen.call(this);
+      webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+      //session started
+  
+      subject.next(null);
+      //closed
+  
+      subject.next(session);
+      //connecting
+      
+      webSocketSpy.onopen.call(this);
+      //no changes
+  
+      webSocketSpy.onerror.call(this);
+      tick(ON_ERROR_RETRY_TIMEOUT);
+      //no changes
+  
+      webSocketSpy.onclose.call(this);
+      //no changes
+  
+      expect(i).toEqual(statuses.length);
+    }
+  ));
 
 });

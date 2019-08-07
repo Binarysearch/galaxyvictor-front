@@ -26,7 +26,7 @@ export function initializer(
         socket.getStatus().pipe(
           first(status => {
             return status === SocketStatus.SESSION_STARTED || 
-            status === SocketStatus.INVALID_SESSION;
+            status === SocketStatus.CLOSED;
           })
         ).subscribe((status) => {
           console.log('RESOLVED');
