@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
-import { RequestService } from './services/request.service';
-import { SocketService } from './services/socket.service';
 import { ApiService } from './services/api.service';
+import { AuthService } from './modules/auth/services/auth.service';
 
 export interface AppRoute {
   path: string;
@@ -17,43 +16,43 @@ export interface AppRoute {
 })
 export class AppComponent {
 
-  sessionStartedConfig: DsConfig = {
+  private sessionStarted: boolean = false;
+
+  config: DsConfig = {
     routes: [
       { path: '/', title: 'Home', faIcon: 'fas fa-home' },
-      { path: '/develop', title: 'Develop', faIcon: 'fas fa-file-code' },
-      { path: '/admin', title: 'Admin', faIcon: 'fas fa-tools' },
-      { path: '/universe', title: 'Universe', faIcon: 'fab fa-galactic-republic' },
-      { path: '/galaxy', title: 'Galaxy', faIcon: 'fa fa-atom' },
-      { path: '/civilizations', title: 'Civilizations', faIcon: 'fab fa-galactic-senate' },
-      { path: '/colonies', title: 'Colonies', faIcon: 'fas fa-globe' },
-      { path: '/fleets', title: 'Fleets', faIcon: 'fas fa-rocket' },
-      { path: '/planets', title: 'Planets', faIcon: 'fas fa-globe-europe' },
-      { path: '/trade', title: 'Trade', faIcon: 'fas fa-handshake' },
-      { path: '/research', title: 'Research', faIcon: 'fas fa-flask' },
-      { path: '/battles', title: 'Battles', faIcon: 'fas fa-fighter-jet'  },
-      { path: '/login', title: 'Login', faIcon: 'fas fa-sign-in-alt', topbarPosition: TopbarPosition.RIGHT },
-      { path: '/register', title: 'Register', faIcon: 'fas fa-user-plus', topbarPosition: TopbarPosition.RIGHT },
+      { path: '/develop', title: 'Develop', faIcon: 'fas fa-file-code', show: this.isSessionStarted.bind(this) },
+      { path: '/admin', title: 'Admin', faIcon: 'fas fa-tools', show: this.isSessionStarted.bind(this) },
+      { path: '/universe', title: 'Universe', faIcon: 'fab fa-galactic-republic', show: this.isSessionStarted.bind(this) },
+      { path: '/galaxy', title: 'Galaxy', faIcon: 'fa fa-atom', show: this.isSessionStarted.bind(this) },
+      { path: '/civilizations', title: 'Civilizations', faIcon: 'fab fa-galactic-senate', show: this.isSessionStarted.bind(this) },
+      { path: '/colonies', title: 'Colonies', faIcon: 'fas fa-globe', show: this.isSessionStarted.bind(this) },
+      { path: '/fleets', title: 'Fleets', faIcon: 'fas fa-rocket', show: this.isSessionStarted.bind(this) },
+      { path: '/planets', title: 'Planets', faIcon: 'fas fa-globe-europe', show: this.isSessionStarted.bind(this) },
+      { path: '/trade', title: 'Trade', faIcon: 'fas fa-handshake', show: this.isSessionStarted.bind(this) },
+      { path: '/research', title: 'Research', faIcon: 'fas fa-flask', show: this.isSessionStarted.bind(this) },
+      { path: '/battles', title: 'Battles', faIcon: 'fas fa-fighter-jet', show: this.isSessionStarted.bind(this)  },
+      { onClick: this.logout.bind(this), title: 'Logout', faIcon: 'fas fa-sign-out-alt', topbarPosition: TopbarPosition.RIGHT, show: this.isSessionStarted.bind(this) },
+      { path: '/login', title: 'Login', faIcon: 'fas fa-sign-in-alt', topbarPosition: TopbarPosition.RIGHT, show: this.isNotSessionStarted.bind(this) },
+      { path: '/register', title: 'Register', faIcon: 'fas fa-user-plus', topbarPosition: TopbarPosition.RIGHT, show: this.isNotSessionStarted.bind(this) },
     ]
   }
 
-  sessionNotStartedConfig: DsConfig = {
-    routes: [
-      { path: '/', title: 'Home', faIcon: 'fas fa-home' },
-      { path: '/login', title: 'Login', faIcon: 'fas fa-sign-in-alt', topbarPosition: TopbarPosition.RIGHT },
-      { path: '/register', title: 'Register', faIcon: 'fas fa-user-plus', topbarPosition: TopbarPosition.RIGHT },
-    ]
-  }
-
-  config: DsConfig = this.sessionNotStartedConfig;
-
-  constructor(private api: ApiService) {
+  constructor(private api: ApiService, private auth: AuthService) {
     api.getReady().subscribe(ready => {
-      if (ready) {
-        this.config = this.sessionStartedConfig;
-      } else {
-        this.config = this.sessionNotStartedConfig;
-      }
+      this.sessionStarted = ready;
     });
   } 
 
+  private isSessionStarted(): boolean {
+    return this.sessionStarted;
+  }
+
+  private isNotSessionStarted(): boolean {
+    return !this.sessionStarted;
+  }
+
+  private logout(): void {
+    this.auth.closeSession();
+  }
 }

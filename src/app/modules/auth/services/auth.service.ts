@@ -32,4 +32,9 @@ export class AuthService {
   public removeSessionFromStorage() {
     localStorage.removeItem('galaxyvictor-session');
   }
+  
+  public closeSession(): void {
+    this.sessionSubject.next(null);
+    this.removeSessionFromStorage();
+  }
 }
