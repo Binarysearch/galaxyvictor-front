@@ -83,7 +83,7 @@ pipeline {
         stage('Coverage') {
             when {
                 expression {
-                    return true || env.BRANCH_NAME == env.TAG_NAME
+                    return env.BRANCH_NAME == env.TAG_NAME
                 } 
             }
             steps {
