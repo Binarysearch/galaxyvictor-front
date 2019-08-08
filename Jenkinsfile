@@ -91,10 +91,10 @@ pipeline {
                     withCredentials([string(credentialsId: 'docker-password', variable: 'DOCKER_PASS')]) {
                         sh 'docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}'
                     }
-                    sh 'docker build --rm -f Dockerfile.coverage -t binarysearch/galaxyvictor-coverage:dev .'
-                    sh 'docker push binarysearch/galaxyvictor-coverage:dev'
-                    sh 'docker container rm galaxyvictor-coverage-dev -f || true'
-                    sh 'docker run -d --network=dev_enviroment_default --network-alias=galaxyvictor-coverage-dev --name=galaxyvictor-coverage-dev binarysearch/galaxyvictor-coverage:dev'
+                    sh 'docker build --rm -f Dockerfile.coverage -t binarysearch/galaxyvictor-coverage-front:dev .'
+                    sh 'docker push binarysearch/galaxyvictor-coverage-front:dev'
+                    sh 'docker container rm galaxyvictor-coverage-front-dev -f || true'
+                    sh 'docker run -d --network=dev_enviroment_default --network-alias=galaxyvictor-coverage-front-dev --name=galaxyvictor-coverage-front-dev binarysearch/galaxyvictor-coverage-front:dev'
                 }
             }
         }
