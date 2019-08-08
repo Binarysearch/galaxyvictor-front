@@ -80,5 +80,24 @@ pipeline {
                 }
             }
         }
+        stage('Coverage') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == env.TAG_NAME
+                } 
+            }
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'docker-password', variable: 'DOCKER_PASS')]) {
+                        sh 'docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}'
+                    }
+                    sh 'docker build --rm -f Dockerfile.coverage -t binarysearch/galaxyvictor-coverage-front:dev .'
+                    sh 'docker push binarysearch/galaxyvictor-coverage-front:dev'
+                    sh 'docker container rm galaxyvictor-coverage-front-dev -f || true'
+                    sh 'docker run -d --network=dev_enviroment_default --network-alias=galaxyvictor-coverage-front-dev --name=galaxyvictor-coverage-front-dev binarysearch/galaxyvictor-coverage-front:dev'
+                }
+            }
+        }
+
     }
 }

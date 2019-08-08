@@ -4,4 +4,5 @@
 # Allow files and directories
 !/dist/galaxyvictor/**
 !/docs/**
+!/coverage/galaxyvictor/**
 !/nginx.conf
