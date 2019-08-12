@@ -33,10 +33,7 @@ describe('RequestService', () => {
   it('should receive msg and close subject', (done: DoneFn) => {
     const service: RequestService = TestBed.get(RequestService);
     
-    service.request({
-      type: 'some-type',
-      payload: 'some-payload'
-    }).subscribe(msg => {
+    service.request('some-type', 'some-payload').subscribe(msg => {
       expect(msg).toEqual('something');
       
     }, null, ()=>{

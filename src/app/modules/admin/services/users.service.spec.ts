@@ -23,7 +23,7 @@ describe('UsersService', () => {
       ]
     });
 
-    apiServiceSpy.request.withArgs({ type: 'get-users', payload: '' }).and.returnValue(of(FAKE_RESULT));
+    apiServiceSpy.request.withArgs('get-users', '').and.returnValue(of(FAKE_RESULT));
 
   });
 
@@ -37,7 +37,7 @@ describe('UsersService', () => {
     
     service.getUsers().subscribe(result => {
       expect(result).toEqual(FAKE_RESULT);
-      expect(apiServiceSpy.request).toHaveBeenCalledWith({ type: 'get-users', payload: '' });
+      expect(apiServiceSpy.request).toHaveBeenCalledWith('get-users', '');
       done();
     });
     

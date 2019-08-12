@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { SocketService, SocketStatus } from './socket.service';
+import { SocketService } from './socket.service';
 import { Observable, Subject } from 'rxjs';
 import { map, filter, tap } from 'rxjs/operators';
 import * as uuid from 'uuid';
 
-export interface WsRequest {
+interface WsRequest {
   id?: string;
   type: string;
   payload: any;
@@ -26,6 +26,7 @@ export class RequestService {
   private subjects: Map<string, Subject<any>> = new Map<string, Subject<any>>();
 
   constructor(private socketService: SocketService) {
+    console.log(this);
     this.socketService.getMessages()
     .pipe(
       map(msg => <WsResponse<any>>JSON.parse(msg)),
@@ -46,17 +47,23 @@ export class RequestService {
     });
   }
 
-  public request<T>(request: WsRequest): Observable<T> {
-    request.id = uuid.v4();
+  public request<T>(type: string, payload: any): Observable<T> {
+    const id = uuid.v4();
     const subject = new Subject<T>();
-    this.subjects.set(request.id, subject);
+    this.subjects.set(id, subject);
 
+    const request: WsRequest = {
+      id: id,
+      type: type,
+      payload: payload
+    };
+     
     this.socketService.send(JSON.stringify(request));
 
     setTimeout(() => {
-      if (this.subjects.has(request.id)) {
-        const subject = this.subjects.get(request.id);
-        this.subjects.delete(request.id);
+      if (this.subjects.has(id)) {
+        const subject = this.subjects.get(id);
+        this.subjects.delete(id);
         subject.error(new Error(`Timeout ${REQUEST_TIMEOUT}ms has passed with no response`));
       }
     }, REQUEST_TIMEOUT);

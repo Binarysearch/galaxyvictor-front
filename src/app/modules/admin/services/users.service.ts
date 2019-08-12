@@ -16,6 +16,6 @@ export class UsersService {
   constructor(private api: ApiService) { }
 
   public getUsers(): Observable<UserListDto> {
-    return this.api.request<UserListDto>({ type: 'get-users', payload: '' });
+    return this.api.request<UserListDto>('get-users', '');
   }
 }
