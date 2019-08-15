@@ -1,4 +1,4 @@
-import { TestBed, async } from '@angular/core/testing';
+import { TestBed, async, fakeAsync, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import { DashboardModule } from '@piros/dashboard';
@@ -17,6 +17,7 @@ describe('AppComponent', () => {
   beforeEach(async(() => {
 
     apiServiceSpy = jasmine.createSpyObj('ApiService', ['getReady']);
+    rendererServiceSpy = jasmine.createSpyObj('MainRendererService', ['init', 'setViewport']);
 
     TestBed.configureTestingModule({
       imports: [
@@ -34,6 +35,8 @@ describe('AppComponent', () => {
     }).compileComponents();
 
     apiServiceSpy.getReady.and.returnValue(of(true));
+
+    
   }));
 
   it('should create the app', () => {
@@ -41,4 +44,18 @@ describe('AppComponent', () => {
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   });
+
+  
+  it('should prepare renderer on ngAfterViewInit', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = <AppComponent>fixture.debugElement.componentInstance;
+    fixture.detectChanges();
+    fixture.whenStable().then(() => {
+      
+      expect(rendererServiceSpy.init).toHaveBeenCalled();
+      expect(rendererServiceSpy.setViewport).toHaveBeenCalled();
+
+    });
+  }));
+
 });
