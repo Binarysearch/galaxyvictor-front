@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, ViewChildren, QueryList, HostListener } from '@angular/core';
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { ApiService } from './services/api.service';
 import { AuthService } from './modules/auth/services/auth.service';
+import { MainRendererService } from './services/render/main-renderer.service';
+import { RenderContext } from './services/render/renderer.interface';
 
 export interface AppRoute {
   path: string;
@@ -14,8 +16,12 @@ export interface AppRoute {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit{
 
+  @ViewChildren('canvasRef') 
+  private canvasRef: QueryList<ElementRef>;
+  private canvas: HTMLCanvasElement;
+  
   private sessionStarted: boolean = false;
 
   config: DsConfig = {
@@ -38,11 +44,31 @@ export class AppComponent {
     ]
   }
 
-  constructor(private api: ApiService, private auth: AuthService) {
+  constructor(
+    private api: ApiService,
+    private auth: AuthService,
+    private renderer: MainRendererService
+  ) {
     api.getReady().subscribe(ready => {
       this.sessionStarted = ready;
     });
   } 
+
+  ngAfterViewInit(): void {
+    this.canvas = <HTMLCanvasElement>this.canvasRef.first.nativeElement;
+    const gl = this.canvas.getContext('webgl2');
+    const context: RenderContext = {
+      gl: <WebGLRenderingContext>gl,
+      aspectRatio: 1.333,
+      camera: {
+        zoom: 1,
+        x: 0,
+        y: 0
+      }
+    };
+    this.renderer.init(context);
+    this.setupCanvasSize();
+  }
 
   private isSessionStarted(): boolean {
     return this.sessionStarted;
@@ -54,5 +80,22 @@ export class AppComponent {
 
   private logout(): void {
     this.auth.closeSession();
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.setupCanvasSize();
+  }
+
+  private setupCanvasSize() {
+    const displayWidth  = this.canvas.clientWidth;
+    const displayHeight = this.canvas.clientHeight;
+
+    if (this.canvas.width  !== displayWidth || this.canvas.height !== displayHeight) {
+        this.canvas.width  = displayWidth;
+        this.canvas.height = displayHeight;
+    }
+
+    this.renderer.setViewport(this.canvas.width, this.canvas.height);
   }
 }
