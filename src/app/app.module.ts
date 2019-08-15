@@ -82,7 +82,8 @@ export function initializer(
       useFactory: initializer,
       multi: true,
       deps: [ EndPointService, AuthService, SocketService ]
-    }
+    },
+    { provide: 'Window', useValue: window }
   ],
   bootstrap: [AppComponent]
 })

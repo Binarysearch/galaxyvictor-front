@@ -3,6 +3,7 @@ import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { ApiService } from './services/api.service';
 import { AuthService } from './modules/auth/services/auth.service';
 import { MainRendererService } from './services/render/main-renderer.service';
+import { RenderContext } from './services/render/renderer.interface';
 
 export interface AppRoute {
   path: string;
@@ -55,8 +56,17 @@ export class AppComponent implements AfterViewInit{
 
   ngAfterViewInit(): void {
     this.canvas = <HTMLCanvasElement>this.canvasRef.first.nativeElement;
-    const context = this.canvas.getContext('webgl2');
-    this.renderer.init(<WebGLRenderingContext>context);
+    const gl = this.canvas.getContext('webgl2');
+    const context: RenderContext = {
+      gl: <WebGLRenderingContext>gl,
+      aspectRatio: 1.333,
+      camera: {
+        zoom: 1,
+        x: 0,
+        y: 0
+      }
+    };
+    this.renderer.init(context);
     this.setupCanvasSize();
   }
 

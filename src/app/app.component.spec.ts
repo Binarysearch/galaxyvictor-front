@@ -5,10 +5,14 @@ import { DashboardModule } from '@piros/dashboard';
 import { SocketService } from './services/socket.service';
 import { ApiService } from './services/api.service';
 import { of } from 'rxjs';
+import { AuthService } from './modules/auth/services/auth.service';
+import { MainRendererService } from './services/render/main-renderer.service';
 
 describe('AppComponent', () => {
 
   let apiServiceSpy: jasmine.SpyObj<ApiService>;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
+  let rendererServiceSpy: jasmine.SpyObj<MainRendererService>;
 
   beforeEach(async(() => {
 
@@ -23,7 +27,9 @@ describe('AppComponent', () => {
         AppComponent
       ],
       providers: [
-        { provide: ApiService, useValue: apiServiceSpy }
+        { provide: ApiService, useValue: apiServiceSpy },
+        { provide: AuthService, useValue: authServiceSpy },
+        { provide: MainRendererService, useValue: rendererServiceSpy }
       ]
     }).compileComponents();
 
