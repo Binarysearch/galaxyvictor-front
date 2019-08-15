@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, ViewChildren, QueryList, HostListener } from '@angular/core';
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { ApiService } from './services/api.service';
 import { AuthService } from './modules/auth/services/auth.service';
@@ -56,7 +56,8 @@ export class AppComponent implements AfterViewInit{
   ngAfterViewInit(): void {
     this.canvas = <HTMLCanvasElement>this.canvasRef.first.nativeElement;
     const context = this.canvas.getContext('webgl2');
-    this.renderer.setupContext(<WebGLRenderingContext>context);
+    this.renderer.init(<WebGLRenderingContext>context);
+    this.setupCanvasSize();
   }
 
   private isSessionStarted(): boolean {
@@ -69,5 +70,22 @@ export class AppComponent implements AfterViewInit{
 
   private logout(): void {
     this.auth.closeSession();
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.setupCanvasSize();
+  }
+
+  private setupCanvasSize() {
+    const displayWidth  = this.canvas.clientWidth;
+    const displayHeight = this.canvas.clientHeight;
+
+    if (this.canvas.width  !== displayWidth || this.canvas.height !== displayHeight) {
+        this.canvas.width  = displayWidth;
+        this.canvas.height = displayHeight;
+    }
+
+    this.renderer.setViewport(this.canvas.width, this.canvas.height);
   }
 }
