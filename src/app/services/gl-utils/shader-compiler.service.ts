@@ -1,27 +1,28 @@
 import { Injectable } from '@angular/core';
+import { LogService } from '../log.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShaderCompilerService {
 
-  constructor() { }
+  constructor(private log: LogService) { }
 
   createShaderProgram(gl: WebGLRenderingContext, vsSource: string, fsSource: string): WebGLShader{
-    const vertShader = gl.createShader(gl.VERTEX_SHADER);
+    const vertShader = gl.createShader(WebGLRenderingContext.VERTEX_SHADER);
     gl.shaderSource(vertShader, vsSource);
     gl.compileShader(vertShader);
     var compilationLog = gl.getShaderInfoLog(vertShader);
     if(compilationLog.trim() != ''){
-        console.log('Shader compiler log: ' + compilationLog);
+        this.log.i('Vertex Shader compiler log: ' + compilationLog);
     }
 
-    const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+    const fragShader = gl.createShader(WebGLRenderingContext.FRAGMENT_SHADER);
     gl.shaderSource(fragShader, fsSource);
     gl.compileShader(fragShader);
     var compilationLog2 = gl.getShaderInfoLog(fragShader);
     if(compilationLog2.trim() != ''){
-        console.log('Shader compiler log: ' + compilationLog2);
+      this.log.i('Fragment Shader compiler log: ' + compilationLog2);
     }
     const prog = gl.createProgram();
     gl.attachShader(prog, vertShader);
