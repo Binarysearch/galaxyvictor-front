@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, ViewChildren, 
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { ApiService } from './services/api.service';
 import { AuthService } from './modules/auth/services/auth.service';
+import { MainRendererService } from './services/render/main-renderer.service';
 
 export interface AppRoute {
   path: string;
@@ -42,7 +43,11 @@ export class AppComponent implements AfterViewInit{
     ]
   }
 
-  constructor(private api: ApiService, private auth: AuthService) {
+  constructor(
+    private api: ApiService,
+    private auth: AuthService,
+    private renderer: MainRendererService
+  ) {
     api.getReady().subscribe(ready => {
       this.sessionStarted = ready;
     });
@@ -50,8 +55,8 @@ export class AppComponent implements AfterViewInit{
 
   ngAfterViewInit(): void {
     this.canvas = <HTMLCanvasElement>this.canvasRef.first.nativeElement;
-    
-    console.log(this.canvas);
+    const context = this.canvas.getContext('webgl2');
+    this.renderer.setupContext(<WebGLRenderingContext>context);
   }
 
   private isSessionStarted(): boolean {
