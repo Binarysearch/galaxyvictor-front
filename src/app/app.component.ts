@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { ApiService } from './services/api.service';
 import { AuthService } from './modules/auth/services/auth.service';
@@ -14,8 +14,12 @@ export interface AppRoute {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit{
 
+  @ViewChildren('canvasRef') 
+  private canvasRef: QueryList<ElementRef>;
+  private canvas: HTMLCanvasElement;
+  
   private sessionStarted: boolean = false;
 
   config: DsConfig = {
@@ -43,6 +47,12 @@ export class AppComponent {
       this.sessionStarted = ready;
     });
   } 
+
+  ngAfterViewInit(): void {
+    this.canvas = <HTMLCanvasElement>this.canvasRef.first.nativeElement;
+    
+    console.log(this.canvas);
+  }
 
   private isSessionStarted(): boolean {
     return this.sessionStarted;

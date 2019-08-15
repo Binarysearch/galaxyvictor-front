@@ -1,4 +1,7 @@
-<dashboard [content]="router" [config]="config"></dashboard>
-<ng-template #router>
-  <router-outlet></router-outlet>
+<dashboard [content]="main" [config]="config"></dashboard>
+<ng-template #main>
+  <div id='main-container'>
+    <canvas id='main-canvas' #canvasRef></canvas>
+    <router-outlet></router-outlet>
+  </div>
 </ng-template>
