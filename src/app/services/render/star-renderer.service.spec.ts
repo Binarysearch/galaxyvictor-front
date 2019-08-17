@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { StarRendererService } from './star-renderer.service';
 import { ShaderCompilerService } from '../gl-utils/shader-compiler.service';
 import { RenderContext } from './renderer.interface';
+import { Camera } from './camera.class';
 
 describe('StarRendererService', () => {
 
@@ -43,11 +44,7 @@ describe('StarRendererService', () => {
     const context: RenderContext = {
       gl: glSpy,
       aspectRatio: 1.333,
-      camera: {
-        zoom: 1,
-        x: 0,
-        y: 0
-      }
+      camera: new Camera()
     };
 
     service.setup(context);

@@ -25,6 +25,7 @@ export class MainRendererService {
     this.setup(context);
     const animate = () => {
       this.window.requestAnimationFrame(animate);
+      context.camera.update();
       this.render(context);
     };
     animate();

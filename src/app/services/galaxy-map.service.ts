@@ -26,11 +26,7 @@ export class GalaxyMapService {
   constructor(
     private renderer: MainRendererService
   ){
-    setInterval(()=>{
-      if(this.context){
-        this.context.camera.update();
-      }
-    }, 30);
+    
   }
 
   setCanvas(canvas: HTMLCanvasElement) {
