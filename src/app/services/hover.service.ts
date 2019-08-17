@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { StarRendererService } from './render/star-renderer.service';
 import { Entity, RenderContext, Renderer } from './render/renderer.interface';
+import { StarSystem } from '../model/star-system.interface';
+import { StarSystemsService } from './star-systems.service';
 
 interface IntersectingElement {
   x: number;
@@ -14,9 +16,10 @@ interface IntersectingElement {
 export class HoverService {
 
   private _hovered: Entity;
+  private starSystems: StarSystem[] = [];
 
-  constructor(private starRenderer: StarRendererService) {
-
+  constructor(private starRenderer: StarRendererService, private starSystemsService: StarSystemsService) {
+    this.starSystemsService.getStarSystems().subscribe(ss => this.starSystems = ss);
   }
 
   public get hovered(): Entity {

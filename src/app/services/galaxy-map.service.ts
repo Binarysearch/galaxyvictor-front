@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { MainRendererService } from './render/main-renderer.service';
 import { RenderContext } from './render/renderer.interface';
 import { Camera } from './render/camera';
+import { HoverService } from './hover.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,8 @@ export class GalaxyMapService {
 
 
   constructor(
-    private renderer: MainRendererService
+    private renderer: MainRendererService,
+    private hoverService: HoverService
   ){
     
   }
@@ -97,7 +99,7 @@ export class GalaxyMapService {
   onMouseMove(event: MouseEvent) {
     const x = ((event.clientX - this.canvas.getBoundingClientRect().left) / this.canvas.width) * 2 - 1;
     const y = -(((event.clientY - this.canvas.getBoundingClientRect().top) / this.canvas.height) * 2 - 1);
-    
+    this.hoverService.mouseMoved(x, y, this.context);
     this._mouseX = x;
     this._mouseY = y;
     if (this.mouseDown) {

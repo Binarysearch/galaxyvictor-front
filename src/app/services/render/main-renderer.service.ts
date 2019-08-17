@@ -2,6 +2,10 @@ import { Injectable, Inject } from '@angular/core';
 import { StarRendererService } from './star-renderer.service';
 import { RenderContext } from './renderer.interface';
 import { ReplaySubject } from 'rxjs';
+import { HoverService } from '../hover.service';
+import { StarSystemsService } from '../star-systems.service';
+import { StarSystem } from 'src/app/model/star-system.interface';
+import { HoverRendererService } from './hover-renderer.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,10 +14,17 @@ export class MainRendererService {
 
   private viewportSubject: ReplaySubject<{w: number, h: number}> = new ReplaySubject(1);
 
+  private starSystems: StarSystem[] = [];
+
   constructor(
     @Inject('Window') private window: Window,
-    private starRenderer: StarRendererService
-  ) { }
+    private starRenderer: StarRendererService,
+    private hoverRenderer: HoverRendererService,
+    private starSystemsService: StarSystemsService,
+    private hoverService: HoverService
+  ) {
+    this.starSystemsService.getStarSystems().subscribe(ss => this.starSystems = ss);
+  }
 
   public init(context: RenderContext): void {
     
@@ -34,6 +45,7 @@ export class MainRendererService {
   private setup(context: RenderContext): void {
     context.gl.clearColor(0, 0, 0, 1);
     this.starRenderer.setup(context);
+    this.hoverRenderer.setup(context);
     
   }
 
@@ -42,14 +54,12 @@ export class MainRendererService {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.starRenderer.prepare(context);
-    this.starRenderer.render([
-      { 
-        x: 0,
-        y: 0,
-        type: 1,
-        size: 5
-      }
-    ], context);
+    this.starRenderer.render(this.starSystems, context);
+
+    if (this.hoverService.hovered) {
+      this.hoverRenderer.prepare(context);
+      this.hoverRenderer.render([this.hoverService.hovered], context);
+    }
 
   }
 
