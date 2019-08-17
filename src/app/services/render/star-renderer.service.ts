@@ -69,26 +69,22 @@ export class StarRendererService implements Renderer{
   }
 
   render(entities: Star[], context: RenderContext): void {
+    const gl = context.gl;
+    const camera = context.camera;
+    const zoom = context.camera.zoom;
+
     entities.forEach(
-      star => this.renderStar(star, context)
+      star => {
+        const scale = (STAR_RENDER_SCALE_ZI * star.size * star.size + STAR_RENDER_SCALE_ZI_SI) / zoom + STAR_RENDER_SCALE_ZD;
+        const color = STAR_COLORS[star.type - 1];
+
+        gl.uniform1f(this.scaleUniformLocation, scale);
+        gl.uniform2f(this.positionUniformLocation, star.x - camera.x, star.y - camera.y);
+        gl.uniform3f(this.colorUniformLocation, color.r, color.g, color.b);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+      }
     );
   }
 
-  private renderStar(star: Star, context: RenderContext) {
-    const gl = context.gl;
-    const camera = context.camera;
-    const color = STAR_COLORS[star.type - 1];
-
-    gl.uniform1f(this.scaleUniformLocation, this.getElementRenderScale(star, context));
-    gl.uniform2f(this.positionUniformLocation, star.x - camera.x, star.y - camera.y);
-    gl.uniform3f(this.colorUniformLocation, color.r, color.g, color.b);
-
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-  }
-
-  getElementRenderScale(star: Star, context: RenderContext): number {
-    const zoom = context.camera.zoom;
-    const scale = (STAR_RENDER_SCALE_ZI * star.size * star.size + STAR_RENDER_SCALE_ZI_SI) / zoom + STAR_RENDER_SCALE_ZD;
-    return scale;
-  }
 }
