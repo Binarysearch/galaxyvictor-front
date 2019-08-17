@@ -18,9 +18,8 @@ export class StarSystemsService {
   constructor(private api: ApiService) {
     this.api.getReady().subscribe(ready => {
       if (ready) {
-        //this.api.request<StarSystemListDto>('get-star-systems', '')
-          //.subscribe(ss => this.starSystemsSubject.next(ss.starSystems));
-          this.starSystemsSubject.next([{x:0,y:0,type:2,size:5}]);
+        this.api.request<StarSystemListDto>('get-star-systems', '')
+          .subscribe(ss => this.starSystemsSubject.next(ss.starSystems));
       } else {
         this.starSystemsSubject.next([]);
       }

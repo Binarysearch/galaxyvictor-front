@@ -2,20 +2,24 @@ import { TestBed } from '@angular/core/testing';
 
 import { GalaxyMapService } from './galaxy-map.service';
 import { MainRendererService } from './render/main-renderer.service';
+import { HoverService } from './hover.service';
 
 describe('GalaxyMapService', () => {
 
   let rendererSpy: jasmine.SpyObj<MainRendererService>;
+  let hoverSpy: jasmine.SpyObj<HoverService>;
   let canvasSpy: jasmine.SpyObj<HTMLCanvasElement>;
 
   beforeEach(() => {
 
-    rendererSpy = jasmine.createSpyObj('MainRendererService', ['init', 'setViewport']);
+    hoverSpy = jasmine.createSpyObj('HoverService', ['mouseMoved', 'hovered']);
+    rendererSpy = jasmine.createSpyObj('MainRendererService', ['init', 'setViewport', 'setSelected']);
     canvasSpy = jasmine.createSpyObj('HTMLCanvasElement', ['height', 'width', 'getContext', 'clientHeight', 'clientWidth']);
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: MainRendererService, useValue: rendererSpy }
+        { provide: MainRendererService, useValue: rendererSpy },
+        { provide: HoverService, useValue: hoverSpy }
       ]
     });
 
@@ -79,10 +83,12 @@ describe('GalaxyMapService', () => {
 
   });
 
-  it('should click', () => {
+  it('should select on click', () => {
     const service: GalaxyMapService = TestBed.get(GalaxyMapService);
         
     service.onMouseClick(undefined);
+
+    expect(rendererSpy.setSelected).toHaveBeenCalled();
 
   });
 

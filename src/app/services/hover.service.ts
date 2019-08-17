@@ -18,7 +18,10 @@ export class HoverService {
   private _hovered: Entity;
   private starSystems: StarSystem[] = [];
 
-  constructor(private starRenderer: StarRendererService, private starSystemsService: StarSystemsService) {
+  constructor(
+    private starRenderer: StarRendererService,
+    private starSystemsService: StarSystemsService
+  ) {
     this.starSystemsService.getStarSystems().subscribe(ss => this.starSystems = ss);
   }
 
