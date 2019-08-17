@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MainRendererService } from './render/main-renderer.service';
-import { RenderContext } from './render/renderer.interface';
+import { RenderContext, Entity } from './render/renderer.interface';
 import { Camera } from './render/camera';
 import { HoverService } from './hover.service';
 
@@ -22,6 +22,7 @@ export class GalaxyMapService {
 
   private mouseDownCameraX: number;
   private mouseDownCameraY: number;
+  private _selected: Entity;
 
 
   constructor(
@@ -62,6 +63,13 @@ export class GalaxyMapService {
     let x = this._mouseX / this.context.camera.zoom * this.context.aspectRatio + this.context.camera.x;
     let y = this._mouseY / this.context.camera.zoom + this.context.camera.y;
 
+    if (this._selected) {
+      x = this._selected.x;
+      y = this._selected.y;
+    } else if (this.hovered) {
+      x = this.hovered.x;
+      y = this.hovered.y;
+    }
 
     if (event.deltaY < 0) {
       this.context.camera.zoomIn(x, y);
@@ -78,7 +86,8 @@ export class GalaxyMapService {
     if (delta > epsilon) {
       return;
     }
-    console.log('MOUSE CLICK', this._mouseX, this._mouseY);
+    this._selected = this.hovered;
+    this.renderer.setSelected(this._selected);
   }
 
   onMouseDown(event: MouseEvent) {
@@ -124,4 +133,13 @@ export class GalaxyMapService {
   getContext(): RenderContext {
     return this.context;
   }
+
+  get hovered(): Entity {
+    return this.hoverService.hovered;
+  }
+
+  get selected(): Entity {
+    return this._selected;
+  }
+
 }

@@ -1,16 +1,18 @@
 import { Injectable, Inject } from '@angular/core';
 import { StarRendererService } from './star-renderer.service';
-import { RenderContext } from './renderer.interface';
+import { RenderContext, Entity } from './renderer.interface';
 import { ReplaySubject } from 'rxjs';
 import { HoverService } from '../hover.service';
 import { StarSystemsService } from '../star-systems.service';
 import { StarSystem } from 'src/app/model/star-system.interface';
 import { HoverRendererService } from './hover-renderer.service';
+import { GalaxyMapService } from '../galaxy-map.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MainRendererService {
+  selected: Entity;
 
   private viewportSubject: ReplaySubject<{w: number, h: number}> = new ReplaySubject(1);
 
@@ -56,15 +58,22 @@ export class MainRendererService {
     this.starRenderer.prepare(context);
     this.starRenderer.render(this.starSystems, context);
 
+    const hovers = [];
     if (this.hoverService.hovered) {
-      this.hoverRenderer.prepare(context);
-      this.hoverRenderer.render([this.hoverService.hovered], context);
+      hovers.push(this.hoverService.hovered);
     }
-
+    if (this.selected) {
+      hovers.push(this.selected);
+    }
+    this.hoverRenderer.prepare(context);
+    this.hoverRenderer.render(hovers, context);
   }
 
   setViewport(w: number, h: number) {
     this.viewportSubject.next({w: w, h: h});
   }
 
+  setSelected(selected: Entity) {
+    this.selected = selected;
+  }
 }

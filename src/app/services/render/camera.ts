@@ -77,7 +77,7 @@ export class Camera {
         let offsetY = 0;
         const newZoom = Math.min(Math.max(this._zoom + this._vZoom, MIN_ZOOM), MAX_ZOOM);
 
-        if (this.cX !== 0) {
+        if (this.cX !== undefined) {
             const oldZoom = this._zoom;
             const zoomChange = oldZoom / newZoom;
             offsetX = -(zoomChange * (this.cX - this.x) - this.cX + this.x);
