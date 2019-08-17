@@ -1,14 +1,9 @@
+import { Camera } from './camera.class';
 
 export interface RenderContext {
     gl: WebGLRenderingContext;
     camera: Camera;
     aspectRatio: number;
-}
-
-export interface Camera{
-    zoom: number;
-    x: number;
-    y: number;
 }
 
 export interface Entity {
