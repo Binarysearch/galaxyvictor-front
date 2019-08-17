@@ -8,7 +8,6 @@ const MIN_Y = -60000;
 const MAX_Y = 60000;
 
 export class Camera {
-    private _aspectRatio: number;
     private _zoom: number;
     private _vZoom: number;
 
@@ -55,14 +54,6 @@ export class Camera {
 
     get zoom() {
         return this._zoom;
-    }
-
-    set aspectRatio(aspectRatio: number) {
-        this._aspectRatio = aspectRatio;
-    }
-
-    get aspectRatio() {
-        return this._aspectRatio;
     }
 
     public zoomIn(x: number, y: number) {

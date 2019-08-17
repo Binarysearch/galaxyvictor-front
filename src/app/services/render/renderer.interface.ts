@@ -1,4 +1,4 @@
-import { Camera } from './camera.class';
+import { Camera } from './camera';
 
 export interface RenderContext {
     gl: WebGLRenderingContext;

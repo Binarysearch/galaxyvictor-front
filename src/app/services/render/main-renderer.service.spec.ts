@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { MainRendererService } from './main-renderer.service';
 import { StarRendererService } from './star-renderer.service';
 import { RenderContext } from './renderer.interface';
-import { Camera } from './camera.class';
+import { Camera } from './camera';
 
 describe('MainRendererService', () => {
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MainRendererService } from './render/main-renderer.service';
 import { RenderContext } from './render/renderer.interface';
-import { Camera } from './render/camera.class';
+import { Camera } from './render/camera';
 
 @Injectable({
   providedIn: 'root'
@@ -117,5 +117,9 @@ export class GalaxyMapService {
 
   onResize() {
     this.setupCanvasSize();
+  }
+
+  getContext(): RenderContext {
+    return this.context;
   }
 }
