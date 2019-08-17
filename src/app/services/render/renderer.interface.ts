@@ -7,11 +7,13 @@ export interface RenderContext {
 }
 
 export interface Entity {
-
+    x: number;
+    y: number;
 }
 
 export interface Renderer {
     setup(context: RenderContext): void;
     prepare(context: RenderContext): void;
     render(entities: Entity[], context: RenderContext): void;
+    getRenderScale(entity: Entity, zoom: number): number;
 }
