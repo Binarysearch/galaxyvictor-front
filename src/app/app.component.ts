@@ -3,6 +3,7 @@ import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { ApiService } from './services/api.service';
 import { AuthService } from './modules/auth/services/auth.service';
 import { MainRendererService } from './services/render/main-renderer.service';
+import { GalaxyMapService } from './services/galaxy-map.service';
 import { RenderContext } from './services/render/renderer.interface';
 
 export interface AppRoute {
@@ -20,7 +21,6 @@ export class AppComponent implements AfterViewInit{
 
   @ViewChildren('canvasRef') 
   private canvasRef: QueryList<ElementRef>;
-  private canvas: HTMLCanvasElement;
   
   private sessionStarted: boolean = false;
 
@@ -47,7 +47,7 @@ export class AppComponent implements AfterViewInit{
   constructor(
     private api: ApiService,
     private auth: AuthService,
-    private renderer: MainRendererService
+    private galaxyMap: GalaxyMapService
   ) {
     api.getReady().subscribe(ready => {
       this.sessionStarted = ready;
@@ -55,19 +55,7 @@ export class AppComponent implements AfterViewInit{
   } 
 
   ngAfterViewInit(): void {
-    this.canvas = <HTMLCanvasElement>this.canvasRef.first.nativeElement;
-    const gl = this.canvas.getContext('webgl2');
-    const context: RenderContext = {
-      gl: <WebGLRenderingContext>gl,
-      aspectRatio: 1.333,
-      camera: {
-        zoom: 1,
-        x: 0,
-        y: 0
-      }
-    };
-    this.renderer.init(context);
-    this.setupCanvasSize();
+    this.galaxyMap.setCanvas(<HTMLCanvasElement>this.canvasRef.first.nativeElement);
   }
 
   private isSessionStarted(): boolean {
@@ -84,18 +72,34 @@ export class AppComponent implements AfterViewInit{
 
   @HostListener('window:resize')
   onResize() {
-    this.setupCanvasSize();
+    this.galaxyMap.onResize();
   }
 
-  private setupCanvasSize() {
-    const displayWidth  = this.canvas.clientWidth;
-    const displayHeight = this.canvas.clientHeight;
-
-    if (this.canvas.width  !== displayWidth || this.canvas.height !== displayHeight) {
-        this.canvas.width  = displayWidth;
-        this.canvas.height = displayHeight;
-    }
-
-    this.renderer.setViewport(this.canvas.width, this.canvas.height);
+  @HostListener('window:mousemove', ['$event'])
+  windowMouseMove(event: MouseEvent) {
+    this.galaxyMap.onMouseMove(event);;
   }
+
+  onMouseWheel(event: MouseWheelEvent){
+    this.galaxyMap.onMouseWheel(event);
+    event.preventDefault();
+  }
+
+  onMouseClick(event){
+    this.galaxyMap.onMouseClick(event);
+  }
+
+  onMouseDown(event){
+    this.galaxyMap.onMouseDown(event);
+  }
+
+  @HostListener('window:mouseup', ['$event'])
+  windowMouseUp(event: MouseEvent) {
+    this.galaxyMap.onMouseUp(event);
+  }
+
+  onContextMenu(event){
+    event.preventDefault();
+  }
+
 }

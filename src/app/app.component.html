@@ -1,7 +1,7 @@
 <dashboard [content]="main" [config]="config"></dashboard>
 <ng-template #main>
   <div id='main-container'>
-    <canvas id='main-canvas' #canvasRef></canvas>
+    <canvas id='main-canvas' #canvasRef (mousewheel)="onMouseWheel($event)" (click)="onMouseClick($event);" (mousedown)="onMouseDown($event);" (contextmenu)="onContextMenu($event);"></canvas>
     <router-outlet></router-outlet>
   </div>
 </ng-template>

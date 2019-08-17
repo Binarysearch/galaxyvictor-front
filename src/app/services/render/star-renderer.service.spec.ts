@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { StarRendererService } from './star-renderer.service';
 import { ShaderCompilerService } from '../gl-utils/shader-compiler.service';
 import { RenderContext } from './renderer.interface';
+import { Camera } from './camera';
 
 describe('StarRendererService', () => {
 
@@ -15,6 +16,13 @@ describe('StarRendererService', () => {
       'createVertexArray',
       'bindVertexArray',
       'bindBuffer',
+      'enable',
+      'drawArrays',
+      'blendFunc',
+      'uniform1f',
+      'uniform2f',
+      'uniform3f',
+      'useProgram',
       'bufferData',
       'createBuffer',
       'getAttribLocation',
@@ -43,14 +51,36 @@ describe('StarRendererService', () => {
     const context: RenderContext = {
       gl: glSpy,
       aspectRatio: 1.333,
-      camera: {
-        zoom: 1,
-        x: 0,
-        y: 0
-      }
+      camera: new Camera()
+    };
+
+    service.prepare(context);
+
+  });
+
+  it('should prepare', () => {
+    const service: StarRendererService = TestBed.get(StarRendererService);
+    
+    const context: RenderContext = {
+      gl: glSpy,
+      aspectRatio: 1.333,
+      camera: new Camera()
     };
 
     service.setup(context);
+
+  });
+
+  it('should render', () => {
+    const service: StarRendererService = TestBed.get(StarRendererService);
+    
+    const context: RenderContext = {
+      gl: glSpy,
+      aspectRatio: 1.333,
+      camera: new Camera()
+    };
+
+    service.render([{ x: 0, y: 0, size: 1, type: 1 }], context);
 
   });
 
