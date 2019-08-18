@@ -21,7 +21,7 @@ describe('SocketService', () => {
 
     webSocketSpy = jasmine.createSpyObj('WebSocket', ['send', 'close' ]);
     endPointSpy = jasmine.createSpyObj('EndPointService', ['getEndPointPath']);
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['getSession', 'removeSessionFromStorage']);
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['getSession', 'removeSessionFromStorage', 'setSessionState']);
     webSocketBuilderServiceSpy = jasmine.createSpyObj('WebSocketBuilderService', ['getSocket']);
 
     endPointSpy.getEndPointPath.withArgs(SOCKET_ENPOINT_ID).and.returnValue(FAKE_SOCKET_PATH);
@@ -186,7 +186,7 @@ describe('SocketService', () => {
       done();
     });
 
-    webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+    webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" , "payload": { "session": { "state": "some" } } }'});
     webSocketSpy.onmessage.call(this, {data: '"someIncomingMsg"'});
     
   });
@@ -231,7 +231,7 @@ describe('SocketService', () => {
       //connecting
   
       webSocketSpy.onopen.call(this);
-      webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+      webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" , "payload": { "session": { "state": "some" } } }'});
       //session started
   
       webSocketSpy.onclose.call(this);
@@ -241,7 +241,7 @@ describe('SocketService', () => {
       //connecting
   
       webSocketSpy.onopen.call(this);
-      webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+      webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" , "payload": { "session": { "state": "some" } } }'});
       //session started
      
       webSocketSpy.onerror.call(this);
@@ -257,7 +257,7 @@ describe('SocketService', () => {
       //connecting
   
       webSocketSpy.onopen.call(this);
-      webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" }'});
+      webSocketSpy.onmessage.call(this, {data: '{ "type": "SessionStartedDto" , "payload": { "session": { "state": "some" } } }'});
       //session started
   
       subject.next(null);
