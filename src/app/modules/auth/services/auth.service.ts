@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Session } from '../../../model/session.interface';
+import { Session, SessionState } from '../../../model/session.interface';
 import { Observable, ReplaySubject } from 'rxjs';
 
 @Injectable({
@@ -7,6 +7,7 @@ import { Observable, ReplaySubject } from 'rxjs';
 })
 export class AuthService {
 
+  private sessionStateSubject: ReplaySubject<SessionState> = new ReplaySubject(1);
   private sessionSubject: ReplaySubject<Session> = new ReplaySubject(1);
 
   constructor() { }
@@ -18,6 +19,14 @@ export class AuthService {
 
   public getSession(): Observable<Session> {
     return this.sessionSubject.asObservable();
+  }
+
+  public setSessionState(sessionState: SessionState) {
+    this.sessionStateSubject.next(sessionState);
+  }
+
+  public getSessionState(): Observable<SessionState> {
+    return this.sessionStateSubject.asObservable();
   }
 
   public loadFromStorage(): Session {

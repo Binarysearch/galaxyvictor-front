@@ -101,6 +101,8 @@ export class SocketService {
     
     if (data.type && data.type === 'SessionStartedDto') {
       this.socket.onmessage = this.onMessage.bind(this);
+      const sessionState = data.payload.session.state;
+      this.auth.setSessionState(sessionState);
       this.setStatus(SocketStatus.SESSION_STARTED);
 
       this.queuedMessages.forEach(msg => {

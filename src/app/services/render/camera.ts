@@ -71,6 +71,12 @@ export class Camera {
         this._vZoom -= 0.02 * this._zoom;
     }
 
+    public setPosition(x: number, y: number, zoom: number) {
+        this._x = x;
+        this._y = y;
+        this._zoom = zoom;
+    }
+
     public update() {
 
         let offsetX = 0;

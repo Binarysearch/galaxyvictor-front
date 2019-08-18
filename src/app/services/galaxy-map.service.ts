@@ -3,6 +3,7 @@ import { MainRendererService } from './render/main-renderer.service';
 import { RenderContext, Entity } from './render/renderer.interface';
 import { Camera } from './render/camera';
 import { HoverService } from './hover.service';
+import { AuthService } from '../modules/auth/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,11 @@ import { HoverService } from './hover.service';
 export class GalaxyMapService {
 
   private canvas: HTMLCanvasElement;
-  private context: RenderContext
+  private context: RenderContext = {
+    gl: null,
+    aspectRatio: 1.333,
+    camera: new Camera()
+  }
 
   private mouseDownX: number;
   private mouseDownY: number;
@@ -27,9 +32,12 @@ export class GalaxyMapService {
 
   constructor(
     private renderer: MainRendererService,
-    private hoverService: HoverService
+    private hoverService: HoverService,
+    private auth: AuthService
   ){
-    
+    this.auth.getSessionState().subscribe(state => {
+      this.context.camera.setPosition(state.cameraX, state.cameraY, state.cameraZ);
+    });
   }
 
   setCanvas(canvas: HTMLCanvasElement) {
@@ -37,11 +45,7 @@ export class GalaxyMapService {
 
     const gl = this.canvas.getContext('webgl2');
 
-    this.context = {
-      gl: <WebGLRenderingContext>gl,
-      aspectRatio: 1.333,
-      camera: new Camera()
-    };
+    this.context.gl = <WebGLRenderingContext>gl;
 
     this.renderer.init(this.context);
     this.setupCanvasSize();
