@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { StarRendererService } from './render/star-renderer.service';
 import { Entity, RenderContext, Renderer } from './render/renderer.interface';
 import { StarSystem } from '../model/star-system.interface';
-import { StarSystemsService } from './star-systems.service';
+import { StarSystemsService } from './data/star-systems.service';
 
 interface IntersectingElement {
   x: number;

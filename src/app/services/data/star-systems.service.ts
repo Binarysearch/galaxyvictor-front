@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from './api.service';
+import { ApiService } from '../api.service';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { StarSystem } from '../model/star-system.interface';
+import { StarSystem } from '../../model/star-system.interface';
 
 export interface StarSystemListDto {
   total: number;

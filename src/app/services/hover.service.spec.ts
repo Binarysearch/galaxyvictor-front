@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { HoverService } from './hover.service';
 import { StarRendererService } from './render/star-renderer.service';
-import { StarSystemsService } from './star-systems.service';
+import { StarSystemsService } from './data/star-systems.service';
 import { of } from 'rxjs';
 
 describe('HoverService', () => {

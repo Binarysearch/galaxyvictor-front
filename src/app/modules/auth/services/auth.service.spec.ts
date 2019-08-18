@@ -45,5 +45,25 @@ describe('AuthService', () => {
 
   });
 
+  it('should remove session from storage on close', () => {
+   
+    const sessionToSet = {
+      user: { id: '12', email: 'someEmail' },
+      token: 'someToken'
+    };
+
+    localStorage.setItem('galaxyvictor-session', JSON.stringify(sessionToSet));
+
+    const service: AuthService = TestBed.get(AuthService);
+
+    const storedSession = service.loadFromStorage();
+    expect(storedSession).toEqual(sessionToSet);
+
+
+    service.closeSession();
+
+    expect(service.loadFromStorage()).toEqual(null);
+  });
+
 
 });

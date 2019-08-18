@@ -3,7 +3,7 @@ import { StarRendererService } from './star-renderer.service';
 import { RenderContext, Entity } from './renderer.interface';
 import { ReplaySubject } from 'rxjs';
 import { HoverService } from '../hover.service';
-import { StarSystemsService } from '../star-systems.service';
+import { StarSystemsService } from '../data/star-systems.service';
 import { StarSystem } from 'src/app/model/star-system.interface';
 import { HoverRendererService } from './hover-renderer.service';
 import { GalaxyMapService } from '../galaxy-map.service';
