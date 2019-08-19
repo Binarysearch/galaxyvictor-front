@@ -3,26 +3,36 @@ import { TestBed } from '@angular/core/testing';
 import { GalaxyMapService } from './galaxy-map.service';
 import { MainRendererService } from './render/main-renderer.service';
 import { HoverService } from './hover.service';
+import { Store } from './data/store';
+import { ApiService } from './api.service';
+import { of } from 'rxjs';
 
 describe('GalaxyMapService', () => {
 
   let rendererSpy: jasmine.SpyObj<MainRendererService>;
   let hoverSpy: jasmine.SpyObj<HoverService>;
   let canvasSpy: jasmine.SpyObj<HTMLCanvasElement>;
+  let storeSpy: jasmine.SpyObj<Store>;
+  let apiSpy: jasmine.SpyObj<ApiService>;
 
   beforeEach(() => {
 
     hoverSpy = jasmine.createSpyObj('HoverService', ['mouseMoved', 'hovered']);
-    rendererSpy = jasmine.createSpyObj('MainRendererService', ['init', 'setViewport', 'setSelected']);
+    rendererSpy = jasmine.createSpyObj('MainRendererService', ['init', 'setViewport', 'setSelectedId']);
     canvasSpy = jasmine.createSpyObj('HTMLCanvasElement', ['height', 'width', 'getContext', 'clientHeight', 'clientWidth']);
+    storeSpy = jasmine.createSpyObj('Store', ['getEntity']);
+    apiSpy = jasmine.createSpyObj('ApiService', ['getReady', 'request']);
 
     TestBed.configureTestingModule({
       providers: [
         { provide: MainRendererService, useValue: rendererSpy },
+        { provide: ApiService, useValue: apiSpy },
+        { provide: Store, useValue: storeSpy },
         { provide: HoverService, useValue: hoverSpy }
       ]
     });
 
+    apiSpy.getReady.and.returnValue(of(false));
 
   });
 
