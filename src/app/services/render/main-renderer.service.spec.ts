@@ -103,7 +103,7 @@ describe('MainRendererService', () => {
     hoverRendererSpy.render.calls.reset();
 
     service.init(context);
-    service.setSelectedId({ x: 0, y: 0 });
+    service.setSelectedId('');
     
     const animate = windowSpy.requestAnimationFrame.calls.argsFor(0)[0];
 

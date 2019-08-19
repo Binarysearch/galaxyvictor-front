@@ -80,7 +80,7 @@ describe('HoverRendererService', () => {
       camera: new Camera()
     };
 
-    service.render([{ x: 0, y: 0 }], context);
+    service.render([{ x: 0, y: 0, id: '' }], context);
 
   });
 

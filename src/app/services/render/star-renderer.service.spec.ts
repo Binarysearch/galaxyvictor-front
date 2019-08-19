@@ -80,7 +80,7 @@ describe('StarRendererService', () => {
       camera: new Camera()
     };
 
-    service.render([{ x: 0, y: 0, size: 1, type: 1 }], context);
+    service.render([{ x: 0, y: 0, size: 1, type: 1, id: ''}], context);
 
   });
 
