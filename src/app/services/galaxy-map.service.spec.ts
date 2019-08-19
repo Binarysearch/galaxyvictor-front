@@ -1,11 +1,11 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { GalaxyMapService } from './galaxy-map.service';
 import { MainRendererService } from './render/main-renderer.service';
 import { HoverService } from './hover.service';
 import { Store } from './data/store';
 import { ApiService } from './api.service';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 describe('GalaxyMapService', () => {
 
@@ -117,6 +117,33 @@ describe('GalaxyMapService', () => {
     service.onMouseDown(<MouseEvent>{ button: 1 });
 
   });
+
+  it('should start autosave on api ready and stop when not ready', fakeAsync(() => {
+
+    const subject: Subject<boolean> = new Subject();
+    apiSpy.getReady.and.returnValue(subject.asObservable());
+    apiSpy.request.and.returnValue(of(1));
+
+    const service: GalaxyMapService = TestBed.get(GalaxyMapService);
+    
+    service.setCanvas(canvasSpy);
+    
+    
+    subject.next(true);
+    tick(1000);
+
+    const newState = {
+      cameraX: service.getContext().camera.x,
+      cameraY: service.getContext().camera.y,
+      cameraZ: service.getContext().camera.zoom,
+      galaxyId: null,
+      selectedId: undefined
+    };
+
+    expect(apiSpy.request).toHaveBeenCalledWith('set-session-state', newState);
+
+    subject.next(false);
+  }));
 
 
 });
