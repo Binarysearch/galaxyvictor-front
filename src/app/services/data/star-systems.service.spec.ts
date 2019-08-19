@@ -30,7 +30,7 @@ describe('StarSystemsService', () => {
 
   it('should call api with get-star-systems', (done: DoneFn) => {
 
-    const fakeStarSystems: StarSystem[] = [{x: 0, y: 0, type: 1, size: 1}];
+    const fakeStarSystems: StarSystem[] = [{x: 0, y: 0, type: 1, size: 1, id: ''}];
     
     apiSpy.getReady.and.returnValue(of(true));
     apiSpy.request.and.returnValue(of({ total: 1, starSystems: fakeStarSystems}));

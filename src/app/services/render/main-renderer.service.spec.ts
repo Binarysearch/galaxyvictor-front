@@ -8,6 +8,7 @@ import { HoverRendererService } from './hover-renderer.service';
 import { StarSystemsService } from '../data/star-systems.service';
 import { of } from 'rxjs';
 import { HoverService } from '../hover.service';
+import { Store } from '../data/store';
 
 describe('MainRendererService', () => {
 
@@ -17,6 +18,7 @@ describe('MainRendererService', () => {
   let hoverRendererSpy: jasmine.SpyObj<HoverRendererService>;
   let starsServiceSpy: jasmine.SpyObj<StarSystemsService>;
   let hoverServiceSpy: jasmine.SpyObj<HoverService>;
+  let storeSpy: jasmine.SpyObj<Store>;
 
   beforeEach(() => {
 
@@ -26,6 +28,7 @@ describe('MainRendererService', () => {
     hoverRendererSpy = jasmine.createSpyObj('HoverRendererService', ['setup', 'prepare', 'render']);
     starsServiceSpy = jasmine.createSpyObj('StarSystemsService', ['getStarSystems']);
     hoverServiceSpy = jasmine.createSpyObj('HoverService', ['hovered']);
+    storeSpy = jasmine.createSpyObj('Store', ['getEntity']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -34,6 +37,7 @@ describe('MainRendererService', () => {
         { provide: StarRendererService, useValue: starRendererSpy },
         { provide: HoverRendererService, useValue: hoverRendererSpy },
         { provide: StarSystemsService, useValue: starsServiceSpy },
+        { provide: Store, useValue: storeSpy },
         { provide: HoverService, useValue: hoverServiceSpy }
       ]
     });
@@ -103,16 +107,16 @@ describe('MainRendererService', () => {
     hoverRendererSpy.render.calls.reset();
 
     service.init(context);
-    service.setSelected({ x: 0, y: 0 });
+    service.setSelectedId('selected');
     
     const animate = windowSpy.requestAnimationFrame.calls.argsFor(0)[0];
 
-
+    storeSpy.getEntity.withArgs('selected').and.returnValue({ x: 0, y: 0, id: 'a'});
     expect(hoverRendererSpy.render).toHaveBeenCalledWith([], context);
 
     animate(0);
 
-    expect(hoverRendererSpy.render).toHaveBeenCalledWith([{ x: 0, y: 0 }], context);
+    expect(hoverRendererSpy.render).toHaveBeenCalledWith([{ x: 0, y: 0, id: 'a'}], context);
 
   });
 

@@ -71,6 +71,12 @@ export class Camera {
         this._vZoom -= 0.02 * this._zoom;
     }
 
+    public setPosition(x: number, y: number, zoom: number) {
+        this._x = x;
+        this._y = y;
+        this._zoom = zoom;
+    }
+
     public update() {
 
         let offsetX = 0;
@@ -86,6 +92,9 @@ export class Camera {
 
         this._zoom = newZoom;
         this._vZoom *= 0.9;
+        if(Math.abs(this._vZoom) < 0.0000001){
+            this._vZoom = 0;
+        }
 
         this._x = Math.min(Math.max(this._x + this._speedX + offsetX, MIN_X), MAX_X);
         this._y = Math.min(Math.max(this._y + this._speedY + offsetY, MIN_Y), MAX_Y);

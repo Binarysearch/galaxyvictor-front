@@ -7,12 +7,14 @@ import { StarSystemsService } from '../data/star-systems.service';
 import { StarSystem } from 'src/app/model/star-system.interface';
 import { HoverRendererService } from './hover-renderer.service';
 import { GalaxyMapService } from '../galaxy-map.service';
+import { Store } from '../data/store';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MainRendererService {
-  selected: Entity;
+
+  private selectedId: string;
 
   private viewportSubject: ReplaySubject<{w: number, h: number}> = new ReplaySubject(1);
 
@@ -23,7 +25,8 @@ export class MainRendererService {
     private starRenderer: StarRendererService,
     private hoverRenderer: HoverRendererService,
     private starSystemsService: StarSystemsService,
-    private hoverService: HoverService
+    private hoverService: HoverService,
+    private store: Store
   ) {
     this.starSystemsService.getStarSystems().subscribe(ss => this.starSystems = ss);
   }
@@ -73,7 +76,11 @@ export class MainRendererService {
     this.viewportSubject.next({w: w, h: h});
   }
 
-  setSelected(selected: Entity) {
-    this.selected = selected;
+  setSelectedId(id: string) {
+    this.selectedId = id;
+  }
+
+  get selected(): Entity {
+    return this.store.getEntity(this.selectedId);
   }
 }

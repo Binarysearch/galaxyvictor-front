@@ -36,12 +36,12 @@ describe('HoverService', () => {
 
   it('should detect hover on star when mouse moved over a star', () => {
 
-    const star = { x: 0, y: 0, type: 1, size: 2 };
+    const star = { x: 0, y: 0, type: 1, size: 2, id: '' };
 
     starServiceSpy.getStarSystems.and.returnValue(of([
       star,
-      { x: 0.05, y: 0, type: 1, size: 2 },
-      { x: 10, y: 10, type: 1, size: 2 }
+      { x: 0.05, y: 0, type: 1, size: 2, id: '' },
+      { x: 10, y: 10, type: 1, size: 2, id: '' }
     ]));
 
     const service: HoverService = TestBed.get(HoverService);

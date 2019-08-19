@@ -30,7 +30,7 @@ export class RequestService {
     this.socketService.getMessages()
     .pipe(
       map(msg => <WsResponse<any>>JSON.parse(msg)),
-      tap(msg => console.log('MESSAGE', msg)),
+      //tap(msg => console.log('MESSAGE', msg)),
       filter(msg => {
         // Filtra los mensajes y solo procesa los que traigan payload, id
         // y tengan un subject escuchando
