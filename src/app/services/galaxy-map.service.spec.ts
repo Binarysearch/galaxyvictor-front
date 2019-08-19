@@ -88,7 +88,7 @@ describe('GalaxyMapService', () => {
         
     service.onMouseClick(undefined);
 
-    expect(rendererSpy.setSelected).toHaveBeenCalled();
+    expect(rendererSpy.setSelectedId).toHaveBeenCalled();
 
   });
 

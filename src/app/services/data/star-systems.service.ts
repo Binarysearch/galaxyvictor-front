@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ApiService } from '../api.service';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { StarSystem } from '../../model/star-system.interface';
+import { Store } from './store';
 
 export interface StarSystemListDto {
   total: number;
@@ -13,21 +14,18 @@ export interface StarSystemListDto {
 })
 export class StarSystemsService {
 
-  private starSystemsSubject: BehaviorSubject<StarSystem[]> = new BehaviorSubject<StarSystem[]>([]);
 
-  constructor(private api: ApiService) {
+  constructor(private api: ApiService, private store: Store) {
     this.api.getReady().subscribe(ready => {
       if (ready) {
         this.api.request<StarSystemListDto>('get-star-systems', 'test-galaxy')
-          .subscribe(ss => this.starSystemsSubject.next(ss.starSystems));
-      } else {
-        this.starSystemsSubject.next([]);
+          .subscribe(ss => this.store.setStarSystems(ss.starSystems));
       }
     });
   }
 
   public getStarSystems(): Observable<StarSystem[]> {
-    return this.starSystemsSubject.asObservable();
+    return this.store.getStarSystems();
   }
 
 }

@@ -4,6 +4,8 @@ import { RenderContext, Entity } from './render/renderer.interface';
 import { Camera } from './render/camera';
 import { HoverService } from './hover.service';
 import { AuthService } from '../modules/auth/services/auth.service';
+import { ApiService } from './api.service';
+import { Store } from './data/store';
 
 @Injectable({
   providedIn: 'root'
@@ -27,17 +29,23 @@ export class GalaxyMapService {
 
   private mouseDownCameraX: number;
   private mouseDownCameraY: number;
-  private _selected: Entity;
+  private selectedId: string;
+  private galaxyId: string;
 
 
   constructor(
     private renderer: MainRendererService,
     private hoverService: HoverService,
-    private auth: AuthService
+    private auth: AuthService,
+    private api: ApiService,
+    private store: Store
   ){
     this.auth.getSessionState().subscribe(state => {
       this.context.camera.setPosition(state.cameraX, state.cameraY, state.cameraZ);
+      this.selectedId = state.selectedId;
+      this.renderer.setSelectedId(this.selectedId);
     });
+    this.startAutosaveState();
   }
 
   setCanvas(canvas: HTMLCanvasElement) {
@@ -67,9 +75,9 @@ export class GalaxyMapService {
     let x = this._mouseX / this.context.camera.zoom * this.context.aspectRatio + this.context.camera.x;
     let y = this._mouseY / this.context.camera.zoom + this.context.camera.y;
 
-    if (this._selected) {
-      x = this._selected.x;
-      y = this._selected.y;
+    if (this.selected) {
+      x = this.selected.x;
+      y = this.selected.y;
     } else if (this.hovered) {
       x = this.hovered.x;
       y = this.hovered.y;
@@ -90,8 +98,8 @@ export class GalaxyMapService {
     if (delta > epsilon) {
       return;
     }
-    this._selected = this.hovered;
-    this.renderer.setSelected(this._selected);
+    this.selectedId = (this.hovered) ? this.hovered.id: null;
+    this.renderer.setSelectedId(this.selectedId);
   }
 
   onMouseDown(event: MouseEvent) {
@@ -143,7 +151,45 @@ export class GalaxyMapService {
   }
 
   get selected(): Entity {
-    return this._selected;
+    return this.store.getEntity(this.selectedId);
   }
 
+  private startAutosaveState() {
+    let interval;
+    this.api.getReady().subscribe(ready => {
+      if (ready) {
+        let savedX: number;
+        let savedY: number;
+        let savedZ: number;
+        let savedSelected: string;
+        interval = setInterval(()=>{
+          if (
+            savedX !== this.context.camera.x ||
+            savedY !== this.context.camera.y ||
+            savedZ !== this.context.camera.zoom ||
+            savedSelected !== this.selectedId
+          ) {
+            const newState = {
+              cameraX: this.context.camera.x,
+              cameraY: this.context.camera.y,
+              cameraZ: this.context.camera.zoom,
+              galaxyId: null,
+              selectedId: this.selectedId
+            };
+            this.api.request('set-session-state', newState).subscribe(()=>{
+              savedX = newState.cameraX;
+              savedY = newState.cameraY;
+              savedZ = newState.cameraZ;
+              savedSelected = newState.selectedId;
+            });
+          }
+        }, 500);
+      } else {
+        if(interval){
+          clearInterval(interval);
+          interval = null;
+        }
+      }
+    });
+  }
 }
