@@ -31,6 +31,7 @@ describe('Store', () => {
   it('should get galaxy when ready', () => {
 
     apiSpy.getReady.and.returnValue(of(true));
+    apiSpy.request.and.returnValue(of({starSystems:[]}));
 
     const store: Store = TestBed.get(Store);
     
