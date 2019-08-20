@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Entity } from '../render/renderer.interface';
 import { StarSystem } from 'src/app/model/star-system.interface';
-import { Subject, BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiService } from '../api.service';
+import { GalaxyDto } from '../../dto/galaxy';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,14 @@ export class Store {
   private starSystems: StarSystem[] = [];
   private starSystemsSubject: BehaviorSubject<StarSystem[]> = new BehaviorSubject([]);
 
-  constructor() { }
+  constructor(private api: ApiService) {
+    this.api.getReady().subscribe(ready => {
+      if (ready) {
+        this.api.request<GalaxyDto>('get-galaxy', 'test-galaxy')
+          .subscribe(galaxy => this.setStarSystems(galaxy.starSystems));
+      }
+    });
+  }
 
   public setStarSystems(starSystems: StarSystem[]): void {
     this.starSystems.forEach(ss => this.entityMap.delete(ss.id));

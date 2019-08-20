@@ -3,10 +3,8 @@ import { StarRendererService } from './star-renderer.service';
 import { RenderContext, Entity } from './renderer.interface';
 import { ReplaySubject } from 'rxjs';
 import { HoverService } from '../hover.service';
-import { StarSystemsService } from '../data/star-systems.service';
 import { StarSystem } from 'src/app/model/star-system.interface';
 import { HoverRendererService } from './hover-renderer.service';
-import { GalaxyMapService } from '../galaxy-map.service';
 import { Store } from '../data/store';
 
 @Injectable({
@@ -24,11 +22,10 @@ export class MainRendererService {
     @Inject('Window') private window: Window,
     private starRenderer: StarRendererService,
     private hoverRenderer: HoverRendererService,
-    private starSystemsService: StarSystemsService,
     private hoverService: HoverService,
     private store: Store
   ) {
-    this.starSystemsService.getStarSystems().subscribe(ss => this.starSystems = ss);
+    this.store.getStarSystems().subscribe(ss => this.starSystems = ss);
   }
 
   public init(context: RenderContext): void {

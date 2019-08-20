@@ -5,7 +5,6 @@ import { StarRendererService } from './star-renderer.service';
 import { RenderContext } from './renderer.interface';
 import { Camera } from './camera';
 import { HoverRendererService } from './hover-renderer.service';
-import { StarSystemsService } from '../data/star-systems.service';
 import { of } from 'rxjs';
 import { HoverService } from '../hover.service';
 import { Store } from '../data/store';
@@ -16,9 +15,8 @@ describe('MainRendererService', () => {
   let windowSpy: jasmine.SpyObj<Window>;
   let starRendererSpy: jasmine.SpyObj<StarRendererService>;
   let hoverRendererSpy: jasmine.SpyObj<HoverRendererService>;
-  let starsServiceSpy: jasmine.SpyObj<StarSystemsService>;
-  let hoverServiceSpy: jasmine.SpyObj<HoverService>;
   let storeSpy: jasmine.SpyObj<Store>;
+  let hoverServiceSpy: jasmine.SpyObj<HoverService>;
 
   beforeEach(() => {
 
@@ -26,9 +24,8 @@ describe('MainRendererService', () => {
     windowSpy = jasmine.createSpyObj('Window', ['requestAnimationFrame']);
     starRendererSpy = jasmine.createSpyObj('StarRendererService', ['setup', 'prepare', 'render']);
     hoverRendererSpy = jasmine.createSpyObj('HoverRendererService', ['setup', 'prepare', 'render']);
-    starsServiceSpy = jasmine.createSpyObj('StarSystemsService', ['getStarSystems']);
     hoverServiceSpy = jasmine.createSpyObj('HoverService', ['hovered']);
-    storeSpy = jasmine.createSpyObj('Store', ['getEntity']);
+    storeSpy = jasmine.createSpyObj('Store', ['getEntity', 'getStarSystems']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -36,13 +33,12 @@ describe('MainRendererService', () => {
         { provide: WebGLRenderingContext, useValue: glSpy },
         { provide: StarRendererService, useValue: starRendererSpy },
         { provide: HoverRendererService, useValue: hoverRendererSpy },
-        { provide: StarSystemsService, useValue: starsServiceSpy },
         { provide: Store, useValue: storeSpy },
         { provide: HoverService, useValue: hoverServiceSpy }
       ]
     });
 
-    starsServiceSpy.getStarSystems.and.returnValue(of([]));
+    storeSpy.getStarSystems.and.returnValue(of([]));
 
   });
 
