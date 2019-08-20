@@ -18,8 +18,8 @@ export class Fleet implements Entity {
         public origin: StarSystem,
         private timeService: TimeService
     ) {
-        this.destinationId = (destination) ? destination.id : null;
-        this.originId = (origin) ? origin.id : null;
+        this.destinationId = destination.id;
+        this.originId = origin.id;
     }
 
     get x(): number {
@@ -62,7 +62,7 @@ export class Fleet implements Entity {
         if (this.destinationId !== this.originId) {
 
             const travelTime = this.travelDistance / this.speed;
-            const timeElapsed = this.timeService.gameTime - this.startTravelTime;
+            const timeElapsed = this.timeService.getGameTime() - this.startTravelTime;
             const remainingTime = travelTime - timeElapsed;
             return 1 - Math.max(Math.min(remainingTime / travelTime, 1), 0);
         }

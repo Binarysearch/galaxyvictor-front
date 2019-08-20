@@ -7,7 +7,7 @@ export class TimeService {
 
   constructor() { }
 
-  get gameTime(): number {
+  getGameTime(): number {
     return new Date().getTime();
   }
 }
