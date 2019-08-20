@@ -8,12 +8,14 @@ import { HoverRendererService } from './hover-renderer.service';
 import { of } from 'rxjs';
 import { HoverService } from '../hover.service';
 import { Store } from '../data/store';
+import { PlanetRendererService } from './planet-renderer.service';
 
 describe('MainRendererService', () => {
 
   let glSpy: jasmine.SpyObj<WebGLRenderingContext>;
   let windowSpy: jasmine.SpyObj<Window>;
   let starRendererSpy: jasmine.SpyObj<StarRendererService>;
+  let planetRendererSpy: jasmine.SpyObj<PlanetRendererService>;
   let hoverRendererSpy: jasmine.SpyObj<HoverRendererService>;
   let storeSpy: jasmine.SpyObj<Store>;
   let hoverServiceSpy: jasmine.SpyObj<HoverService>;
@@ -23,15 +25,17 @@ describe('MainRendererService', () => {
     glSpy = jasmine.createSpyObj('WebGLRenderingContext', ['viewport', 'clearColor', 'clear']);
     windowSpy = jasmine.createSpyObj('Window', ['requestAnimationFrame']);
     starRendererSpy = jasmine.createSpyObj('StarRendererService', ['setup', 'prepare', 'render']);
+    planetRendererSpy = jasmine.createSpyObj('PlanetRendererService', ['setup', 'prepare', 'render']);
     hoverRendererSpy = jasmine.createSpyObj('HoverRendererService', ['setup', 'prepare', 'render']);
     hoverServiceSpy = jasmine.createSpyObj('HoverService', ['hovered']);
-    storeSpy = jasmine.createSpyObj('Store', ['getEntity', 'getStarSystems']);
+    storeSpy = jasmine.createSpyObj('Store', ['getEntity', 'getStarSystems', 'getPlanets']);
 
     TestBed.configureTestingModule({
       providers: [
         { provide: 'Window', useValue: windowSpy },
         { provide: WebGLRenderingContext, useValue: glSpy },
         { provide: StarRendererService, useValue: starRendererSpy },
+        { provide: PlanetRendererService, useValue: planetRendererSpy },
         { provide: HoverRendererService, useValue: hoverRendererSpy },
         { provide: Store, useValue: storeSpy },
         { provide: HoverService, useValue: hoverServiceSpy }
@@ -39,6 +43,7 @@ describe('MainRendererService', () => {
     });
 
     storeSpy.getStarSystems.and.returnValue(of([]));
+    storeSpy.getPlanets.and.returnValue(of([]));
 
   });
 
@@ -65,7 +70,7 @@ describe('MainRendererService', () => {
     expect(windowSpy.requestAnimationFrame).toHaveBeenCalledTimes(2);
 
     expect(starRendererSpy.setup).toHaveBeenCalledWith(context);
-    expect(starRendererSpy.prepare).toHaveBeenCalledWith(context);
+    expect(starRendererSpy.render).toHaveBeenCalledWith([], context);
     
   });
 
