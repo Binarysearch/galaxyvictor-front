@@ -5,5 +5,5 @@ export interface PlanetInfo {
     type: number;
     size: number;
     orbit: number;
-    colony: ColonyInfo[];
+    colony: ColonyInfo;
 }
