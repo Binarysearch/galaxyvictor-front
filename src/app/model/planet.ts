@@ -6,10 +6,10 @@ export class Planet implements Entity {
 
     constructor(
         public id: string,
-        private type: number,
-        private size: number,
-        private orbit: number,
-        private starSystem: StarSystem
+        public type: number,
+        public size: number,
+        public orbit: number,
+        public starSystem: StarSystem
     ) {
 
     }

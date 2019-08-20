@@ -63,6 +63,7 @@ export class StarRendererService implements Renderer{
   }
 
   render(entities: StarSystem[], context: RenderContext): void {
+    this.prepare(context);
     const gl = context.gl;
     const camera = context.camera;
     const zoom = context.camera.zoom;

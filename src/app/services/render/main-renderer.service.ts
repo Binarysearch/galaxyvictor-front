@@ -6,6 +6,8 @@ import { HoverService } from '../hover.service';
 import { StarSystem } from 'src/app/model/star-system.interface';
 import { HoverRendererService } from './hover-renderer.service';
 import { Store } from '../data/store';
+import { Planet } from 'src/app/model/planet';
+import { PlanetRendererService } from './planet-renderer.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,15 +19,18 @@ export class MainRendererService {
   private viewportSubject: ReplaySubject<{w: number, h: number}> = new ReplaySubject(1);
 
   private starSystems: StarSystem[] = [];
+  private planets: Planet[] = [];
 
   constructor(
     @Inject('Window') private window: Window,
     private starRenderer: StarRendererService,
+    private planetRenderer: PlanetRendererService,
     private hoverRenderer: HoverRendererService,
     private hoverService: HoverService,
     private store: Store
   ) {
     this.store.getStarSystems().subscribe(ss => this.starSystems = ss);
+    this.store.getPlanets().subscribe(planets => this.planets = planets);
   }
 
   public init(context: RenderContext): void {
@@ -47,6 +52,7 @@ export class MainRendererService {
   private setup(context: RenderContext): void {
     context.gl.clearColor(0, 0, 0, 1);
     this.starRenderer.setup(context);
+    this.planetRenderer.setup(context);
     this.hoverRenderer.setup(context);
     
   }
@@ -55,9 +61,6 @@ export class MainRendererService {
     const gl = context.gl;
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    this.starRenderer.prepare(context);
-    this.starRenderer.render(this.starSystems, context);
-
     const hovers = [];
     if (this.hoverService.hovered) {
       hovers.push(this.hoverService.hovered);
@@ -65,8 +68,13 @@ export class MainRendererService {
     if (this.selected) {
       hovers.push(this.selected);
     }
-    this.hoverRenderer.prepare(context);
     this.hoverRenderer.render(hovers, context);
+
+
+
+    this.starRenderer.render(this.starSystems, context);
+
+    this.planetRenderer.render(this.planets, context);
   }
 
   setViewport(w: number, h: number) {

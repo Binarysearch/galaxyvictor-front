@@ -3,6 +3,9 @@ import { StarRendererService } from './render/star-renderer.service';
 import { Entity, RenderContext, Renderer } from './render/renderer.interface';
 import { StarSystem } from '../model/star-system.interface';
 import { Store } from './data/store';
+import { PlanetRendererService } from './render/planet-renderer.service';
+import { Planet } from '../model/planet';
+import { MIN_ZOOM_TO_VIEW_PLANETS } from '../galaxy-constants';
 
 interface IntersectingElement {
   x: number;
@@ -17,12 +20,15 @@ export class HoverService {
 
   private _hovered: Entity;
   private starSystems: StarSystem[] = [];
+  private planets: Planet[] = [];
 
   constructor(
     private starRenderer: StarRendererService,
+    private planetRenderer: PlanetRendererService,
     private store: Store
   ) {
     this.store.getStarSystems().subscribe(ss => this.starSystems = ss);
+    this.store.getPlanets().subscribe(planets => this.planets = planets);
   }
 
   public get hovered(): Entity {
@@ -32,8 +38,9 @@ export class HoverService {
 
   mouseMoved(x: number, y: number, context: RenderContext): void {
     const intersectingStars = this.getintersectingStars(x, y, context);
+    const intersectingPlanets = this.getintersectingPlanets(x, y, context);
 
-    const closest = this.getClosestElement(x, y, context, [intersectingStars]);
+    const closest = this.getClosestElement(x, y, context, [intersectingStars, intersectingPlanets]);
 
     this._hovered = closest;
   }
@@ -58,6 +65,13 @@ export class HoverService {
 
   getintersectingStars(x: number, y: number, context: RenderContext) {
     return this.getIntersectingElements(x, y, context, this.starSystems, this.starRenderer);
+  }
+
+  getintersectingPlanets(x: number, y: number, context: RenderContext) {
+    if (context.camera.zoom < MIN_ZOOM_TO_VIEW_PLANETS) {
+      return [];
+    }
+    return this.getIntersectingElements(x, y, context, this.planets, this.planetRenderer);
   }
 
   getIntersectingElements(x: number, y: number, context: RenderContext, elements: Entity[], renderer: Renderer): IntersectingElement[] {

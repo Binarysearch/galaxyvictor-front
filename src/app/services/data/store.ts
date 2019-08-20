@@ -65,7 +65,7 @@ export class Store {
 
   public addPlanets(planets: Planet[]): void {
     planets.forEach(p => this.entityMap.set(p.id, p));
-    this.planets.concat(planets);
+    this.planets = this.planets.concat(planets);
     this.planetsSubject.next(this.planets);
   }
 
