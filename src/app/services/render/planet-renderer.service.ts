@@ -1,27 +1,29 @@
 import { Injectable } from '@angular/core';
-import { Renderer, RenderContext, Entity } from './renderer.interface';
+import { Renderer, RenderContext } from './renderer.interface';
+import { PLANET_VS_SOURCE, PLANET_FS_SOURCE } from './shaders/planet-shader';
 import { ShaderCompilerService } from '../gl-utils/shader-compiler.service';
-import { HOVER_VS_SOURCE, HOVER_FS_SOURCE } from './shaders/hover-shader';
+import { Planet } from 'src/app/model/planet';
+import { PLANET_COLORS, PLANET_RENDER_SCALE_ZI, PLANET_RENDER_SCALE_ZD, PLANET_RENDER_SCALE_ZI_SI, MIN_ZOOM_TO_VIEW_PLANETS } from 'src/app/galaxy-constants';
 
 @Injectable({
   providedIn: 'root'
 })
-export class HoverRendererService implements Renderer{
+export class PlanetRendererService implements Renderer{
 
   program: WebGLShader;
   vao: WebGLVertexArrayObjectOES;
-  timeUniformLocation: WebGLUniformLocation;
   aspectUniformLocation: WebGLUniformLocation;
   scaleUniformLocation: WebGLUniformLocation;
   zoomUniformLocation: WebGLUniformLocation;
   positionUniformLocation: WebGLUniformLocation;
+  starPositionUniformLocation: WebGLUniformLocation;
   colorUniformLocation: WebGLUniformLocation;
 
   constructor(private shaderCompiler: ShaderCompilerService) { }
 
   setup(context: RenderContext): void {
     const gl = context.gl;
-    this.program = this.shaderCompiler.createShaderProgram(gl, HOVER_VS_SOURCE, HOVER_FS_SOURCE);
+    this.program = this.shaderCompiler.createShaderProgram(gl, PLANET_VS_SOURCE, PLANET_FS_SOURCE);
 
     this.vao = (gl as any).createVertexArray();
     (gl as any).bindVertexArray(this.vao);
@@ -33,11 +35,11 @@ export class HoverRendererService implements Renderer{
     gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(coord);
 
-    this.timeUniformLocation = gl.getUniformLocation(this.program, 'time');
     this.aspectUniformLocation = gl.getUniformLocation(this.program, 'aspect');
     this.scaleUniformLocation = gl.getUniformLocation(this.program, 'scale');
     this.zoomUniformLocation = gl.getUniformLocation(this.program, 'zoom');
     this.positionUniformLocation = gl.getUniformLocation(this.program, 'pos');
+    this.starPositionUniformLocation = gl.getUniformLocation(this.program, 'starPosition');
     this.colorUniformLocation = gl.getUniformLocation(this.program, 'color');
   }
 
@@ -53,33 +55,40 @@ export class HoverRendererService implements Renderer{
     gl.useProgram(this.program);
     gl2.bindVertexArray(this.vao);
 
-    const time = (Date.now() % (Math.PI * 2000)) * 0.001;
 
-    gl.uniform1f(this.timeUniformLocation, time);
     gl.uniform1f(this.zoomUniformLocation, zoom);
     gl.uniform1f(this.aspectUniformLocation, aspect);
   }
 
-  render(entities: Entity[], context: RenderContext): void {
+  render(entities: Planet[], context: RenderContext): void {
+    if (context.camera.zoom < MIN_ZOOM_TO_VIEW_PLANETS) {
+      return;
+    }
     this.prepare(context);
     const gl = context.gl;
     const camera = context.camera;
     const zoom = context.camera.zoom;
 
     entities.forEach(
-      hub => {
-        const scale = this.getRenderScale(hub, zoom);
+      planet => {
+        const scale = this.getRenderScale(planet, zoom);
 
+        const color = PLANET_COLORS[planet.type - 1];
+        const angle = planet.angle;
+    
         gl.uniform1f(this.scaleUniformLocation, scale);
-        gl.uniform2f(this.positionUniformLocation, hub.x - camera.x, hub.y - camera.y);
-        gl.uniform3f(this.colorUniformLocation, 1, 1, 1);
+        gl.uniform2f(this.positionUniformLocation, planet.x - camera.x, planet.y - camera.y);
+        gl.uniform2f(this.starPositionUniformLocation, -Math.cos(angle), -Math.sin(angle));
+        gl.uniform3f(this.colorUniformLocation, color.r, color.g, color.b);
+    
         gl.drawArrays(gl.TRIANGLES, 0, 6);
       }
     );
   }
 
-  getRenderScale(star: Entity, zoom: number): number {
-    return 0.1;
+  getRenderScale(planet: Planet, zoom: number): number {
+    const scale = (PLANET_RENDER_SCALE_ZI * planet.size * planet.size + PLANET_RENDER_SCALE_ZI_SI)
+      / zoom + (PLANET_RENDER_SCALE_ZD * planet.size * planet.size);
+    return scale;
   }
-
 }
