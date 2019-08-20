@@ -1,4 +1,4 @@
 export interface ColonyInfo {
     id: string;
-    planetId: string;
+    civilizationId: string;
 }
