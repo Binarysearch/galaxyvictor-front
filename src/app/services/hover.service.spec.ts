@@ -2,30 +2,30 @@ import { TestBed } from '@angular/core/testing';
 
 import { HoverService } from './hover.service';
 import { StarRendererService } from './render/star-renderer.service';
-import { StarSystemsService } from './data/star-systems.service';
 import { of } from 'rxjs';
 import { RenderContext } from './render/renderer.interface';
 import { Camera } from './render/camera';
+import { Store } from './data/store';
 
 describe('HoverService', () => {
 
   let starRendererSpy: jasmine.SpyObj<StarRendererService>;
-  let starServiceSpy: jasmine.SpyObj<StarSystemsService>;
+  let storeSpy: jasmine.SpyObj<Store>;
 
 
   beforeEach(() => {
 
     starRendererSpy = jasmine.createSpyObj('StarRendererService', ['getRenderScale']);
-    starServiceSpy = jasmine.createSpyObj('StarSystemsService', ['getStarSystems']);
+    storeSpy = jasmine.createSpyObj('Store', ['getStarSystems']);
 
     TestBed.configureTestingModule({
       providers: [
         { provide: StarRendererService, useValue: starRendererSpy },
-        { provide: StarSystemsService, useValue: starServiceSpy }
+        { provide: Store, useValue: storeSpy }
       ]
     });
 
-    starServiceSpy.getStarSystems.and.returnValue(of([]));
+    storeSpy.getStarSystems.and.returnValue(of([]));
     
   });
 
@@ -38,7 +38,7 @@ describe('HoverService', () => {
 
     const star = { x: 0, y: 0, type: 1, size: 2, id: '' };
 
-    starServiceSpy.getStarSystems.and.returnValue(of([
+    storeSpy.getStarSystems.and.returnValue(of([
       star,
       { x: 0.05, y: 0, type: 1, size: 2, id: '' },
       { x: 10, y: 10, type: 1, size: 2, id: '' }
