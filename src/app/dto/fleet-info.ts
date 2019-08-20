@@ -1,4 +1,4 @@
-export interface FleetInfoDto {
+export interface FleetInfo {
     id: string;
     civilizationId: string;
     originId: string;

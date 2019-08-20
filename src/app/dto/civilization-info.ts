@@ -1,4 +1,4 @@
-export interface CivilizationInfoDto {
+export interface CivilizationInfo {
     id: string;
     name: string;
 }

@@ -1,4 +1,4 @@
-export interface ColonyInfoDto {
+export interface ColonyInfo {
     id: string;
     planetId: string;
 }

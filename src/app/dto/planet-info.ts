@@ -1,3 +1,3 @@
-export interface PlanetInfoDto {
+export interface PlanetInfo {
     id: string;
 }

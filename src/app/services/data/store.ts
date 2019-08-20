@@ -3,7 +3,7 @@ import { Entity } from '../render/renderer.interface';
 import { StarSystem } from 'src/app/model/star-system.interface';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiService } from '../api.service';
-import { GalaxyDetailDto } from '../../dto/galaxy-detail';
+import { GalaxyDetail } from '../../dto/galaxy-detail';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class Store {
   constructor(private api: ApiService) {
     this.api.getReady().subscribe(ready => {
       if (ready) {
-        this.api.request<GalaxyDetailDto>('get-galaxy', 'test-galaxy')
+        this.api.request<GalaxyDetail>('get-galaxy', 'test-galaxy')
           .subscribe(galaxy => this.setStarSystems(galaxy.starSystems));
       }
     });

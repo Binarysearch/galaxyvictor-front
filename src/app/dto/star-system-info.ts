@@ -1,4 +1,4 @@
-export interface StarSystemInfoDto {
+export interface StarSystemInfo {
     id: string;
     x: number;
     y: number;
