@@ -4,6 +4,7 @@ export interface FleetInfo {
     originId: string;
     destinationId: string;
     startTravelTime: number;
-    acceleration: number;
+    speed: number;
+    seed: number;
     shipCount: number;
 }

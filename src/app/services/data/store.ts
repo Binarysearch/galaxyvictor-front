@@ -8,6 +8,8 @@ import { Planet } from 'src/app/model/planet';
 import { PlanetInfo } from 'src/app/dto/planet-info';
 import { map } from 'rxjs/operators';
 import { FAKE_GALAXY_DATA } from './fake_civ_data';
+import { Fleet } from 'src/app/model/fleet';
+import { TimeService } from '../time.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +24,10 @@ export class Store {
   private planets: Planet[] = [];
   private planetsSubject: BehaviorSubject<Planet[]> = new BehaviorSubject([]);
 
-  constructor(private api: ApiService) {
+  private fleets: Fleet[] = [];
+  private fleetsSubject: BehaviorSubject<Fleet[]> = new BehaviorSubject([]);
+
+  constructor(private api: ApiService, private timeService: TimeService) {
     this.api.getReady().subscribe(ready => {
       if (ready) {
         this.api.request<GalaxyDetail>('get-galaxy', 'test-galaxy')
@@ -34,6 +39,8 @@ export class Store {
             this.setStarSystems(galaxy.starSystems);
 
             if (galaxy.civilization) {
+
+              //Add planets
               const planets: Planet[] = galaxy.civilization.exploredStarSystems.map(
                 ss => ss.planets.map(
                   p => new Planet(
@@ -49,6 +56,23 @@ export class Store {
               );
 
               this.addPlanets(planets);
+              //end add planets
+              
+              //add fleets
+              const fleets: Fleet[] = galaxy.civilization.fleets.map(
+                f => new Fleet(
+                  f.id,
+                  f.seed,
+                  f.speed,
+                  f.startTravelTime,
+                  <StarSystem>this.getEntity(f.destinationId),
+                  <StarSystem>this.getEntity(f.originId),
+                  this.timeService
+                )
+              );
+              
+              this.addFleets(fleets);
+              //end add fleets
             }
 
           });
@@ -69,8 +93,18 @@ export class Store {
     this.planetsSubject.next(this.planets);
   }
 
+  public addFleets(fleets: Fleet[]): void {
+    fleets.forEach(f => this.entityMap.set(f.id, f));
+    this.fleets = this.fleets.concat(fleets);
+    this.fleetsSubject.next(this.fleets);
+  }
+
   public getPlanets(): Observable<Planet[]> {
     return this.planetsSubject.asObservable();
+  }
+
+  public getFleets(): Observable<Fleet[]> {
+    return this.fleetsSubject.asObservable();
   }
 
   public getStarSystems(): Observable<StarSystem[]> {

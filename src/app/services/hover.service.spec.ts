@@ -16,7 +16,7 @@ describe('HoverService', () => {
   beforeEach(() => {
 
     starRendererSpy = jasmine.createSpyObj('StarRendererService', ['getRenderScale']);
-    storeSpy = jasmine.createSpyObj('Store', ['getStarSystems', 'getPlanets']);
+    storeSpy = jasmine.createSpyObj('Store', ['getStarSystems', 'getPlanets', 'getFleets']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -27,6 +27,7 @@ describe('HoverService', () => {
 
     storeSpy.getStarSystems.and.returnValue(of([]));
     storeSpy.getPlanets.and.returnValue(of([]));
+    storeSpy.getFleets.and.returnValue(of([]));
     
   });
 

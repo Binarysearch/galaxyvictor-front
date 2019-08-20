@@ -6,6 +6,8 @@ import { Store } from './data/store';
 import { PlanetRendererService } from './render/planet-renderer.service';
 import { Planet } from '../model/planet';
 import { MIN_ZOOM_TO_VIEW_PLANETS } from '../galaxy-constants';
+import { Fleet } from '../model/fleet';
+import { FleetRendererService } from './render/fleet-renderer.service';
 
 interface IntersectingElement {
   x: number;
@@ -21,14 +23,17 @@ export class HoverService {
   private _hovered: Entity;
   private starSystems: StarSystem[] = [];
   private planets: Planet[] = [];
+  private fleets: Fleet[] = [];
 
   constructor(
     private starRenderer: StarRendererService,
     private planetRenderer: PlanetRendererService,
+    private fleetRenderer: FleetRendererService,
     private store: Store
   ) {
     this.store.getStarSystems().subscribe(ss => this.starSystems = ss);
     this.store.getPlanets().subscribe(planets => this.planets = planets);
+    this.store.getFleets().subscribe(fleets => this.fleets = fleets);
   }
 
   public get hovered(): Entity {
@@ -38,9 +43,10 @@ export class HoverService {
 
   mouseMoved(x: number, y: number, context: RenderContext): void {
     const intersectingStars = this.getintersectingStars(x, y, context);
+    const intersectingFleets = this.getintersectingFleets(x, y, context);
     const intersectingPlanets = this.getintersectingPlanets(x, y, context);
 
-    const closest = this.getClosestElement(x, y, context, [intersectingStars, intersectingPlanets]);
+    const closest = this.getClosestElement(x, y, context, [intersectingStars, intersectingFleets, intersectingPlanets]);
 
     this._hovered = closest;
   }
@@ -65,6 +71,10 @@ export class HoverService {
 
   getintersectingStars(x: number, y: number, context: RenderContext) {
     return this.getIntersectingElements(x, y, context, this.starSystems, this.starRenderer);
+  }
+
+  getintersectingFleets(x: number, y: number, context: RenderContext) {
+    return this.getIntersectingElements(x, y, context, this.fleets, this.fleetRenderer);
   }
 
   getintersectingPlanets(x: number, y: number, context: RenderContext) {

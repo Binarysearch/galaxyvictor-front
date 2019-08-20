@@ -9,6 +9,7 @@ import { of } from 'rxjs';
 import { HoverService } from '../hover.service';
 import { Store } from '../data/store';
 import { PlanetRendererService } from './planet-renderer.service';
+import { FleetRendererService } from './fleet-renderer.service';
 
 describe('MainRendererService', () => {
 
@@ -16,6 +17,7 @@ describe('MainRendererService', () => {
   let windowSpy: jasmine.SpyObj<Window>;
   let starRendererSpy: jasmine.SpyObj<StarRendererService>;
   let planetRendererSpy: jasmine.SpyObj<PlanetRendererService>;
+  let fleetRendererSpy: jasmine.SpyObj<FleetRendererService>;
   let hoverRendererSpy: jasmine.SpyObj<HoverRendererService>;
   let storeSpy: jasmine.SpyObj<Store>;
   let hoverServiceSpy: jasmine.SpyObj<HoverService>;
@@ -26,9 +28,10 @@ describe('MainRendererService', () => {
     windowSpy = jasmine.createSpyObj('Window', ['requestAnimationFrame']);
     starRendererSpy = jasmine.createSpyObj('StarRendererService', ['setup', 'prepare', 'render']);
     planetRendererSpy = jasmine.createSpyObj('PlanetRendererService', ['setup', 'prepare', 'render']);
+    fleetRendererSpy = jasmine.createSpyObj('FleetRendererService', ['setup', 'prepare', 'render']);
     hoverRendererSpy = jasmine.createSpyObj('HoverRendererService', ['setup', 'prepare', 'render']);
     hoverServiceSpy = jasmine.createSpyObj('HoverService', ['hovered']);
-    storeSpy = jasmine.createSpyObj('Store', ['getEntity', 'getStarSystems', 'getPlanets']);
+    storeSpy = jasmine.createSpyObj('Store', ['getEntity', 'getStarSystems', 'getPlanets', 'getFleets']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -36,6 +39,7 @@ describe('MainRendererService', () => {
         { provide: WebGLRenderingContext, useValue: glSpy },
         { provide: StarRendererService, useValue: starRendererSpy },
         { provide: PlanetRendererService, useValue: planetRendererSpy },
+        { provide: FleetRendererService, useValue: fleetRendererSpy },
         { provide: HoverRendererService, useValue: hoverRendererSpy },
         { provide: Store, useValue: storeSpy },
         { provide: HoverService, useValue: hoverServiceSpy }
@@ -44,6 +48,7 @@ describe('MainRendererService', () => {
 
     storeSpy.getStarSystems.and.returnValue(of([]));
     storeSpy.getPlanets.and.returnValue(of([]));
+    storeSpy.getFleets.and.returnValue(of([]));
 
   });
 
