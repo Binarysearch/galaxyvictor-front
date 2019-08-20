@@ -8,6 +8,8 @@ import { HoverRendererService } from './hover-renderer.service';
 import { Store } from '../data/store';
 import { Planet } from 'src/app/model/planet';
 import { PlanetRendererService } from './planet-renderer.service';
+import { FleetRendererService } from './fleet-renderer.service';
+import { Fleet } from 'src/app/model/fleet';
 
 @Injectable({
   providedIn: 'root'
@@ -20,17 +22,20 @@ export class MainRendererService {
 
   private starSystems: StarSystem[] = [];
   private planets: Planet[] = [];
+  private fleets: Fleet[] = [];
 
   constructor(
     @Inject('Window') private window: Window,
     private starRenderer: StarRendererService,
     private planetRenderer: PlanetRendererService,
+    private fleetRenderer: FleetRendererService,
     private hoverRenderer: HoverRendererService,
     private hoverService: HoverService,
     private store: Store
   ) {
     this.store.getStarSystems().subscribe(ss => this.starSystems = ss);
     this.store.getPlanets().subscribe(planets => this.planets = planets);
+    this.store.getFleets().subscribe(fleets => this.fleets = fleets);
   }
 
   public init(context: RenderContext): void {
@@ -53,6 +58,7 @@ export class MainRendererService {
     context.gl.clearColor(0, 0, 0, 1);
     this.starRenderer.setup(context);
     this.planetRenderer.setup(context);
+    this.fleetRenderer.setup(context);
     this.hoverRenderer.setup(context);
     
   }
@@ -70,11 +76,9 @@ export class MainRendererService {
     }
     this.hoverRenderer.render(hovers, context);
 
-
-
     this.starRenderer.render(this.starSystems, context);
-
     this.planetRenderer.render(this.planets, context);
+    this.fleetRenderer.render(this.fleets, context);
   }
 
   setViewport(w: number, h: number) {

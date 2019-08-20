@@ -5,7 +5,39 @@ export const FAKE_CIVILIZATION_DATA: CivilizationDetail = {
     id: 'civ1',
     name: 'fake',
     capitolId: 'p1',
-    fleets: [],
+    fleets: [
+        {
+            id: 'f1',
+            civilizationId: 'civ1',
+            originId: 'ss1',
+            destinationId: 'ss1',
+            startTravelTime: 0,
+            speed: 1,
+            seed: 1,
+            shipCount: 0
+        },
+        {
+            id: 'f2',
+            civilizationId: 'civ1',
+            originId: 'ss2',
+            destinationId: 'ss1',
+            startTravelTime: new Date().getTime(),
+            speed: 0.0001,
+            seed: 2,
+            shipCount: 0
+        },
+        {
+            id: 'f3',
+            civilizationId: 'civ1',
+            originId: 'ss1',
+            destinationId: 'ss2',
+            startTravelTime: new Date().getTime(),
+            speed: 0.00002,
+            seed: 2,
+            shipCount: 0
+        }
+
+    ],
     knownCivilizations: [],
     exploredStarSystems: [
         {
