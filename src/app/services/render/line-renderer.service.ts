@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { SegmentRenderer, RenderContext, Segment } from './renderer.interface';
 import { ShaderCompilerService } from '../gl-utils/shader-compiler.service';
 import { SEGMENT_VS_SOURCE, SEGMENT_FS_SOURCE } from './shaders/segment-shader';
-import { FLEET_VERTICES } from './shapes/fleet-vertices';
 
 @Injectable({
   providedIn: 'root'
