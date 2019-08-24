@@ -7,7 +7,7 @@ import { FLEET_VERTICES } from './shapes/fleet-vertices';
 @Injectable({
   providedIn: 'root'
 })
-export class TravelLineRendererService implements SegmentRenderer{
+export class LineRendererService implements SegmentRenderer{
 
   program: WebGLShader;
   vao: WebGLVertexArrayObjectOES;

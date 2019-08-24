@@ -1,5 +1,5 @@
 import { Entity } from '../services/render/renderer.interface';
-import { StarSystem } from './star-system.interface';
+import { StarSystem } from './star-system';
 import { PLANET_ROTATION_SPEED_MULT, PLANET_ORBIT_SCALE_MULTIPLIER } from '../galaxy-constants';
 
 export class Planet implements Entity {

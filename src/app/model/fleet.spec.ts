@@ -1,6 +1,6 @@
 import { Fleet } from './fleet';
 import { TimeService } from '../services/time.service';
-import { StarSystem } from './star-system.interface';
+import { StarSystem } from './star-system';
 
 describe('Fleet', () => {
     let timeServiceSpy: jasmine.SpyObj<TimeService> = jasmine.createSpyObj('TimeService', ['getGameTime']);

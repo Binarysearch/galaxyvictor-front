@@ -1,6 +1,6 @@
 import { Entity } from '../services/render/renderer.interface';
 import { TimeService } from '../services/time.service';
-import { StarSystem } from './star-system.interface';
+import { StarSystem } from './star-system';
 import { FLEET_ROTATION_SPEED_MULT } from '../galaxy-constants';
 
 export class Fleet implements Entity {

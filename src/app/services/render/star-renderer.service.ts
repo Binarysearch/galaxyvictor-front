@@ -3,7 +3,7 @@ import { Renderer, RenderContext, Entity } from './renderer.interface';
 import { ShaderCompilerService } from '../gl-utils/shader-compiler.service';
 import { STAR_SYSTEM_VS_SOURCE, STAR_SYSTEM_FS_SOURCE } from './shaders/star-system-shader';
 import { STAR_RENDER_SCALE_ZI, STAR_RENDER_SCALE_ZI_SI, STAR_RENDER_SCALE_ZD, STAR_COLORS } from 'src/app/galaxy-constants';
-import { StarSystem } from '../../model/star-system.interface';
+import { StarSystem } from '../../model/star-system';
 
 @Injectable({
   providedIn: 'root'

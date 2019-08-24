@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Entity } from '../render/renderer.interface';
-import { StarSystem } from 'src/app/model/star-system.interface';
+import { StarSystem } from 'src/app/model/star-system';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiService } from '../api.service';
 import { GalaxyDetail } from '../../dto/galaxy-detail';
@@ -32,11 +32,14 @@ export class Store {
       if (ready) {
         this.api.request<GalaxyDetail>('get-galaxy', 'test-galaxy')
           .pipe(
-            map(g => FAKE_GALAXY_DATA)
+            map(g => ({...FAKE_GALAXY_DATA, starSystems: g.starSystems.concat(FAKE_GALAXY_DATA.starSystems)}))
           )
           .subscribe(galaxy => {
 
-            this.setStarSystems(galaxy.starSystems);
+            const starSystems: StarSystem[] = galaxy.starSystems.map(
+              ss => new StarSystem(ss.id, ss.x, ss.y, ss.size, ss.type)
+            );
+            this.setStarSystems(starSystems);
 
             if (galaxy.civilization) {
 

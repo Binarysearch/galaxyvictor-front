@@ -57,13 +57,13 @@ export const FAKE_CIVILIZATION_DATA: CivilizationDetail = {
         },
         {
             id: 'ss2',
-            x: 1,
+            x: 100,
             y: 0,
             type: 1,
             size: 5,
             planets:[
-                { id: 'p3', type: 1, size: 1, orbit: 1, colony: null },
-                { id: 'p4', type: 2, size: 2, orbit: 2, colony: null }
+                { id: 'p7', type: 1, size: 1, orbit: 1, colony: null },
+                { id: 'p8', type: 2, size: 2, orbit: 2, colony: null }
             ]
         },
 
@@ -75,7 +75,7 @@ export const FAKE_GALAXY_DATA: GalaxyDetail = {
     name: 'galaxyName',
     starSystems: [
         { id: 'ss1', x: 0, y: 0, type: 3, size: 2 },
-        { id: 'ss2', x: 1, y: 0, type: 1, size: 5 },
+        { id: 'ss2', x: 100, y: 0, type: 1, size: 5 },
     ],
     civilization: FAKE_CIVILIZATION_DATA
 }
