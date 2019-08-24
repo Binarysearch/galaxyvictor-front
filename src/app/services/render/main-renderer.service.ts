@@ -1,15 +1,16 @@
 import { Injectable, Inject } from '@angular/core';
 import { StarRendererService } from './star-renderer.service';
-import { RenderContext, Entity } from './renderer.interface';
+import { RenderContext, Entity, Segment } from './renderer.interface';
 import { ReplaySubject } from 'rxjs';
 import { HoverService } from '../hover.service';
-import { StarSystem } from 'src/app/model/star-system.interface';
+import { StarSystem } from 'src/app/model/star-system';
 import { HoverRendererService } from './hover-renderer.service';
 import { Store } from '../data/store';
 import { Planet } from 'src/app/model/planet';
 import { PlanetRendererService } from './planet-renderer.service';
 import { FleetRendererService } from './fleet-renderer.service';
 import { Fleet } from 'src/app/model/fleet';
+import { LineRendererService } from './line-renderer.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +31,7 @@ export class MainRendererService {
     private planetRenderer: PlanetRendererService,
     private fleetRenderer: FleetRendererService,
     private hoverRenderer: HoverRendererService,
+    private travelLineRenderer: LineRendererService,
     private hoverService: HoverService,
     private store: Store
   ) {
@@ -60,6 +62,7 @@ export class MainRendererService {
     this.planetRenderer.setup(context);
     this.fleetRenderer.setup(context);
     this.hoverRenderer.setup(context);
+    this.travelLineRenderer.setup(context);
     
   }
 
@@ -79,6 +82,23 @@ export class MainRendererService {
     this.starRenderer.render(this.starSystems, context);
     this.planetRenderer.render(this.planets, context);
     this.fleetRenderer.render(this.fleets, context);
+
+    this.travelLineRenderer.render(this.getTravelLines(), context);
+  }
+
+  getTravelLines(): Segment[] {
+    const lines = [];
+    if(this.selected instanceof Fleet){
+      const f = <Fleet>this.selected;
+      if (f.isTravelling) {
+        lines.push({ id: '', x1: f.x, y1: f.y, x2: f.destination.x, y2: f.destination.y });
+      }
+      if (this.hoverService.hovered && this.hoverService.hovered instanceof StarSystem) {
+        const ss = this.hoverService.hovered;
+        lines.push({ id: '', x1: f.x, y1: f.y, x2: ss.x, y2: ss.y });
+      }
+    }
+    return lines;
   }
 
   setViewport(w: number, h: number) {
@@ -92,4 +112,5 @@ export class MainRendererService {
   get selected(): Entity {
     return this.store.getEntity(this.selectedId);
   }
+
 }

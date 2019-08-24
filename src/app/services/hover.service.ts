@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { StarRendererService } from './render/star-renderer.service';
 import { Entity, RenderContext, Renderer } from './render/renderer.interface';
-import { StarSystem } from '../model/star-system.interface';
+import { StarSystem } from '../model/star-system';
 import { Store } from './data/store';
 import { PlanetRendererService } from './render/planet-renderer.service';
 import { Planet } from '../model/planet';
