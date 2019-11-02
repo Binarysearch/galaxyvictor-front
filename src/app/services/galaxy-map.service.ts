@@ -41,7 +41,7 @@ export class GalaxyMapService {
     private store: Store
   ){
     this.api.getSessionState<SessionState>().subscribe(state => {
-      this.context.camera.setPosition(state.cameraX, state.cameraY, state.cameraZ);
+      this.context.camera.setPosition(state.cameraX || 0, state.cameraY || 0, state.cameraZ || 0);
       this.selectedId = state.selectedId;
       this.renderer.setSelectedId(this.selectedId);
     });
@@ -156,7 +156,7 @@ export class GalaxyMapService {
 
   private startAutosaveState() {
     let interval;
-    this.api.getStatus().pipe(first(s => s === SocketStatus.SESSION_STARTED)).subscribe(ready => {
+    this.api.isReady().subscribe(ready => {
       if (ready) {
         let savedX: number;
         let savedY: number;

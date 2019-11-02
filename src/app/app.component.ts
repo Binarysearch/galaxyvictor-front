@@ -46,8 +46,8 @@ export class AppComponent implements AfterViewInit{
     private api: ApiService,
     private galaxyMap: GalaxyMapService
   ) {
-    api.getStatus().pipe(first(s => s === SocketStatus.SESSION_STARTED)).subscribe(ready => {
-      this.sessionStarted = true;
+    api.isReady().subscribe(ready => {
+      this.sessionStarted = ready;
     });
   } 
 

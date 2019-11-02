@@ -27,10 +27,7 @@ export class Store {
   private fleetsSubject: BehaviorSubject<Fleet[]> = new BehaviorSubject([]);
 
   constructor(private api: ApiService, private timeService: TimeService) {
-    this.api.getStatus()
-    .pipe(
-      first(s => s === SocketStatus.SESSION_STARTED)
-    )
+    this.api.isReady()
     .subscribe(ready => {
       if (ready) {
         this.api.request<GalaxyDetail>('get-galaxy', 'test-galaxy')
