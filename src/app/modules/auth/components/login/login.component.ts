@@ -1,8 +1,8 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Validators, FormBuilder, FormControl } from '@angular/forms';
 import { TranslateService } from '../../../../services/translate.service';
-import { LoginService } from '../../services/login.service';
 import { Router } from '@angular/router';
+import { ApiService } from '@piros/api';
 
 @Component({
   selector: 'app-login',
@@ -20,14 +20,14 @@ export class LoginComponent implements OnInit {
 
   errorMessage: string;
 
-  constructor(private router: Router ,public loginService: LoginService, public ts: TranslateService, private fb: FormBuilder) { }
+  constructor(private router: Router ,public api: ApiService, public ts: TranslateService, private fb: FormBuilder) { }
 
   ngOnInit() {
 
   }
 
   login() {
-    this.loginService.login(this.loginForm.value.email, this.loginForm.value.password)
+    this.api.login(this.loginForm.value.email, this.loginForm.value.password)
     .subscribe(() => {
       this.router.navigateByUrl('/');
     });

@@ -3,9 +3,10 @@ import { MainRendererService } from './render/main-renderer.service';
 import { RenderContext, Entity } from './render/renderer.interface';
 import { Camera } from './render/camera';
 import { HoverService } from './hover.service';
-import { AuthService } from '../modules/auth/services/auth.service';
-import { ApiService } from './api.service';
+import { ApiService, SocketStatus } from '@piros/api';
 import { Store } from './data/store';
+import { first } from 'rxjs/operators';
+import { SessionState } from '../model/session.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -36,11 +37,10 @@ export class GalaxyMapService {
   constructor(
     private renderer: MainRendererService,
     private hoverService: HoverService,
-    private auth: AuthService,
     private api: ApiService,
     private store: Store
   ){
-    this.auth.getSessionState().subscribe(state => {
+    this.api.getSessionState<SessionState>().subscribe(state => {
       this.context.camera.setPosition(state.cameraX, state.cameraY, state.cameraZ);
       this.selectedId = state.selectedId;
       this.renderer.setSelectedId(this.selectedId);
@@ -156,7 +156,7 @@ export class GalaxyMapService {
 
   private startAutosaveState() {
     let interval;
-    this.api.getReady().subscribe(ready => {
+    this.api.getStatus().pipe(first(s => s === SocketStatus.SESSION_STARTED)).subscribe(ready => {
       if (ready) {
         let savedX: number;
         let savedY: number;

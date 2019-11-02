@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
-import { RegisterService } from '../../services/register.service';
 import { TranslateService } from 'src/app/services/translate.service';
 import { Router } from '@angular/router';
+import { ApiService } from '@piros/api';
 
 @Component({
   selector: 'app-register',
@@ -19,7 +19,7 @@ export class RegisterComponent implements OnInit {
 
   errorMessage ='';
   
-  constructor(private router: Router ,private registerService: RegisterService, public ts: TranslateService, private fb: FormBuilder) { }
+  constructor(private router: Router ,private api: ApiService, public ts: TranslateService, private fb: FormBuilder) { }
 
   ngOnInit() {
   }
@@ -39,7 +39,7 @@ export class RegisterComponent implements OnInit {
   register() {
     const email = this.registerForm.value.email;
     const password = this.registerForm.value.password;
-    this.registerService.register(email, password).subscribe(() => {
+    this.api.register(email, password).subscribe(() => {
       this.router.navigateByUrl('/');
     });
   }

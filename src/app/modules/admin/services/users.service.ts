@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../../../model/user.interface';
-import { ApiService } from 'src/app/services/api.service';
+import { ApiService } from '@piros/api';
 
 export interface UserListDto {
   total: number;

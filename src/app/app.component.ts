@@ -1,10 +1,8 @@
-import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, ViewChildren, QueryList, HostListener } from '@angular/core';
+import { Component, ElementRef, AfterViewInit, ViewChildren, QueryList, HostListener } from '@angular/core';
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
-import { ApiService } from './services/api.service';
-import { AuthService } from './modules/auth/services/auth.service';
-import { MainRendererService } from './services/render/main-renderer.service';
+import { ApiService, SocketStatus } from '@piros/api';
 import { GalaxyMapService } from './services/galaxy-map.service';
-import { RenderContext } from './services/render/renderer.interface';
+import { first } from 'rxjs/operators';
 
 export interface AppRoute {
   path: string;
@@ -46,11 +44,10 @@ export class AppComponent implements AfterViewInit{
 
   constructor(
     private api: ApiService,
-    private auth: AuthService,
     private galaxyMap: GalaxyMapService
   ) {
-    api.getReady().subscribe(ready => {
-      this.sessionStarted = ready;
+    api.getStatus().pipe(first(s => s === SocketStatus.SESSION_STARTED)).subscribe(ready => {
+      this.sessionStarted = true;
     });
   } 
 
@@ -67,7 +64,7 @@ export class AppComponent implements AfterViewInit{
   }
 
   private logout(): void {
-    this.auth.closeSession();
+    this.api.closeSession();
   }
 
   @HostListener('window:resize')

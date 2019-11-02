@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiInfo, EndPointService, Endpoint } from '../../../../services/end-point.service';
 import { TableConfig, LocalDataSource } from '@piros/table';
 import { User } from 'src/app/model/user.interface';
-import { RequestService } from 'src/app/services/request.service';
 import { UsersService } from '../../services/users.service';
 
 @Component({
@@ -11,8 +9,6 @@ import { UsersService } from '../../services/users.service';
   styleUrls: ['./users.component.css']
 })
 export class UsersComponent implements OnInit {
-
-  apiInfo: ApiInfo;
 
   config: TableConfig<User>;
 

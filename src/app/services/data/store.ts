@@ -2,11 +2,10 @@ import { Injectable } from '@angular/core';
 import { Entity } from '../render/renderer.interface';
 import { StarSystem } from 'src/app/model/star-system';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ApiService } from '../api.service';
+import { ApiService, SocketStatus } from '@piros/api';
 import { GalaxyDetail } from '../../dto/galaxy-detail';
 import { Planet } from 'src/app/model/planet';
-import { PlanetInfo } from 'src/app/dto/planet-info';
-import { map } from 'rxjs/operators';
+import { map, first } from 'rxjs/operators';
 import { FAKE_GALAXY_DATA } from './fake_civ_data';
 import { Fleet } from 'src/app/model/fleet';
 import { TimeService } from '../time.service';
@@ -28,7 +27,11 @@ export class Store {
   private fleetsSubject: BehaviorSubject<Fleet[]> = new BehaviorSubject([]);
 
   constructor(private api: ApiService, private timeService: TimeService) {
-    this.api.getReady().subscribe(ready => {
+    this.api.getStatus()
+    .pipe(
+      first(s => s === SocketStatus.SESSION_STARTED)
+    )
+    .subscribe(ready => {
       if (ready) {
         this.api.request<GalaxyDetail>('get-galaxy', 'test-galaxy')
           .pipe(
