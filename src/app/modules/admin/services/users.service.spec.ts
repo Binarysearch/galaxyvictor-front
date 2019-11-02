@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 
 import { UsersService, UserListDto } from './users.service';
-import { ApiService } from 'src/app/services/api.service';
 import { of } from 'rxjs';
+import { ApiService } from '@piros/api';
 
 describe('UsersService', () => {
 

@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { Store } from './store';
-import { ApiService } from '../api.service';
+import { ApiService } from '@piros/api';
 import { of } from 'rxjs';
 
 describe('Store', () => {
@@ -10,7 +10,7 @@ describe('Store', () => {
 
   beforeEach(() => {
 
-    apiSpy = jasmine.createSpyObj('ApiService', ['request', 'getReady']);
+    apiSpy = jasmine.createSpyObj('ApiService', ['request', 'isReady']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -22,7 +22,7 @@ describe('Store', () => {
 
   it('should be created', () => {
 
-    apiSpy.getReady.and.returnValue(of(false));
+    apiSpy.isReady.and.returnValue(of(false));
 
     const store: Store = TestBed.get(Store);
     expect(store).toBeTruthy();
@@ -30,7 +30,7 @@ describe('Store', () => {
 
   it('should get galaxy when ready', () => {
 
-    apiSpy.getReady.and.returnValue(of(true));
+    apiSpy.isReady.and.returnValue(of(true));
     apiSpy.request.and.returnValue(of({starSystems:[]}));
 
     const store: Store = TestBed.get(Store);

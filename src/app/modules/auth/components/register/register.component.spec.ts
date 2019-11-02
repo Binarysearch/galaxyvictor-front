@@ -3,20 +3,20 @@ import { async, ComponentFixture, TestBed, fakeAsync } from '@angular/core/testi
 import { RegisterComponent } from './register.component';
 import { TranslateService } from 'src/app/services/translate.service';
 import { ReactiveFormsModule } from '@angular/forms';
-import { RegisterService } from '../../services/register.service';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
+import { ApiService } from '@piros/api';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
-  let registerServiceSpy: jasmine.SpyObj<RegisterService>;
+  let registerServiceSpy: jasmine.SpyObj<ApiService>;
   let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async(() => {
 
-    registerServiceSpy = jasmine.createSpyObj('RegisterService', ['register']);
+    registerServiceSpy = jasmine.createSpyObj('ApiService', ['register']);
     routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
     TestBed.configureTestingModule({
@@ -27,7 +27,7 @@ describe('RegisterComponent', () => {
       ],
       providers: [
         TranslateService,
-        { provide: RegisterService, useValue: registerServiceSpy },
+        { provide: ApiService, useValue: registerServiceSpy },
         { provide: Router, useValue: routerSpy }
       ]
     })
@@ -70,8 +70,9 @@ describe('RegisterComponent', () => {
       expect(fixture.componentInstance.repeatPassword.value).toBe('someOtherPassword');
 
       registerServiceSpy.register.and.returnValue(of({
-        user: { id: '', email: ''},
-        token: 'some_token'
+        user: { id: '', username: '', password: ''},
+        token: 'some_token',
+        state: null
       }));
 
       fixture.componentInstance.register();

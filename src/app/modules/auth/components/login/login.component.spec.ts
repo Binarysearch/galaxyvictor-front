@@ -4,19 +4,19 @@ import { LoginComponent } from './login.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { TranslateService } from 'src/app/services/translate.service';
-import { LoginService } from '../../services/login.service';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
+import { ApiService } from '@piros/api';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let loginServiceSpy: jasmine.SpyObj<LoginService>;
+  let loginServiceSpy: jasmine.SpyObj<ApiService>;
   let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async(() => {
 
-    loginServiceSpy = jasmine.createSpyObj('LoginService', ['login']);
+    loginServiceSpy = jasmine.createSpyObj('ApiService', ['login']);
     routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
     TestBed.configureTestingModule({
@@ -27,7 +27,7 @@ describe('LoginComponent', () => {
       ],
       providers: [
         TranslateService,
-        { provide: LoginService, useValue: loginServiceSpy },
+        { provide: ApiService, useValue: loginServiceSpy },
         { provide: Router, useValue: routerSpy }
       ]
     })
@@ -64,8 +64,9 @@ describe('LoginComponent', () => {
       expect(fixture.componentInstance.password.value).toBe('somePassword');
 
       loginServiceSpy.login.and.returnValue(of({
-        user: { id: '', email: ''},
-        token: 'some_token'
+        user: { id: '', username: '', password: ''},
+        token: 'some_token',
+        state: null
       }));
 
       fixture.componentInstance.login();

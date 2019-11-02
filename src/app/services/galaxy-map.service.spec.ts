@@ -4,7 +4,7 @@ import { GalaxyMapService } from './galaxy-map.service';
 import { MainRendererService } from './render/main-renderer.service';
 import { HoverService } from './hover.service';
 import { Store } from './data/store';
-import { ApiService } from './api.service';
+import { ApiService } from '@piros/api';
 import { of, Subject } from 'rxjs';
 
 describe('GalaxyMapService', () => {
@@ -21,7 +21,7 @@ describe('GalaxyMapService', () => {
     rendererSpy = jasmine.createSpyObj('MainRendererService', ['init', 'setViewport', 'setSelectedId']);
     canvasSpy = jasmine.createSpyObj('HTMLCanvasElement', ['height', 'width', 'getContext', 'clientHeight', 'clientWidth']);
     storeSpy = jasmine.createSpyObj('Store', ['getEntity']);
-    apiSpy = jasmine.createSpyObj('ApiService', ['getReady', 'request']);
+    apiSpy = jasmine.createSpyObj('ApiService', ['isReady', 'request', 'getSessionState']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -32,7 +32,12 @@ describe('GalaxyMapService', () => {
       ]
     });
 
-    apiSpy.getReady.and.returnValue(of(false));
+    apiSpy.isReady.and.returnValue(of(false));
+    apiSpy.getSessionState.and.returnValue(of({
+      cameraX: 0,
+      cameraY: 0,
+      cameraZ: 0
+    }));
 
   });
 
@@ -121,7 +126,7 @@ describe('GalaxyMapService', () => {
   it('should start autosave on api ready and stop when not ready', fakeAsync(() => {
 
     const subject: Subject<boolean> = new Subject();
-    apiSpy.getReady.and.returnValue(subject.asObservable());
+    apiSpy.isReady.and.returnValue(subject.asObservable());
     apiSpy.request.and.returnValue(of(1));
 
     const service: GalaxyMapService = TestBed.get(GalaxyMapService);

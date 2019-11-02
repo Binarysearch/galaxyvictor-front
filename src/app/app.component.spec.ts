@@ -2,21 +2,18 @@ import { TestBed, async, fakeAsync, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import { DashboardModule } from '@piros/dashboard';
-import { SocketService } from './services/socket.service';
-import { ApiService } from './services/api.service';
 import { of } from 'rxjs';
-import { AuthService } from './modules/auth/services/auth.service';
 import { GalaxyMapService } from './services/galaxy-map.service';
+import { ApiService } from '@piros/api';
 
 describe('AppComponent', () => {
 
   let apiServiceSpy: jasmine.SpyObj<ApiService>;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
   let galaxyMapSpy: jasmine.SpyObj<GalaxyMapService>;
 
   beforeEach(async(() => {
 
-    apiServiceSpy = jasmine.createSpyObj('ApiService', ['getReady']);
+    apiServiceSpy = jasmine.createSpyObj('ApiService', ['isReady']);
     galaxyMapSpy = jasmine.createSpyObj('GalaxyMapService', [
       'setCanvas',
       'onMouseWheel',
@@ -37,12 +34,11 @@ describe('AppComponent', () => {
       ],
       providers: [
         { provide: ApiService, useValue: apiServiceSpy },
-        { provide: AuthService, useValue: authServiceSpy },
         { provide: GalaxyMapService, useValue: galaxyMapSpy }
       ]
     }).compileComponents();
 
-    apiServiceSpy.getReady.and.returnValue(of(true));
+    apiServiceSpy.isReady.and.returnValue(of(true));
 
     
   }));
