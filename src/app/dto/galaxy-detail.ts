@@ -1,8 +1,8 @@
-import { GalaxyInfo } from './galaxy-info';
-import { StarSystemInfo } from './star-system-info';
-import { CivilizationDetail } from './civilization-detail';
+import { GalaxyInfoDto } from './galaxy-info';
+import { StarSystemInfoDto } from './star-system-info';
+import { CivilizationDetailDto } from './civilization-detail';
 
-export interface GalaxyDetail extends GalaxyInfo {
-    starSystems: StarSystemInfo[];
-    civilization: CivilizationDetail;
+export interface GalaxyDetailDto extends GalaxyInfoDto {
+    starSystems: StarSystemInfoDto[];
+    civilization: CivilizationDetailDto;
 }

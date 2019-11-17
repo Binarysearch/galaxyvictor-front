@@ -1,7 +1,7 @@
-import { CivilizationDetail } from '../../dto/civilization-detail';
-import { GalaxyDetail } from 'src/app/dto/galaxy-detail';
+import { CivilizationDetailDto } from '../../dto/civilization-detail';
+import { GalaxyDetailDto } from 'src/app/dto/galaxy-detail';
 
-export const FAKE_CIVILIZATION_DATA: CivilizationDetail = {
+export const FAKE_CIVILIZATION_DATA: CivilizationDetailDto = {
     id: 'civ1',
     name: 'fake',
     capitolId: 'p1',
@@ -70,7 +70,7 @@ export const FAKE_CIVILIZATION_DATA: CivilizationDetail = {
     ]
 }
 
-export const FAKE_GALAXY_DATA: GalaxyDetail = {
+export const FAKE_GALAXY_DATA: GalaxyDetailDto = {
     id: 'galaxyId',
     name: 'galaxyName',
     starSystems: [

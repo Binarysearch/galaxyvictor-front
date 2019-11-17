@@ -1,10 +1,10 @@
-import { FleetInfo } from './fleet-info';
-import { CivilizationInfo } from './civilization-info';
-import { StarSystemDetail } from './star-system-detail';
+import { FleetInfoDto } from './fleet-info';
+import { CivilizationInfoDto } from './civilization-info';
+import { StarSystemDetailDto } from './star-system-detail';
 
-export interface CivilizationDetail extends CivilizationInfo {
+export interface CivilizationDetailDto extends CivilizationInfoDto {
     capitolId: string;
-    fleets: FleetInfo[];
-    exploredStarSystems: StarSystemDetail[];
-    knownCivilizations: CivilizationInfo[];
+    fleets: FleetInfoDto[];
+    exploredStarSystems: StarSystemDetailDto[];
+    knownCivilizations: CivilizationInfoDto[];
 }

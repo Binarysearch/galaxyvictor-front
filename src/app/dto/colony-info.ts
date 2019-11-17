@@ -1,4 +1,4 @@
-export interface ColonyInfo {
+export interface ColonyInfoDto {
     id: string;
     civilizationId: string;
 }

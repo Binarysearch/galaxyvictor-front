@@ -3,7 +3,7 @@ import { Entity } from '../render/renderer.interface';
 import { StarSystem } from 'src/app/model/star-system';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiService, SocketStatus } from '@piros/api';
-import { GalaxyDetail } from '../../dto/galaxy-detail';
+import { GalaxyDetailDto } from '../../dto/galaxy-detail';
 import { Planet } from 'src/app/model/planet';
 import { map, first } from 'rxjs/operators';
 import { FAKE_GALAXY_DATA } from './fake_civ_data';
@@ -30,7 +30,7 @@ export class Store {
     this.api.isReady()
     .subscribe(ready => {
       if (ready) {
-        this.api.request<GalaxyDetail>('get-galaxy', 'test-galaxy')
+        this.api.request<GalaxyDetailDto>('get-galaxy', 'test-galaxy')
           .pipe(
             map(g => ({...FAKE_GALAXY_DATA, starSystems: g.starSystems.concat(FAKE_GALAXY_DATA.starSystems)}))
           )

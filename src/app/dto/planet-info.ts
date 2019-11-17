@@ -1,9 +1,9 @@
-import { ColonyInfo } from './colony-info';
+import { ColonyInfoDto } from './colony-info';
 
-export interface PlanetInfo {
+export interface PlanetInfoDto {
     id: string;
     type: number;
     size: number;
     orbit: number;
-    colony: ColonyInfo;
+    colony: ColonyInfoDto;
 }

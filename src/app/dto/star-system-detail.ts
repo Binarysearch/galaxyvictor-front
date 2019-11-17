@@ -1,6 +1,6 @@
-import { PlanetInfo } from './planet-info';
-import { StarSystemInfo } from './star-system-info';
+import { PlanetInfoDto } from './planet-info';
+import { StarSystemInfoDto } from './star-system-info';
 
-export interface StarSystemDetail extends StarSystemInfo {
-    planets: PlanetInfo[];
+export interface StarSystemDetailDto extends StarSystemInfoDto {
+    planets: PlanetInfoDto[];
 }
