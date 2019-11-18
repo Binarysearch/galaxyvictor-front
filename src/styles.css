@@ -15,7 +15,7 @@
   --text-color-normal: hsla(var(--hue), 75%, 85%, 0.8);
   --text-color-accent: hsla(var(--hue), 85%, 95%, 0.9);
   --text-shadow-color: hsla(var(--hue), 100%, 90%, 0.5);
-  --panel-background-color: hsla(var(--hue), 100%, 15%, 0.5);
+  --panel-background-color: hsla(var(--hue), 100%, 15%, 0.8);
 
   --input-color-placeholder: hsla(var(--hue), 75%, 75%, 0.5);
   --input-color-focus: hsla(var(--hue), 75%, 75%, 0.9);

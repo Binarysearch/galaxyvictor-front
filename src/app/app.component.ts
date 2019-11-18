@@ -3,6 +3,8 @@ import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { ApiService, SocketStatus } from '@piros/api';
 import { GalaxyMapService } from './services/galaxy-map.service';
 import { first } from 'rxjs/operators';
+import { Store } from './services/data/store';
+import { Civilization } from './model/civilization';
 
 export interface AppRoute {
   path: string;
@@ -20,12 +22,13 @@ export class AppComponent implements AfterViewInit{
   @ViewChildren('canvasRef') 
   private canvasRef: QueryList<ElementRef>;
   
-  private sessionStarted: boolean = false;
+  public sessionStarted: boolean = false;
+
+  public civilization: Civilization;
 
   config: DsConfig = {
     routes: [
       { path: '/', title: 'Home', faIcon: 'fas fa-home' },
-      { path: '/develop', title: 'Develop', faIcon: 'fas fa-file-code', show: this.isSessionStarted.bind(this) },
       { path: '/admin', title: 'Admin', faIcon: 'fas fa-tools', show: this.isSessionStarted.bind(this) },
       { path: '/universe', title: 'Universe', faIcon: 'fab fa-galactic-republic', show: this.isSessionStarted.bind(this) },
       { path: '/galaxy', title: 'Galaxy', faIcon: 'fa fa-atom', show: this.isSessionStarted.bind(this) },
@@ -44,11 +47,13 @@ export class AppComponent implements AfterViewInit{
 
   constructor(
     private api: ApiService,
-    private galaxyMap: GalaxyMapService
+    private galaxyMap: GalaxyMapService,
+    private store: Store
   ) {
     api.isReady().subscribe(ready => {
       this.sessionStarted = ready;
     });
+    store.getCivilization().subscribe(civilization => this.civilization = civilization);
   } 
 
   ngAfterViewInit(): void {

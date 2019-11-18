@@ -18,12 +18,15 @@ import { ResearchModule } from './modules/research/research.module';
 import { TradeModule } from './modules/trade/trade.module';
 import { UniverseModule } from './modules/universe/universe.module';
 import { ApiModule } from '@piros/api';
+import { CreateCivilizationComponent } from './components/create-civilization/create-civilization.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    IndexComponent
+    IndexComponent,
+    CreateCivilizationComponent
   ],
   imports: [
     BrowserModule,
@@ -41,7 +44,8 @@ import { ApiModule } from '@piros/api';
     AppRoutingModule,
     HttpClientModule,
     DashboardModule,
-    ApiModule
+    ApiModule,
+    ReactiveFormsModule
   ],
   providers: [
     { provide: 'Window', useValue: window }

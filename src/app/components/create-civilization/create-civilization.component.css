@@ -1,0 +1,16 @@
+.ng-valid[required]  {
+    border-left: 5px solid #42A948 !important;
+  }
+  
+  .ng-invalid.ng-dirty:not(form)  {
+    border-left: 5px solid #a94442 !important;
+  }
+  .container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 50px;
+  }
+  h1{
+      text-align: center;
+  }

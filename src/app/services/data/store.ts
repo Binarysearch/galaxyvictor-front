@@ -34,9 +34,9 @@ export class Store {
     .subscribe(ready => {
       if (ready) {
         this.api.request<GalaxyDetailDto>('get-galaxy', 'test-galaxy')
-          .pipe(
-            map(g => ({...FAKE_GALAXY_DATA, starSystems: g.starSystems.concat(FAKE_GALAXY_DATA.starSystems)}))
-          )
+          //.pipe(
+            //map(g => ({...FAKE_GALAXY_DATA, starSystems: g.starSystems.concat(FAKE_GALAXY_DATA.starSystems)}))
+          //)
           .subscribe(galaxy => {
 
             const starSystems: StarSystem[] = galaxy.starSystems.map(

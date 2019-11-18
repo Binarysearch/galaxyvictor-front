@@ -21,7 +21,7 @@
     "@angular/platform-browser-dynamic": "~8.0.0",
     "@angular/router": "~8.0.0",
     "@fortawesome/fontawesome-free": "^5.9.0",
-    "@piros/api": "0.0.5",
+    "@piros/api": "0.0.7",
     "@piros/dashboard": "0.0.6",
     "@piros/table": "0.0.4",
     "rxjs": "~6.4.0",
