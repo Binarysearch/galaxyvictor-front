@@ -24,7 +24,7 @@ export class CreateCivilizationComponent implements OnInit {
   }
 
   create() {
-    
+    this.api.request('create-civilization', this.form.value.name).subscribe();
   }
 
   get name (): FormControl {

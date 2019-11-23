@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Entity } from '../render/renderer.interface';
 import { StarSystem } from '../../model/star-system';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ApiService, SocketStatus } from '@piros/api';
+import { ApiService, SocketStatus, ChannelConnection } from '@piros/api';
 import { GalaxyDetailDto } from '../../dto/galaxy-detail';
 import { Planet } from '../../model/planet';
 import { map, first } from 'rxjs/operators';
@@ -57,21 +57,23 @@ export class Store {
       this.civilizationSubject.next(new Civilization(civilization.id, civilization.name));
 
       //Add planets
-      const planets: Planet[] = civilization.exploredStarSystems.map(
-        ss => ss.planets.map(
-          p => new Planet(
-            p.id,
-            p.type,
-            p.size,
-            p.orbit,
-            <StarSystem>this.getEntity(ss.id)
+      if (civilization.exploredStarSystems.length > 0) {
+        const planets: Planet[] = civilization.exploredStarSystems.map(
+          ss => ss.planets.map(
+            p => new Planet(
+              p.id,
+              p.type,
+              p.size,
+              p.orbit,
+              <StarSystem>this.getEntity(ss.id)
+            )
           )
-        )
-      ).reduce(
-        (prev, curr) => prev.concat(curr)
-      );
+        ).reduce(
+          (prev, curr) => prev.concat(curr)
+        );
 
-      this.addPlanets(planets);
+        this.addPlanets(planets);
+      }
       //end add planets
       
       //add fleets
@@ -91,6 +93,12 @@ export class Store {
       //end add fleets
     } else {
       this.civilizationSubject.next(undefined);
+
+      const createCivilizationChannel: ChannelConnection<CivilizationDetailDto> = this.api.connectToChannel<CivilizationDetailDto>('create-civilization');
+      createCivilizationChannel.observable.subscribe(civilization => {
+        this.setCivilization(civilization);
+        createCivilizationChannel.disconnect();
+      });
     }
   }
 
