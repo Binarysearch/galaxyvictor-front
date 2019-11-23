@@ -71,7 +71,6 @@ export const FAKE_CIVILIZATION_DATA: CivilizationDetailDto = {
 }
 
 export const FAKE_GALAXY_DATA: GalaxyDetailDto = {
-    id: 'galaxyId',
     name: 'galaxyName',
     starSystems: [
         { id: 'ss1', x: 0, y: 0, type: 3, size: 2 },
