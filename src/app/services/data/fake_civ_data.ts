@@ -4,7 +4,7 @@ import { GalaxyDetailDto } from 'src/app/dto/galaxy-detail';
 export const FAKE_CIVILIZATION_DATA: CivilizationDetailDto = {
     id: 'civ1',
     name: 'fake',
-    capitolId: 'p1',
+    homeworldId: 'p1',
     fleets: [
         {
             id: 'f1',

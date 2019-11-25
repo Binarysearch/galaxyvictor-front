@@ -54,7 +54,6 @@ export class Store {
 
   private setCivilization(civilization: CivilizationDetailDto) {
     if (civilization) {
-      this.civilizationSubject.next(new Civilization(civilization.id, civilization.name));
 
       //Add planets
       if (civilization.exploredStarSystems.length > 0) {
@@ -91,6 +90,9 @@ export class Store {
       
       this.addFleets(fleets);
       //end add fleets
+
+      this.civilizationSubject.next(new Civilization(civilization.id, civilization.name, <Planet>this.getEntity(civilization.homeworldId)));
+      
     } else {
       this.civilizationSubject.next(undefined);
 

@@ -5,8 +5,10 @@ import { Camera } from './render/camera';
 import { HoverService } from './hover.service';
 import { ApiService, SocketStatus } from '@piros/api';
 import { Store } from './data/store';
-import { first } from 'rxjs/operators';
+import { first, mergeMap, map } from 'rxjs/operators';
 import { SessionState } from '../model/session.interface';
+import { forkJoin } from 'rxjs';
+import { Civilization } from '../model/civilization';
 
 @Injectable({
   providedIn: 'root'
@@ -40,12 +42,35 @@ export class GalaxyMapService {
     private api: ApiService,
     private store: Store
   ){
-    this.api.getSessionState<SessionState>().subscribe(state => {
-      this.context.camera.setPosition(state.cameraX || 0, state.cameraY || 0, state.cameraZ || 0);
-      this.selectedId = state.selectedId;
-      this.renderer.setSelectedId(this.selectedId);
-    });
+
+    this.subscribeToStartingPosition();
+
+    
     this.startAutosaveState();
+  }
+
+  private subscribeToStartingPosition() {
+    this.api.getSessionState<SessionState>().pipe(mergeMap(state => this.store.getCivilization().pipe(map(civ => ({ state: state, civilization: civ }))))).subscribe(result => {
+      const sessionState: SessionState = result.state;
+      const civilization: Civilization = result.civilization;
+      
+      let x = 0, y = 0, z = 0.00003, selected;
+      if (sessionState.cameraX && sessionState.cameraY && sessionState.cameraZ) {
+        x = sessionState.cameraX;
+        y = sessionState.cameraY;
+        z = sessionState.cameraZ;
+        selected = sessionState.selectedId;
+      }
+      else if (civilization) {
+        x = civilization.homeworld.x;
+        y = civilization.homeworld.y;
+        z = 0.5;
+        selected = civilization.homeworld.id;
+      }
+      this.selectedId = selected;
+      this.renderer.setSelectedId(this.selectedId);
+      this.context.camera.setPosition(x, y, z);
+    });
   }
 
   setCanvas(canvas: HTMLCanvasElement) {
