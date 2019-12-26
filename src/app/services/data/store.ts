@@ -9,6 +9,7 @@ import { Fleet } from '../../model/fleet';
 import { TimeService } from '../time.service';
 import { CivilizationDetailDto } from '../../dto/civilization-detail';
 import { Civilization } from '../../model/civilization';
+import { Colony } from 'src/app/model/colony';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,8 @@ export class Store {
   private starSystemsSubject: BehaviorSubject<StarSystem[]> = new BehaviorSubject([]);
 
   private planetsSubject: BehaviorSubject<Planet[]> = new BehaviorSubject([]);
+
+  private coloniesSubject: BehaviorSubject<Colony[]> = new BehaviorSubject([]);
 
   private fleetsSubject: BehaviorSubject<Fleet[]> = new BehaviorSubject([]);
 
@@ -50,31 +53,48 @@ export class Store {
     });
   }
 
-  private setCivilization(civilization: CivilizationDetailDto) {
-    if (civilization) {
-
+  private setCivilization(civilizationDto: CivilizationDetailDto) {
+    if (civilizationDto) {
+      const civilization = new Civilization(civilizationDto.id, civilizationDto.name);
+      
       //Add planets
-      if (civilization.exploredStarSystems.length > 0) {
-        const planets: Planet[] = civilization.exploredStarSystems.map(
-          ss => ss.planets.map(
-            p => new Planet(
-              p.id,
-              p.type,
-              p.size,
-              p.orbit,
-              <StarSystem>this.getEntity(ss.id)
-            )
+      if (civilizationDto.exploredStarSystems.length > 0) {
+        const planets: Planet[] = [];
+        const colonies: Colony[] = [];
+        civilizationDto.exploredStarSystems.forEach(
+          ss => ss.planets.forEach(
+            p => {
+              const planet: Planet = new Planet(
+                p.id,
+                p.type,
+                p.size,
+                p.orbit,
+                <StarSystem>this.getEntity(ss.id)
+              );
+              planets.push(planet);
+
+              if (p.colony) {
+                const colony = new Colony(
+                  p.colony.id,
+                  planet, 
+                  civilization
+                );
+                planet.colony = colony;
+                colonies.push(colony);
+              }
+            }
           )
-        ).reduce(
-          (prev, curr) => prev.concat(curr)
         );
 
         this.addPlanets(planets);
+        this.addColonies(colonies);
       }
       //end add planets
       
+      civilization.homeworld = <Planet>this.getEntity(civilizationDto.homeworldId);
+
       //add fleets
-      const fleets: Fleet[] = civilization.fleets.map(
+      const fleets: Fleet[] = civilizationDto.fleets.map(
         f => new Fleet(
           f.id,
           f.seed,
@@ -89,7 +109,7 @@ export class Store {
       this.addFleets(fleets);
       //end add fleets
 
-      this.civilizationSubject.next(new Civilization(civilization.id, civilization.name, <Planet>this.getEntity(civilization.homeworldId)));
+      this.civilizationSubject.next(civilization);
       
     } else {
       this.civilizationSubject.next(undefined);
@@ -100,6 +120,12 @@ export class Store {
         createCivilizationChannel.disconnect();
       });
     }
+  }
+
+  addColonies(colonies: Colony[]) {
+    colonies.forEach(c => this.entityMap.set(c.id, c));
+    const newColonies = this.coloniesSubject.value.concat(colonies);
+    this.coloniesSubject.next(newColonies);
   }
 
   public setStarSystems(starSystems: StarSystem[]): void {
@@ -124,6 +150,10 @@ export class Store {
     return this.planetsSubject.asObservable();
   }
 
+  public getColonies(): Observable<Colony[]> {
+    return this.coloniesSubject.asObservable();
+  }
+
   public getFleets(): Observable<Fleet[]> {
     return this.fleetsSubject.asObservable();
   }
@@ -144,6 +174,7 @@ export class Store {
     this.starSystemsSubject.next([]);
     this.planetsSubject.next([]);
     this.fleetsSubject.next([]);
+    this.coloniesSubject.next([]);
     this.civilizationSubject.next(undefined);
     this.entityMap.clear();
   }

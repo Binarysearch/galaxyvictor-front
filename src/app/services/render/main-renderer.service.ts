@@ -9,8 +9,10 @@ import { Store } from '../data/store';
 import { Planet } from 'src/app/model/planet';
 import { PlanetRendererService } from './planet-renderer.service';
 import { FleetRendererService } from './fleet-renderer.service';
+import { ColonyRendererService } from './colony-renderer.service';
 import { Fleet } from 'src/app/model/fleet';
 import { LineRendererService } from './line-renderer.service';
+import { Colony } from 'src/app/model/colony';
 
 @Injectable({
   providedIn: 'root'
@@ -24,12 +26,14 @@ export class MainRendererService {
   private starSystems: StarSystem[] = [];
   private planets: Planet[] = [];
   private fleets: Fleet[] = [];
+  private colonies: Colony[] = [];
 
   constructor(
     @Inject('Window') private window: Window,
     private starRenderer: StarRendererService,
     private planetRenderer: PlanetRendererService,
     private fleetRenderer: FleetRendererService,
+    private colonyRenderer: ColonyRendererService,
     private hoverRenderer: HoverRendererService,
     private travelLineRenderer: LineRendererService,
     private hoverService: HoverService,
@@ -38,6 +42,7 @@ export class MainRendererService {
     this.store.getStarSystems().subscribe(ss => this.starSystems = ss);
     this.store.getPlanets().subscribe(planets => this.planets = planets);
     this.store.getFleets().subscribe(fleets => this.fleets = fleets);
+    this.store.getColonies().subscribe(colonies => this.colonies = colonies);
   }
 
   public init(context: RenderContext): void {
@@ -61,6 +66,7 @@ export class MainRendererService {
     this.starRenderer.setup(context);
     this.planetRenderer.setup(context);
     this.fleetRenderer.setup(context);
+    this.colonyRenderer.setup(context);
     this.hoverRenderer.setup(context);
     this.travelLineRenderer.setup(context);
     
@@ -82,6 +88,7 @@ export class MainRendererService {
     this.starRenderer.render(this.starSystems, context);
     this.planetRenderer.render(this.planets, context);
     this.fleetRenderer.render(this.fleets, context);
+    this.colonyRenderer.render(this.colonies, context);
 
     this.travelLineRenderer.render(this.getTravelLines(), context);
   }

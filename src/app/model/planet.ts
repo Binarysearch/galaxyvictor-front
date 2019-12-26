@@ -1,8 +1,11 @@
 import { Entity } from '../services/render/renderer.interface';
 import { StarSystem } from './star-system';
 import { PLANET_ROTATION_SPEED_MULT, PLANET_ORBIT_SCALE_MULTIPLIER } from '../galaxy-constants';
+import { Colony } from './colony';
 
 export class Planet implements Entity {
+    
+    colony: Colony;
 
     constructor(
         public id: string,
