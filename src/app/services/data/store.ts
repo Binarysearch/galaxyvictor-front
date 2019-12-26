@@ -2,11 +2,9 @@ import { Injectable } from '@angular/core';
 import { Entity } from '../render/renderer.interface';
 import { StarSystem } from '../../model/star-system';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ApiService, SocketStatus, ChannelConnection } from '@piros/api';
+import { ApiService, ChannelConnection } from '@piros/api';
 import { GalaxyDetailDto } from '../../dto/galaxy-detail';
 import { Planet } from '../../model/planet';
-import { map, first } from 'rxjs/operators';
-import { FAKE_GALAXY_DATA } from './fake_civ_data';
 import { Fleet } from '../../model/fleet';
 import { TimeService } from '../time.service';
 import { CivilizationDetailDto } from '../../dto/civilization-detail';
@@ -140,5 +138,13 @@ export class Store {
 
   public getEntity(id: string): Entity {
     return this.entityMap.get(id);
+  }
+
+  public clear(): void {
+    this.starSystemsSubject.next([]);
+    this.planetsSubject.next([]);
+    this.fleetsSubject.next([]);
+    this.civilizationSubject.next(undefined);
+    this.entityMap.clear();
   }
 }

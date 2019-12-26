@@ -70,6 +70,7 @@ export class AppComponent implements AfterViewInit{
 
   private logout(): void {
     this.api.closeSession();
+    this.store.clear();
   }
 
   @HostListener('window:resize')

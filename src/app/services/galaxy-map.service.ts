@@ -41,35 +41,37 @@ export class GalaxyMapService {
     private hoverService: HoverService,
     private api: ApiService,
     private store: Store
-  ){
-
+  ){ 
     this.subscribeToStartingPosition();
-
-    
     this.startAutosaveState();
   }
 
   private subscribeToStartingPosition() {
-    this.api.getSessionState<SessionState>().pipe(mergeMap(state => this.store.getCivilization().pipe(map(civ => ({ state: state, civilization: civ }))))).subscribe(result => {
-      const sessionState: SessionState = result.state;
-      const civilization: Civilization = result.civilization;
-      
-      let x = 0, y = 0, z = 0.00003, selected;
-      if (sessionState.cameraX && sessionState.cameraY && sessionState.cameraZ) {
-        x = sessionState.cameraX;
-        y = sessionState.cameraY;
-        z = sessionState.cameraZ;
-        selected = sessionState.selectedId;
+    this.api.isReady().subscribe(ready => {
+      if (ready) {
+        this.api.getSessionState<SessionState>().pipe(mergeMap(state => this.store.getCivilization().pipe(map(civ => ({ state: state, civilization: civ }))))).subscribe(result => {
+          const sessionState: SessionState = result.state;
+          const civilization: Civilization = result.civilization;
+          
+          let x = 0, y = 0, z = 0.00003, selected;
+          if (sessionState.cameraX && sessionState.cameraY && sessionState.cameraZ) {
+            x = sessionState.cameraX;
+            y = sessionState.cameraY;
+            z = sessionState.cameraZ;
+            selected = sessionState.selectedId;
+          }
+          else if (civilization) {
+            x = civilization.homeworld.x;
+            y = civilization.homeworld.y;
+            z = 0.5;
+            selected = civilization.homeworld.id;
+          }
+          this.selectedId = selected;
+          this.renderer.setSelectedId(this.selectedId);
+          this.context.camera.setPosition(x, y, z);
+        });
+
       }
-      else if (civilization) {
-        x = civilization.homeworld.x;
-        y = civilization.homeworld.y;
-        z = 0.5;
-        selected = civilization.homeworld.id;
-      }
-      this.selectedId = selected;
-      this.renderer.setSelectedId(this.selectedId);
-      this.context.camera.setPosition(x, y, z);
     });
   }
 
