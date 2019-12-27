@@ -41,7 +41,7 @@ export class Store {
           .subscribe(galaxy => {
 
             const starSystems: StarSystem[] = galaxy.starSystems.map(
-              ss => new StarSystem(ss.id, ss.x, ss.y, ss.size, ss.type)
+              ss => new StarSystem(ss.id, ss.name, ss.x, ss.y, ss.size, ss.type)
             );
             this.setStarSystems(starSystems);
 

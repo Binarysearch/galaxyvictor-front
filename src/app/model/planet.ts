@@ -31,4 +31,8 @@ export class Planet implements Entity {
         const speed = PLANET_ROTATION_SPEED_MULT / Math.sqrt(this.orbit);
         return (startingAngle + speed * time) % (Math.PI * 2);
     }
+
+    get name(): string {
+        return this.starSystem.name + ' ' + this.orbit;
+    }
 }

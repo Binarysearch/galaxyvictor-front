@@ -1,1 +1,3 @@
-<span class='text-label' *ngFor="let p of procesedPlanets" [style.left]="p.x + 'px'" [style.top]="p.y + 'px'">{{ p.x }}</span>
+<div class="text" *ngFor="let p of procesedPlanets" [style.left]="p.x + 'px'" [style.top]="p.y + 'px'">
+    <span class='text-label' >{{ p.name }}</span>
+</div>

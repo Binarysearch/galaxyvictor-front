@@ -150,8 +150,8 @@ describe('MainRendererService', () => {
     service.init(context);
     service.setSelectedId('selected');
 
-    const ss1 = new StarSystem('ss1', 0, 0, 1, 1);
-    const ss2 = new StarSystem('ss2', 0, 0, 1, 1);
+    const ss1 = new StarSystem('ss1', '', 0, 0, 1, 1);
+    const ss2 = new StarSystem('ss2', '', 0, 0, 1, 1);
     const timeServiceSpy = jasmine.createSpyObj('TimeService', ['getGameTime']);
 
     const fleet = new Fleet('f1', 1, 1, 0, ss1, ss2, timeServiceSpy);

@@ -1,3 +1,11 @@
+.text {
+    position: absolute;
+    white-space: nowrap;
+    display: block;
+}
 .text-label {
-    position: fixed;
+    position: relative;
+    word-break: keep-all;
+    white-space: nowrap;
+    left: -50%;
 }
