@@ -20,13 +20,15 @@ import { UniverseModule } from './modules/universe/universe.module';
 import { ApiModule } from '@piros/api';
 import { CreateCivilizationComponent } from './components/create-civilization/create-civilization.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { TextRendererComponent } from './components/text-renderer/text-renderer.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     IndexComponent,
-    CreateCivilizationComponent
+    CreateCivilizationComponent,
+    TextRendererComponent
   ],
   imports: [
     BrowserModule,

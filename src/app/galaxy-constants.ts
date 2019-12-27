@@ -60,6 +60,7 @@ export const PLANET_SIZES = [
 
 // Camera constants
 export const MIN_ZOOM_TO_VIEW_PLANETS = 0.01;
+export const MIN_ZOOM_TO_VIEW_NAMES = 0.05;
 
 // Rotation speeds
 export const PLANET_ROTATION_SPEED_MULT = 0.01;

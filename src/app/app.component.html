@@ -1,7 +1,10 @@
 <dashboard [content]="main" [config]="config"></dashboard>
 <ng-template #main>
   <div id='main-container'>
-    <canvas id='main-canvas' #canvasRef (mousewheel)="onMouseWheel($event)" (click)="onMouseClick($event);" (mousedown)="onMouseDown($event);" (contextmenu)="onContextMenu($event);"></canvas>
+    <div (mousewheel)="onMouseWheel($event)"  (click)="onMouseClick($event);" (mousedown)="onMouseDown($event);" (contextmenu)="onContextMenu($event);">
+      <canvas id='main-canvas' #canvasRef></canvas>
+      <app-text-renderer></app-text-renderer>
+    </div>
     <div *ngIf="!sessionStarted || civilization"><router-outlet></router-outlet></div>
     <div *ngIf="!(!sessionStarted || civilization)"><create-civilization></create-civilization></div>
   </div>

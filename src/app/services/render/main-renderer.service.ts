@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { StarRendererService } from './star-renderer.service';
 import { RenderContext, Entity, Segment } from './renderer.interface';
-import { ReplaySubject } from 'rxjs';
+import { ReplaySubject, Observable } from 'rxjs';
 import { HoverService } from '../hover.service';
 import { StarSystem } from 'src/app/model/star-system';
 import { HoverRendererService } from './hover-renderer.service';
@@ -110,6 +110,10 @@ export class MainRendererService {
 
   setViewport(w: number, h: number) {
     this.viewportSubject.next({w: w, h: h});
+  }
+
+  getViewport(): Observable<{w: number, h: number}> {
+    return this.viewportSubject.asObservable();
   }
 
   setSelectedId(id: string) {
