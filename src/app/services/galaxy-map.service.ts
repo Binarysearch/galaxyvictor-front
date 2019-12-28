@@ -222,7 +222,7 @@ export class GalaxyMapService {
               savedSelected = newState.selectedId;
             });
           }
-        }, 500);
+        }, 2500);
       } else {
         if(interval){
           clearInterval(interval);

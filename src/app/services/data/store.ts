@@ -10,6 +10,8 @@ import { TimeService } from '../time.service';
 import { CivilizationDetailDto } from '../../dto/civilization-detail';
 import { Civilization } from '../../model/civilization';
 import { Colony } from 'src/app/model/colony';
+import { FleetUpdatesService } from '../updates/fleet-updates.service';
+import { FleetInfoDto } from 'src/app/dto/fleet-info';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +32,11 @@ export class Store {
 
 
 
-  constructor(private api: ApiService, private timeService: TimeService) {
+  constructor(
+    private api: ApiService,
+    private timeService: TimeService,
+    private fleetUpdatesService: FleetUpdatesService
+  ) {
     this.api.isReady()
     .subscribe(ready => {
       if (ready) {
@@ -49,7 +55,17 @@ export class Store {
             
 
           });
+        
+          this.subscribeToFleetUpdates();
       }
+    });
+  }
+
+  private subscribeToFleetUpdates() {
+    this.fleetUpdatesService.getFleetUpdates().subscribe(f => {
+      const fleet = this.createFleet(f);
+      this.removeFleet(fleet);
+      this.addFleets([fleet]);
     });
   }
 
@@ -97,16 +113,7 @@ export class Store {
 
       //add fleets
       const fleets: Fleet[] = civilizationDto.fleets.map(
-        f => new Fleet(
-          f.id,
-          f.seed,
-          f.speed,
-          f.startTravelTime,
-          <StarSystem>this.getEntity(f.destinationId),
-          <StarSystem>this.getEntity(f.originId),
-          <Civilization>this.getEntity(f.civilizationId),
-          this.timeService
-        )
+        f => this.createFleet(f)
       );
       
       this.addFleets(fleets);
@@ -123,6 +130,19 @@ export class Store {
         createCivilizationChannel.disconnect();
       });
     }
+  }
+
+  private createFleet(f: FleetInfoDto): Fleet {
+    return new Fleet(
+      f.id,
+      f.seed,
+      f.speed,
+      f.startTravelTime,
+      <StarSystem>this.getEntity(f.destinationId),
+      <StarSystem>this.getEntity(f.originId),
+      <Civilization>this.getEntity(f.civilizationId),
+      this.timeService
+    );
   }
 
   addColonies(colonies: Colony[]) {
@@ -146,6 +166,12 @@ export class Store {
   public addFleets(fleets: Fleet[]): void {
     fleets.forEach(f => this.entityMap.set(f.id, f));
     const newFleets = this.fleetsSubject.value.concat(fleets);
+    this.fleetsSubject.next(newFleets);
+  }
+
+  public removeFleet(fleet: Fleet): void {
+    this.entityMap.delete(fleet.id);
+    const newFleets = this.fleetsSubject.value.filter(f => f.id !== fleet.id);
     this.fleetsSubject.next(newFleets);
   }
 
