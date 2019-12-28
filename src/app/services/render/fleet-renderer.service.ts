@@ -4,6 +4,7 @@ import { ShaderCompilerService } from '../gl-utils/shader-compiler.service';
 import { FLEET_VS_SOURCE, FLEET_FS_SOURCE } from './shaders/fleet-shader';
 import { FLEET_VERTICES } from './shapes/fleet-vertices';
 import { Fleet } from '../../model/fleet';
+import { ColorService } from '../color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,10 @@ export class FleetRendererService implements Renderer{
   angleUniformLocation: WebGLUniformLocation;
   colorUniformLocation: WebGLUniformLocation;
 
-  constructor(private shaderCompiler: ShaderCompilerService) { }
+  constructor(
+    private shaderCompiler: ShaderCompilerService,
+    private colorService: ColorService
+  ) { }
 
   setup(context: RenderContext): void {
     const gl = context.gl;
@@ -70,12 +74,13 @@ export class FleetRendererService implements Renderer{
       fleet => {
         const scale = this.getRenderScale(fleet, zoom);
 
+        const { r, g, b } = this.colorService.getCivilizationColor(fleet.civilization.id);
         const angle = fleet.angle;
 
         gl.uniform1f(this.scaleUniformLocation, scale);
         gl.uniform2f(this.positionUniformLocation, fleet.x - camera.x, fleet.y - camera.y);
         gl.uniform1f(this.angleUniformLocation, -angle);
-        gl.uniform3f(this.colorUniformLocation, 1, 1, 0);
+        gl.uniform3f(this.colorUniformLocation, r, g, b);
 
         gl.drawArrays(gl.TRIANGLES, 0, 90);
       }

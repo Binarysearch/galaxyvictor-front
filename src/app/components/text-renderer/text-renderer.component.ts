@@ -5,6 +5,7 @@ import { VisibleEntitiesService } from '../../services/visible-entities/visible-
 import { VisibleStar } from '../../services/visible-entities/visible-stars.service';
 import { takeUntil } from 'rxjs/operators';
 import { Planet } from 'src/app/model/planet';
+import { ColorService } from 'src/app/services/color.service';
 
 @Component({
   selector: 'app-text-renderer',
@@ -18,7 +19,8 @@ export class TextRendererComponent implements OnInit, OnDestroy {
   public visibleStars: VisibleStar[] = [];
 
   constructor(
-    private visibleEntitiesService: VisibleEntitiesService
+    private visibleEntitiesService: VisibleEntitiesService,
+    private colorService: ColorService
   ) { }
 
   ngOnInit() {
@@ -38,7 +40,7 @@ export class TextRendererComponent implements OnInit, OnDestroy {
 
   getColor(p: Planet): string {
     if (p.colony) {
-      return '#ffff00';
+      return this.colorService.getCivilizationColorHex(p.colony.id);
     } else {
       return '#ffffff';
     }

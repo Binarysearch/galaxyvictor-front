@@ -12,6 +12,7 @@ import { Civilization } from '../model/civilization';
 import { Fleet } from '../model/fleet';
 import { StarSystem } from '../model/star-system';
 import { CommandService } from './command.service';
+import { ConstraintService } from './constraint.service';
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +38,6 @@ export class GalaxyMapService {
   private mouseDownCameraY: number;
   private selectedId: string;
   private galaxyId: string;
-  private civilization: Civilization;
 
 
   constructor(
@@ -45,9 +45,9 @@ export class GalaxyMapService {
     private hoverService: HoverService,
     private api: ApiService,
     private command: CommandService,
+    private constraintService: ConstraintService,
     private store: Store
   ){
-    this.store.getCivilization().subscribe(civilization => this.civilization = civilization);
     this.subscribeToStartingPosition();
     this.startAutosaveState();
   }
@@ -124,13 +124,7 @@ export class GalaxyMapService {
   }
 
   onRightButtonMouseClick(event: MouseEvent) {
-    if (
-      this.selected instanceof Fleet && 
-      this.hovered instanceof StarSystem &&
-      !this.selected.isTravelling &&
-      this.selected.destination.id !== this.hovered.id &&
-      this.selected.civilization.id === this.civilization.id
-    ) {
+    if (this.constraintService.canStartTravelTo(this.selected, this.hovered)) {
       this.command.startTravel(this.selected.id, this.hovered.id);
     }
   }

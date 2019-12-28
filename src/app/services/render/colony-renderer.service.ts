@@ -4,6 +4,7 @@ import { ShaderCompilerService } from '../gl-utils/shader-compiler.service';
 import { COLONY_VS_SOURCE, COLONY_FS_SOURCE } from './shaders/colony-shader';
 import { Colony } from '../../model/colony';
 import { PLANET_RENDER_SCALE_ZI, PLANET_RENDER_SCALE_ZI_SI, PLANET_RENDER_SCALE_ZD } from 'src/app/galaxy-constants';
+import { ColorService } from '../color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,10 @@ export class ColonyRendererService implements Renderer{
   positionUniformLocation: WebGLUniformLocation;
   colorUniformLocation: WebGLUniformLocation;
 
-  constructor(private shaderCompiler: ShaderCompilerService) { }
+  constructor(
+    private shaderCompiler: ShaderCompilerService,
+    private colorService: ColorService
+  ) { }
 
   setup(context: RenderContext): void {
     const gl = context.gl;
@@ -70,11 +74,12 @@ export class ColonyRendererService implements Renderer{
 
     colonies.forEach(
       colony => {
+        const { r, g, b } = this.colorService.getCivilizationColor(colony.civilization.id);
         const scale = this.getRenderScale(colony, zoom);
 
         gl.uniform1f(this.scaleUniformLocation, scale);
         gl.uniform2f(this.positionUniformLocation, colony.x - camera.x, colony.y - camera.y);
-        gl.uniform3f(this.colorUniformLocation, 1, 1, 0);
+        gl.uniform3f(this.colorUniformLocation, r, g, b);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
       }
     );

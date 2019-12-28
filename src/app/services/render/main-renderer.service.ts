@@ -14,6 +14,7 @@ import { Fleet } from 'src/app/model/fleet';
 import { LineRendererService } from './line-renderer.service';
 import { Colony } from 'src/app/model/colony';
 import { VisibleEntitiesService } from '../visible-entities/visible-entities.service';
+import { ConstraintService } from '../constraint.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,7 +40,8 @@ export class MainRendererService {
     private travelLineRenderer: LineRendererService,
     private hoverService: HoverService,
     private store: Store,
-    private visibleEntitiesService: VisibleEntitiesService
+    private visibleEntitiesService: VisibleEntitiesService,
+    private constraintService: ConstraintService
   ) {
     this.visibleEntitiesService.getViewportStars().subscribe(ss => this.starSystems = ss);
     this.visibleEntitiesService.getViewportPlanets().subscribe(planets => this.planets = planets);
@@ -103,7 +105,7 @@ export class MainRendererService {
       if (f.isTravelling) {
         lines.push({ id: '', x1: f.x, y1: f.y, x2: f.destination.x, y2: f.destination.y });
       }
-      if (this.hoverService.hovered && this.hoverService.hovered instanceof StarSystem) {
+      if (this.constraintService.canStartTravelTo(this.selected, this.hoverService.hovered)) {
         const ss = this.hoverService.hovered;
         lines.push({ id: '', x1: f.x, y1: f.y, x2: ss.x, y2: ss.y });
       }
