@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Store } from '../data/store';
-import { GalaxyMapService } from '../galaxy-map.service';
-import { MainRendererService } from '../render/main-renderer.service';
 import { Planet } from '../../model/planet';
-import { MIN_ZOOM_TO_VIEW_NAMES } from '../../galaxy-constants';
+import { MIN_ZOOM_TO_VIEW_PLANET_NAMES } from '../../galaxy-constants';
 import { Camera } from '../render/camera';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { PlanetRendererService } from '../render/planet-renderer.service';
@@ -29,8 +27,7 @@ export class VisiblePlanetsService {
   private planets: Planet[] = [];
   private viewportPlanets: BehaviorSubject<Planet[]> = new BehaviorSubject([]);
   private visiblePlanets: BehaviorSubject<VisiblePlanet[]> = new BehaviorSubject([]);
-  planetsChanged: boolean;
-  oldCameraCoords: { x: number; y: number; zoom: number; };
+  private planetsChanged: boolean;
 
   constructor(
     private store: Store,
@@ -65,7 +62,7 @@ export class VisiblePlanetsService {
       this.planetsChanged = false;
     }
 
-    if(this.camera.zoom < MIN_ZOOM_TO_VIEW_NAMES){
+    if(this.camera.zoom < MIN_ZOOM_TO_VIEW_PLANET_NAMES){
       this.visiblePlanets.next([]);
     } else {
       const visiblePlanets = this.viewportPlanets.value.map(p => {

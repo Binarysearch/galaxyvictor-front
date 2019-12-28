@@ -41,7 +41,7 @@ export class MainRendererService {
     private store: Store,
     private visibleEntitiesService: VisibleEntitiesService
   ) {
-    this.store.getStarSystems().subscribe(ss => this.starSystems = ss);
+    this.visibleEntitiesService.getViewportStars().subscribe(ss => this.starSystems = ss);
     this.visibleEntitiesService.getViewportPlanets().subscribe(planets => this.planets = planets);
     this.store.getFleets().subscribe(fleets => this.fleets = fleets);
     this.store.getColonies().subscribe(colonies => this.colonies = colonies);
