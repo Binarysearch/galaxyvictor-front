@@ -9,6 +9,9 @@ import { first, mergeMap, map } from 'rxjs/operators';
 import { SessionState } from '../model/session.interface';
 import { forkJoin } from 'rxjs';
 import { Civilization } from '../model/civilization';
+import { Fleet } from '../model/fleet';
+import { StarSystem } from '../model/star-system';
+import { CommandService } from './command.service';
 
 @Injectable({
   providedIn: 'root'
@@ -34,14 +37,17 @@ export class GalaxyMapService {
   private mouseDownCameraY: number;
   private selectedId: string;
   private galaxyId: string;
+  private civilization: Civilization;
 
 
   constructor(
     private renderer: MainRendererService,
     private hoverService: HoverService,
     private api: ApiService,
+    private command: CommandService,
     private store: Store
-  ){ 
+  ){
+    this.store.getCivilization().subscribe(civilization => this.civilization = civilization);
     this.subscribeToStartingPosition();
     this.startAutosaveState();
   }
@@ -117,7 +123,19 @@ export class GalaxyMapService {
     }
   }
 
-  onMouseClick(event: any) {
+  onRightButtonMouseClick(event: MouseEvent) {
+    if (
+      this.selected instanceof Fleet && 
+      this.hovered instanceof StarSystem &&
+      !this.selected.isTravelling &&
+      this.selected.destination.id !== this.hovered.id &&
+      this.selected.civilization.id === this.civilization.id
+    ) {
+      this.command.startTravel(this.selected.id, this.hovered.id);
+    }
+  }
+
+  onMouseClick(event: MouseEvent) {
     const dx = (this.mouseDownX - this._mouseX) * 100;
     const dy = (this.mouseDownY - this._mouseY) * 100;
     const epsilon = 2;

@@ -4,6 +4,7 @@ import { VisiblePlanet } from '../../services/visible-entities/visible-planets.s
 import { VisibleEntitiesService } from '../../services/visible-entities/visible-entities.service';
 import { VisibleStar } from '../../services/visible-entities/visible-stars.service';
 import { takeUntil } from 'rxjs/operators';
+import { Planet } from 'src/app/model/planet';
 
 @Component({
   selector: 'app-text-renderer',
@@ -35,4 +36,11 @@ export class TextRendererComponent implements OnInit, OnDestroy {
     this.destroyed.complete();
   }
 
+  getColor(p: Planet): string {
+    if (p.colony) {
+      return '#ffff00';
+    } else {
+      return '#ffffff';
+    }
+  }
 }

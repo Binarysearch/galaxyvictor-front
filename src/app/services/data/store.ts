@@ -57,6 +57,8 @@ export class Store {
     if (civilizationDto) {
       const civilization = new Civilization(civilizationDto.id, civilizationDto.name);
       
+      this.entityMap.set(civilization.id, civilization);
+      
       //Add planets
       if (civilizationDto.exploredStarSystems.length > 0) {
         const planets: Planet[] = [];
@@ -77,7 +79,7 @@ export class Store {
                 const colony = new Colony(
                   p.colony.id,
                   planet, 
-                  civilization
+                  <Civilization>this.getEntity(p.colony.civilizationId)
                 );
                 planet.colony = colony;
                 colonies.push(colony);
@@ -102,6 +104,7 @@ export class Store {
           f.startTravelTime,
           <StarSystem>this.getEntity(f.destinationId),
           <StarSystem>this.getEntity(f.originId),
+          <Civilization>this.getEntity(f.civilizationId),
           this.timeService
         )
       );

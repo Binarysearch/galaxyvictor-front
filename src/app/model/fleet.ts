@@ -2,6 +2,7 @@ import { Entity } from '../services/render/renderer.interface';
 import { TimeService } from '../services/time.service';
 import { StarSystem } from './star-system';
 import { FLEET_ROTATION_SPEED_MULT } from '../galaxy-constants';
+import { Civilization } from './civilization';
 
 export class Fleet implements Entity {
 
@@ -16,6 +17,7 @@ export class Fleet implements Entity {
         public startTravelTime: number,
         public destination: StarSystem,
         public origin: StarSystem,
+        public civilization: Civilization,
         private timeService: TimeService
     ) {
         this.destinationId = destination.id;

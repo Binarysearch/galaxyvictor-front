@@ -102,6 +102,7 @@ export class AppComponent implements AfterViewInit{
   }
 
   onContextMenu(event){
+    this.galaxyMap.onRightButtonMouseClick(event);
     event.preventDefault();
   }
 
