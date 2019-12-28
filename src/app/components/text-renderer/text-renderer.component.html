@@ -1,6 +1,6 @@
 <div class="text" *ngFor="let p of visiblePlanets" [style.left]="p.x + 'px'" [style.top]="p.y + 'px'">
-    <span class='text-label' >{{ p.planet.name }}</span>
+    <span class='planet-label' >{{ p.planet.name }}</span>
 </div>
 <div class="text" *ngFor="let ss of visibleStars" [style.left]="ss.x + 'px'" [style.top]="ss.y + 'px'">
-    <span class='text-label' >{{ ss.star.name }}</span>
+    <span class='star-label' >{{ ss.star.name }}</span>
 </div>

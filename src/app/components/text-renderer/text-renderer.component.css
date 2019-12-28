@@ -3,9 +3,18 @@
     white-space: nowrap;
     display: block;
 }
-.text-label {
+.planet-label {
     position: relative;
     word-break: keep-all;
     white-space: nowrap;
     left: -50%;
+    font-size: 10px;
+}
+.star-label {
+    position: relative;
+    word-break: keep-all;
+    white-space: nowrap;
+    left: -50%;
+    font-size: 16px;
+    font-weight: 800;
 }
