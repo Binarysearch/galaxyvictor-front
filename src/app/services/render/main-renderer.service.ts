@@ -13,6 +13,7 @@ import { ColonyRendererService } from './colony-renderer.service';
 import { Fleet } from 'src/app/model/fleet';
 import { LineRendererService } from './line-renderer.service';
 import { Colony } from 'src/app/model/colony';
+import { VisibleEntitiesService } from '../visible-entities/visible-entities.service';
 
 @Injectable({
   providedIn: 'root'
@@ -37,10 +38,11 @@ export class MainRendererService {
     private hoverRenderer: HoverRendererService,
     private travelLineRenderer: LineRendererService,
     private hoverService: HoverService,
-    private store: Store
+    private store: Store,
+    private visibleEntitiesService: VisibleEntitiesService
   ) {
     this.store.getStarSystems().subscribe(ss => this.starSystems = ss);
-    this.store.getPlanets().subscribe(planets => this.planets = planets);
+    this.visibleEntitiesService.getViewportPlanets().subscribe(planets => this.planets = planets);
     this.store.getFleets().subscribe(fleets => this.fleets = fleets);
     this.store.getColonies().subscribe(colonies => this.colonies = colonies);
   }
@@ -50,6 +52,7 @@ export class MainRendererService {
     this.viewportSubject.subscribe(vp => {
       context.gl.viewport(0, 0, vp.w, vp.h);
       context.aspectRatio = vp.w / vp.h;
+      this.visibleEntitiesService.setViewport(vp);
     });
 
     this.setup(context);
@@ -69,7 +72,7 @@ export class MainRendererService {
     this.colonyRenderer.setup(context);
     this.hoverRenderer.setup(context);
     this.travelLineRenderer.setup(context);
-    
+    this.visibleEntitiesService.setup(context);
   }
 
   private render(context: RenderContext): void {
