@@ -11,7 +11,9 @@ import { CivilizationDetailDto } from '../../dto/civilization-detail';
 import { Civilization } from '../../model/civilization';
 import { Colony } from 'src/app/model/colony';
 import { FleetUpdatesService } from '../updates/fleet-updates.service';
+import { PlanetUpdatesService } from '../updates/planet-updates.service';
 import { FleetInfoDto } from 'src/app/dto/fleet-info';
+import { PlanetInfoDto } from 'src/app/dto/planet-info';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +37,8 @@ export class Store {
   constructor(
     private api: ApiService,
     private timeService: TimeService,
-    private fleetUpdatesService: FleetUpdatesService
+    private fleetUpdatesService: FleetUpdatesService,
+    private planetUpdatesService: PlanetUpdatesService
   ) {
     this.api.isReady()
     .subscribe(ready => {
@@ -57,6 +60,7 @@ export class Store {
           });
         
           this.subscribeToFleetUpdates();
+          this.subscribeToPlanetUpdates();
       }
     });
   }
@@ -66,6 +70,14 @@ export class Store {
       const fleet = this.createFleet(f);
       this.removeFleet(fleet);
       this.addFleets([fleet]);
+    });
+  }
+
+  private subscribeToPlanetUpdates() {
+    this.planetUpdatesService.getPlanetUpdates().subscribe(p => {
+      const planet = this.createPlanet(p);
+      this.removePlanet(planet);
+      this.addPlanets([planet]);
     });
   }
 
@@ -82,13 +94,7 @@ export class Store {
         civilizationDto.exploredStarSystems.forEach(
           ss => ss.planets.forEach(
             p => {
-              const planet: Planet = new Planet(
-                p.id,
-                p.type,
-                p.size,
-                p.orbit,
-                <StarSystem>this.getEntity(ss.id)
-              );
+              const planet: Planet = this.createPlanet(p);
               planets.push(planet);
 
               if (p.colony) {
@@ -145,6 +151,16 @@ export class Store {
     );
   }
 
+  private createPlanet(p: PlanetInfoDto): Planet {
+    return new Planet(
+      p.id,
+      p.type,
+      p.size,
+      p.orbit,
+      <StarSystem>this.getEntity(p.starSystem)
+    );
+  }
+
   addColonies(colonies: Colony[]) {
     colonies.forEach(c => this.entityMap.set(c.id, c));
     const newColonies = this.coloniesSubject.value.concat(colonies);
@@ -160,6 +176,12 @@ export class Store {
   public addPlanets(planets: Planet[]): void {
     planets.forEach(p => this.entityMap.set(p.id, p));
     const newPlanets = this.planetsSubject.value.concat(planets);
+    this.planetsSubject.next(newPlanets);
+  }
+
+  public removePlanet(planet: Planet): void {
+    this.entityMap.delete(planet.id);
+    const newPlanets = this.planetsSubject.value.filter(p => p.id !== planet.id);
     this.planetsSubject.next(newPlanets);
   }
 
