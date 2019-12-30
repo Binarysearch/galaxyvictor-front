@@ -31,6 +31,8 @@ export class Store {
   private fleetsSubject: BehaviorSubject<Fleet[]> = new BehaviorSubject([]);
 
   private civilizationSubject: BehaviorSubject<Civilization> = new BehaviorSubject(undefined);
+  
+  private unknownCivilization: Civilization = new Civilization('', 'Desconocida');
 
 
 
@@ -90,30 +92,35 @@ export class Store {
       //Add planets
       if (civilizationDto.exploredStarSystems.length > 0) {
         const planets: Planet[] = [];
-        const colonies: Colony[] = [];
         civilizationDto.exploredStarSystems.forEach(
           ss => ss.planets.forEach(
             p => {
               const planet: Planet = this.createPlanet(p);
               planets.push(planet);
-
-              if (p.colony) {
-                const colony = new Colony(
-                  p.colony.id,
-                  planet, 
-                  <Civilization>this.getEntity(p.colony.civilizationId)
-                );
-                planet.colony = colony;
-                colonies.push(colony);
-              }
             }
           )
         );
 
         this.addPlanets(planets);
-        this.addColonies(colonies);
       }
       //end add planets
+
+      if (civilizationDto.colonies) {
+        const colonies: Colony[] = [];
+        
+        civilizationDto.colonies.forEach(c => {
+          const planet = <Planet>this.entityMap.get(c.planet);
+          const colony = new Colony(
+            c.id,
+            planet, 
+            this.getCivilizationById(c.civilizationId)
+          );
+          planet.colony = colony;
+          colonies.push(colony);
+        });
+
+        this.addColonies(colonies);
+      }
       
       civilization.homeworld = <Planet>this.getEntity(civilizationDto.homeworldId);
 
@@ -146,7 +153,7 @@ export class Store {
       f.startTravelTime,
       <StarSystem>this.getEntity(f.destinationId),
       <StarSystem>this.getEntity(f.originId),
-      <Civilization>this.getEntity(f.civilizationId),
+      this.getCivilizationById(f.civilizationId),
       this.timeService
     );
   }
@@ -159,6 +166,14 @@ export class Store {
       p.orbit,
       <StarSystem>this.getEntity(p.starSystem)
     );
+  }
+
+  private getCivilizationById(id: string): Civilization {
+    if (this.entityMap.has(id)) {
+      return <Civilization>this.entityMap.get(id);
+    } else {
+      return this.unknownCivilization;
+    }
   }
 
   addColonies(colonies: Colony[]) {

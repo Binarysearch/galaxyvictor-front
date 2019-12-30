@@ -40,7 +40,7 @@ export class TextRendererComponent implements OnInit, OnDestroy {
 
   getColor(p: Planet): string {
     if (p.colony) {
-      return this.colorService.getCivilizationColorHex(p.colony.id);
+      return this.colorService.getCivilizationColorHex(p.colony.civilization.id);
     } else {
       return '#ffffff';
     }

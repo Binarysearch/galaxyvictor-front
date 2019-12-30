@@ -6,5 +6,4 @@ export interface PlanetInfoDto {
     type: number;
     size: number;
     orbit: number;
-    colony: ColonyInfoDto;
 }

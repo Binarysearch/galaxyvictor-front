@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Store } from './data/store';
 
 export interface Color {
   r: number;
@@ -11,10 +12,29 @@ export interface Color {
 })
 export class ColorService {
 
-  constructor() { }
+  private civilizationId: string;
+
+  constructor(
+    private store: Store
+  ) {
+    this.store.getCivilization().subscribe(
+      civilization => {
+        
+        if (civilization) {
+          this.civilizationId = civilization.id;
+        } else {
+          this.civilizationId = null;
+        }
+      }
+    );
+  }
 
   public getCivilizationColor(civilizationId: string): Color {
-    return { r: 0, g: 1, b: 0 }
+    if (this.civilizationId === civilizationId) {
+      return { r: 0, g: 1, b: 0 };
+    } else {
+      return { r: 1, g: 0, b: 0 };
+    }
   }
 
   public getCivilizationColorHex(civilizationId: string): string {
