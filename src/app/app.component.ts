@@ -106,4 +106,7 @@ export class AppComponent implements AfterViewInit{
     event.preventDefault();
   }
 
+  isHovering(): boolean {
+    return this.galaxyMap.hovered != null;
+  }
 }
