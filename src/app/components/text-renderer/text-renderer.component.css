@@ -1,4 +1,5 @@
 .text {
+    pointer-events: none;
     position: absolute;
     white-space: nowrap;
     display: block;
