@@ -33,6 +33,8 @@ export class Store {
   private civilizationSubject: BehaviorSubject<Civilization> = new BehaviorSubject(undefined);
   
   private unknownCivilization: Civilization = new Civilization('', 'Desconocida');
+  private unknownStarSystem: StarSystem = new StarSystem('', 'Desconocido', 0, 0, 1, 1);
+  private unknownPlanet: Planet = new Planet('', 1, 0, 0, this.unknownStarSystem);
 
 
 
@@ -168,7 +170,23 @@ export class Store {
     );
   }
 
-  private getCivilizationById(id: string): Civilization {
+  public getStarSystemById(id: string): StarSystem {
+    if (this.entityMap.has(id)) {
+      return <StarSystem>this.entityMap.get(id);
+    } else {
+      return this.unknownStarSystem;
+    }
+  }
+
+  public getPlanetById(id: string): Planet {
+    if (this.entityMap.has(id)) {
+      return <Planet>this.entityMap.get(id);
+    } else {
+      return this.unknownPlanet;
+    }
+  }
+
+  public getCivilizationById(id: string): Civilization {
     if (this.entityMap.has(id)) {
       return <Civilization>this.entityMap.get(id);
     } else {
@@ -179,6 +197,12 @@ export class Store {
   addColonies(colonies: Colony[]) {
     colonies.forEach(c => this.entityMap.set(c.id, c));
     const newColonies = this.coloniesSubject.value.concat(colonies);
+    this.coloniesSubject.next(newColonies);
+  }
+
+  public removeColony(colony: Colony): void {
+    this.entityMap.delete(colony.id);
+    const newColonies = this.coloniesSubject.value.filter(c => c.id !== colony.id);
     this.coloniesSubject.next(newColonies);
   }
 
