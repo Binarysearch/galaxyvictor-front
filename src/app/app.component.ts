@@ -5,6 +5,7 @@ import { GalaxyMapService } from './services/galaxy-map.service';
 import { first } from 'rxjs/operators';
 import { Store } from './services/data/store';
 import { Civilization } from './model/civilization';
+import { EventManagerService } from './services/events/event-manager.service';
 
 export interface AppRoute {
   path: string;
@@ -48,7 +49,8 @@ export class AppComponent implements AfterViewInit{
   constructor(
     private api: ApiService,
     private galaxyMap: GalaxyMapService,
-    private store: Store
+    private store: Store,
+    private eventManagerService: EventManagerService
   ) {
     api.isReady().subscribe(ready => {
       this.sessionStarted = ready;
