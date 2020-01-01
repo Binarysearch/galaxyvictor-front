@@ -186,6 +186,10 @@ export class Store {
     }
   }
 
+  public getFleetById(id: string): Fleet {
+    return <Fleet>this.entityMap.get(id);
+  }
+
   public getCivilizationById(id: string): Civilization {
     if (this.entityMap.has(id)) {
       return <Civilization>this.entityMap.get(id);

@@ -4,6 +4,7 @@ import { ExploreStarSystemEventService } from './explore-star-system-event.servi
 import { StartTravelEventService } from './start-travel-event.service';
 import { VisibilityGainedEventService } from './visibility-gained-event.service';
 import { VisibilityLostEventService } from './visibility-lost-event.service';
+import { DeleteFleetEventService } from './delete-fleet-event.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,13 +16,15 @@ export class EventManagerService {
     private exploreStarSystemEventService: ExploreStarSystemEventService,
     private startTravelEventService: StartTravelEventService,
     private visibilityGainedEventService: VisibilityGainedEventService,
-    private visibilityLostEventService: VisibilityLostEventService
+    private visibilityLostEventService: VisibilityLostEventService,
+    private deleteFleetEventService: DeleteFleetEventService,
   ) {
     endTravelEventService.getEvents().subscribe(console.log);
     startTravelEventService.getEvents().subscribe(console.log);
     exploreStarSystemEventService.getEvents().subscribe(console.log);
     visibilityGainedEventService.getEvents().subscribe(console.log);
     visibilityLostEventService.getEvents().subscribe(console.log);
+    deleteFleetEventService.getEvents().subscribe(console.log);
   }
 
   
