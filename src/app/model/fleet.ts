@@ -15,8 +15,8 @@ export class Fleet implements Entity {
         public seed: number,
         public speed: number,
         public startTravelTime: number,
-        public destination: StarSystem,
         public origin: StarSystem,
+        public destination: StarSystem,
         public civilization: Civilization,
         private timeService: TimeService
     ) {
@@ -25,34 +25,34 @@ export class Fleet implements Entity {
     }
 
     get x(): number {
-        let travelX = this.destination.x;
+        let travelX = this.origin.x;
         if (this.isTravelling) {
             const p = this.travelPercent;
-            travelX = this.origin.x * (1 - p) + this.destination.x * p;
+            travelX = this.destination.x * p + this.origin.x * (1 - p);
         }
 
         return Math.cos(this.angle) * this.orbit * 0.01 + travelX;
     }
 
     get y(): number {
-        let travelY = this.destination.y;
+        let travelY = this.origin.y;
         if (this.isTravelling) {
             const p = this.travelPercent;
-            travelY = this.origin.y * (1 - p) + this.destination.y * p;
+            travelY = this.destination.y * p + this.origin.y * (1 - p);
         }
 
         return Math.sin(this.angle) * this.orbit * 0.01 + travelY;
     }
 
     get travelDistance() {
-        const x = this.destination.x - this.origin.x;
-        const y = this.destination.y - this.origin.y;
+        const x = this.origin.x - this.destination.x;
+        const y = this.origin.y - this.destination.y;
         return Math.sqrt(x * x + y * y);
     }
 
     get angle(): number {
         if (this.isTravelling) {
-            return Math.atan2(this.origin.y - this.destination.y, this.origin.x - this.destination.x) + Math.PI / 2;
+            return Math.atan2(this.destination.y - this.origin.y, this.destination.x - this.origin.x) - Math.PI / 2;
         }
         const startingAngle = (this.seed) % (Math.PI * 2);
         const time = new Date().getTime() * 0.001;

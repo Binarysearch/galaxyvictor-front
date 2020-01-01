@@ -103,7 +103,7 @@ export class MainRendererService {
     if(this.selected instanceof Fleet){
       const f = <Fleet>this.selected;
       if (f.isTravelling) {
-        lines.push({ id: '', x1: f.x, y1: f.y, x2: f.destination.x, y2: f.destination.y });
+        lines.push({ id: '', x1: f.x, y1: f.y, x2: f.origin.x, y2: f.origin.y });
       }
       if (this.constraintService.canStartTravelTo(this.selected, this.hoverService.hovered)) {
         const ss = this.hoverService.hovered;

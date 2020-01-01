@@ -10,8 +10,6 @@ import { TimeService } from '../time.service';
 import { CivilizationDetailDto } from '../../dto/civilization-detail';
 import { Civilization } from '../../model/civilization';
 import { Colony } from 'src/app/model/colony';
-import { FleetUpdatesService } from '../updates/fleet-updates.service';
-import { PlanetUpdatesService } from '../updates/planet-updates.service';
 import { FleetInfoDto } from 'src/app/dto/fleet-info';
 import { PlanetInfoDto } from 'src/app/dto/planet-info';
 
@@ -40,9 +38,7 @@ export class Store {
 
   constructor(
     private api: ApiService,
-    private timeService: TimeService,
-    private fleetUpdatesService: FleetUpdatesService,
-    private planetUpdatesService: PlanetUpdatesService
+    private timeService: TimeService
   ) {
     this.api.isReady()
     .subscribe(ready => {
@@ -62,26 +58,7 @@ export class Store {
             
 
           });
-        
-          this.subscribeToFleetUpdates();
-          this.subscribeToPlanetUpdates();
       }
-    });
-  }
-
-  private subscribeToFleetUpdates() {
-    this.fleetUpdatesService.getFleetUpdates().subscribe(f => {
-      const fleet = this.createFleet(f);
-      this.removeFleet(fleet);
-      this.addFleets([fleet]);
-    });
-  }
-
-  private subscribeToPlanetUpdates() {
-    this.planetUpdatesService.getPlanetUpdates().subscribe(p => {
-      const planet = this.createPlanet(p);
-      this.removePlanet(planet);
-      this.addPlanets([planet]);
     });
   }
 
@@ -153,8 +130,8 @@ export class Store {
       f.seed,
       f.speed,
       f.startTravelTime,
-      <StarSystem>this.getEntity(f.destinationId),
       <StarSystem>this.getEntity(f.originId),
+      <StarSystem>this.getEntity(f.destinationId),
       this.getCivilizationById(f.civilizationId),
       this.timeService
     );

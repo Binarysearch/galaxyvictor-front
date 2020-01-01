@@ -6,6 +6,7 @@ import { FleetInfoDto } from '../../dto/fleet-info';
 import { Fleet } from '../../model/fleet';
 import { Store } from '../data/store';
 import { TimeService } from '../time.service';
+import { FleetManagerService } from '../data/fleet-manager.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,8 @@ export class EndTravelEventService {
   constructor(
     private api: ApiService,
     private store: Store,
-    private timeService: TimeService
+    private timeService: TimeService,
+    private fleetManagerService: FleetManagerService
   ) {
     this.api.isReady().subscribe(
       ready => {
@@ -26,7 +28,7 @@ export class EndTravelEventService {
           this.connection = this.api.connectToChannel<EndTravelEvent>('end-travel-events');
           this.connection.observable.subscribe(event => {
             this.events.next(event);
-            this.updateFleet(event.fleet);
+            this.fleetManagerService.updateFleet(event.fleet);
           });
         }
       }
@@ -35,20 +37,5 @@ export class EndTravelEventService {
 
   public getEvents(): Observable<EndTravelEvent> {
     return this.events.asObservable();
-  }
-
-  private updateFleet(fleetDto: FleetInfoDto) {
-    const fleet = new Fleet(
-      fleetDto.id,
-      fleetDto.seed,
-      fleetDto.speed,
-      fleetDto.startTravelTime,
-      this.store.getStarSystemById(fleetDto.destinationId),
-      this.store.getStarSystemById(fleetDto.originId),
-      this.store.getCivilizationById(fleetDto.civilizationId),
-      this.timeService
-    );
-    this.store.removeFleet(fleet);
-    this.store.addFleets([fleet]);
   }
 }

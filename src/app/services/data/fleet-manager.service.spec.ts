@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { FleetUpdatesService } from './fleet-updates.service';
+import { FleetManagerService } from './fleet-manager.service';
 
-describe('FleetUpdatesService', () => {
+describe('FleetManagerService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: FleetUpdatesService = TestBed.get(FleetUpdatesService);
+    const service: FleetManagerService = TestBed.get(FleetManagerService);
     expect(service).toBeTruthy();
   });
 });

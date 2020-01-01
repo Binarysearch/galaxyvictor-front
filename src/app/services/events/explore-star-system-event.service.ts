@@ -6,10 +6,9 @@ import { ColonyInfoDto } from 'src/app/dto/colony-info';
 import { PlanetInfoDto } from 'src/app/dto/planet-info';
 import { Store } from '../data/store';
 import { TimeService } from '../time.service';
-import { FleetInfoDto } from 'src/app/dto/fleet-info';
-import { Fleet } from 'src/app/model/fleet';
 import { Planet } from 'src/app/model/planet';
 import { Colony } from 'src/app/model/colony';
+import { FleetManagerService } from '../data/fleet-manager.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +21,8 @@ export class ExploreStarSystemEventService {
   constructor(
     private api: ApiService,
     private store: Store,
-    private timeService: TimeService
+    private timeService: TimeService,
+    private fleetManagerService: FleetManagerService
   ) {
     this.api.isReady().subscribe(
       ready => {
@@ -49,10 +49,10 @@ export class ExploreStarSystemEventService {
       this.updateColonies(event.colonies);
     }
     if (event.incomingFleets && event.incomingFleets.length > 0) {
-      this.updateFleets(event.incomingFleets);
+      this.fleetManagerService.updateFleets(event.incomingFleets);
     }
     if (event.orbitingFleets && event.orbitingFleets.length > 0) {
-      this.updateFleets(event.orbitingFleets);
+      this.fleetManagerService.updateFleets(event.orbitingFleets);
     }
   }
   
@@ -83,23 +83,5 @@ export class ExploreStarSystemEventService {
       this.store.addColonies([colony]);
     });
   }
-
-  private updateFleets(fleets: FleetInfoDto[]) {
-    fleets.forEach(fleetDto => {
-      const fleet = new Fleet(
-        fleetDto.id,
-        fleetDto.seed,
-        fleetDto.speed,
-        fleetDto.startTravelTime,
-        this.store.getStarSystemById(fleetDto.destinationId),
-        this.store.getStarSystemById(fleetDto.originId),
-        this.store.getCivilizationById(fleetDto.civilizationId),
-        this.timeService
-      );
-      this.store.removeFleet(fleet);
-      this.store.addFleets([fleet]);
-    });
-  }
-
 
 }

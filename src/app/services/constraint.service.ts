@@ -22,7 +22,7 @@ export class ConstraintService {
     return traveller instanceof Fleet && 
       destination instanceof StarSystem &&
       !traveller.isTravelling &&
-      traveller.destination.id !== destination.id &&
+      traveller.origin.id !== destination.id &&
       traveller.civilization.id === this.civilization.id
   }
 }
