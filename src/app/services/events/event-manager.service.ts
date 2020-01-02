@@ -19,12 +19,7 @@ export class EventManagerService {
     private visibilityLostEventService: VisibilityLostEventService,
     private deleteFleetEventService: DeleteFleetEventService,
   ) {
-    endTravelEventService.getEvents().subscribe(console.log);
-    startTravelEventService.getEvents().subscribe(console.log);
-    exploreStarSystemEventService.getEvents().subscribe(console.log);
-    visibilityGainedEventService.getEvents().subscribe(console.log);
-    visibilityLostEventService.getEvents().subscribe(console.log);
-    deleteFleetEventService.getEvents().subscribe(console.log);
+    
   }
 
   

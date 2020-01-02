@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { RenderContext } from './render/renderer.interface';
 import { Camera } from './render/camera';
 import { Store } from './data/store';
+import { StarSystem } from '../model/star-system';
 
 describe('HoverService', () => {
 
@@ -38,12 +39,14 @@ describe('HoverService', () => {
 
   it('should detect hover on star when mouse moved over a star', () => {
 
-    const star = { x: 0, y: 0, type: 1, size: 2, id: '' };
+    const star = new StarSystem('','', 0, 0, 1, 2);
+    const star2 = new StarSystem('','', 0.05, 0, 1, 2);
+    const star3 = new StarSystem('','', 10, 10, 1, 2);
 
     storeSpy.getStarSystems.and.returnValue(of([
       star,
-      { x: 0.05, y: 0, type: 1, size: 2, id: '' },
-      { x: 10, y: 10, type: 1, size: 2, id: '' }
+      star2,
+      star3
     ]));
 
     const service: HoverService = TestBed.get(HoverService);

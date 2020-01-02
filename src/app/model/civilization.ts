@@ -17,7 +17,8 @@ export class Civilization {
 
     constructor(
         public id: string,
-        public name: string
+        public name: string,
+        public playerCivilization: boolean
     ) {
 
     }

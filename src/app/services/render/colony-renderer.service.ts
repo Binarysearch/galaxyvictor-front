@@ -66,7 +66,7 @@ export class ColonyRendererService implements Renderer{
     gl.uniform1f(this.aspectUniformLocation, aspect);
   }
 
-  render(colonies: Colony[], context: RenderContext): void {
+  render(colonies: Set<Colony>, context: RenderContext): void {
     this.prepare(context);
     const gl = context.gl;
     const camera = context.camera;
@@ -87,8 +87,8 @@ export class ColonyRendererService implements Renderer{
 
   getRenderScale(colony: Colony, zoom: number): number {
     const planet = colony.planet;
-    const scale = (PLANET_RENDER_SCALE_ZI * planet.size * planet.size + PLANET_RENDER_SCALE_ZI_SI)
-      / zoom + (PLANET_RENDER_SCALE_ZD * planet.size * planet.size);
+    const scale = (PLANET_RENDER_SCALE_ZI * planet.size.id * planet.size.id + PLANET_RENDER_SCALE_ZI_SI)
+      / zoom + (PLANET_RENDER_SCALE_ZD * planet.size.id * planet.size.id);
     return scale * 3;
   }
 

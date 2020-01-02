@@ -3,14 +3,28 @@ import { StarSystem } from './star-system';
 import { PLANET_ROTATION_SPEED_MULT, PLANET_ORBIT_SCALE_MULTIPLIER } from '../galaxy-constants';
 import { Colony } from './colony';
 
+export interface PlanetSize {
+    id: number;
+    name: string;
+    description: string;
+}
+
+export interface PlanetType {
+    id: number;
+    name: string;
+    description: string;
+    color: { r: number; g: number; b: number };
+    colorHex: string;
+}
+
 export class Planet implements Entity {
     
     colony: Colony;
 
     constructor(
         public id: string,
-        public type: number,
-        public size: number,
+        public type: PlanetType,
+        public size: PlanetSize,
         public orbit: number,
         public starSystem: StarSystem
     ) {
@@ -26,7 +40,7 @@ export class Planet implements Entity {
     }
 
     get angle(): number {
-        const startingAngle = (this.type * this.size * this.orbit) % (Math.PI * 2);
+        const startingAngle = (this.type.id * this.size.id * this.orbit) % (Math.PI * 2);
         const time = new Date().getTime() * 0.001;
         const speed = PLANET_ROTATION_SPEED_MULT / Math.sqrt(this.orbit);
         return (startingAngle + speed * time) % (Math.PI * 2);

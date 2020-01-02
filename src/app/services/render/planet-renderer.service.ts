@@ -60,7 +60,7 @@ export class PlanetRendererService implements Renderer{
     gl.uniform1f(this.aspectUniformLocation, aspect);
   }
 
-  render(entities: Planet[], context: RenderContext): void {
+  render(entities: Set<Planet>, context: RenderContext): void {
     if (context.camera.zoom < MIN_ZOOM_TO_VIEW_PLANETS) {
       return;
     }
@@ -73,7 +73,7 @@ export class PlanetRendererService implements Renderer{
       planet => {
         const scale = this.getRenderScale(planet, zoom);
 
-        const color = PLANET_COLORS[planet.type - 1];
+        const color = planet.type.color;
         const angle = planet.angle;
     
         gl.uniform1f(this.scaleUniformLocation, scale);
@@ -87,8 +87,8 @@ export class PlanetRendererService implements Renderer{
   }
 
   getRenderScale(planet: Planet, zoom: number): number {
-    const scale = (PLANET_RENDER_SCALE_ZI * planet.size * planet.size + PLANET_RENDER_SCALE_ZI_SI)
-      / zoom + (PLANET_RENDER_SCALE_ZD * planet.size * planet.size);
+    const scale = (PLANET_RENDER_SCALE_ZI * planet.size.id * planet.size.id + PLANET_RENDER_SCALE_ZI_SI)
+      / zoom + (PLANET_RENDER_SCALE_ZD * planet.size.id * planet.size.id);
     return scale;
   }
 }

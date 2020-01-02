@@ -1,3 +1,6 @@
+import { StarType, StarSize } from './model/star-system';
+import { PlanetSize, PlanetType } from './model/planet';
+
 export const STAR_COLORS = [
   {r: 1, g: 0, b: 0}, // red
   {r: 1, g: 1, b: 0}, // yellow
@@ -6,20 +9,20 @@ export const STAR_COLORS = [
   {r: 1, g: 1, b: 1} // white
 ];
 
-export const STAR_TYPES = [
-  'Roja',
-  'Amarilla',
-  'Azul',
-  'Naranja',
-  'Blanca'
+export const STAR_TYPES: StarType[] = [
+  { id: 1, name: 'Roja', description: '', color: { r: 1, g: 0, b: 0 }, colorHex: '#ff0000' },
+  { id: 2, name: 'Amarilla', description: '', color: { r: 1, g: 1, b: 0 }, colorHex: '#ffff00' },
+  { id: 3, name: 'Azul', description: '', color: { r: 0, g: 0, b: 1 }, colorHex: '#0000ff' },
+  { id: 4, name: 'Naranja', description: '', color: { r: 1, g: 0.5, b: 0 }, colorHex: '#ff8800' },
+  { id: 5, name: 'Blanca', description: '', color: { r: 1, g: 1, b: 1 }, colorHex: '#ffffff' }
 ];
 
-export const STAR_SIZES = [
-  'Enana',
-  'Pequeña',
-  'Mediana',
-  'Grande',
-  'Gigante'
+export const STAR_SIZES: StarSize[] = [
+  { id: 1, name: 'Enana', description: '' },
+  { id: 2, name: 'Pequeña', description: '' },
+  { id: 3, name: 'Mediana', description: '' },
+  { id: 4, name: 'Grande', description: '' },
+  { id: 5, name: 'Gigante', description: '' }
 ];
 
 export const PLANET_COLORS = [
@@ -36,26 +39,26 @@ export const PLANET_COLORS = [
   {r: 0.2, g: 2.2, b: 0.2}, // superterran
 ];
 
-export const PLANET_TYPES = [
-  'Volcanico',
-  'Esteril',
-  'Ferreo',
-  'Carbonico',
-  'Desertico',
-  'Helado',
-  'Arido',
-  'Tundra',
-  'Oceanico',
-  'Terrestre',
-  'Gaia'
+export const PLANET_TYPES: PlanetType[] = [
+  { id: 1, name: 'Volcanico', description: '', color: {r: 1, g: 0, b: 0}, colorHex: '#ff0000' },
+  { id: 1, name: 'Esteril', description: '', color: {r: 1, g: 1, b: 1}, colorHex: '#aaaaaa' },
+  { id: 1, name: 'Ferreo', description: '', color: {r: 1, g: 0.3, b: 0.3}, colorHex: '#ff6060' },
+  { id: 1, name: 'Carbonico', description: '', color: {r: 0.2, g: 0.2, b: 0.2}, colorHex: '#0f0f0f' },
+  { id: 1, name: 'Desertico', description: '', color: {r: 0.8, g: 0.8, b: 0.3}, colorHex: '#888808' },
+  { id: 1, name: 'Helado', description: '', color: {r: 1, g: 1, b: 1.3}, colorHex: '#8888ff' },
+  { id: 1, name: 'Arido', description: '', color: {r: 1, g: 1, b: 0.4}, colorHex: '#aaaa40' },
+  { id: 1, name: 'Tundra', description: '', color: {r: 0.6, g: 0.6, b: 1}, colorHex: '#4444ff' },
+  { id: 1, name: 'Oceanico', description: '', color: {r: 0.7, g: 0.7, b: 2}, colorHex: '#2222ff' },
+  { id: 1, name: 'Terrestre', description: '', color: {r: 0.0, g: 0.8, b: 0.3}, colorHex: '#009930' },
+  { id: 1, name: 'Gaia', description: '', color: {r: 0.2, g: 2.2, b: 0.2}, colorHex: '#04ff04' }
 ];
 
-export const PLANET_SIZES = [
-  'Enano',
-  'Pequeño',
-  'Mediano',
-  'Grande',
-  'Gigante'
+export const PLANET_SIZES: PlanetSize[] = [
+  { id: 1, name: 'Enano', description: '' },
+  { id: 2, name: 'Pequeño', description: '' },
+  { id: 3, name: 'Mediano', description: '' },
+  { id: 4, name: 'Grande', description: '' },
+  { id: 5, name: 'Gigante', description: '' }
 ];
 
 // Camera constants

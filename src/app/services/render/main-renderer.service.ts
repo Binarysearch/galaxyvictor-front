@@ -26,9 +26,9 @@ export class MainRendererService {
   private viewportSubject: ReplaySubject<{w: number, h: number}> = new ReplaySubject(1);
 
   private starSystems: StarSystem[] = [];
-  private planets: Planet[] = [];
-  private fleets: Fleet[] = [];
-  private colonies: Colony[] = [];
+  private planets: Set<Planet> = new Set();
+  private fleets: Set<Fleet> = new Set();
+  private colonies: Set<Colony> = new Set();
 
   constructor(
     @Inject('Window') private window: Window,
@@ -101,9 +101,9 @@ export class MainRendererService {
   getTravelLines(): Segment[] {
     const lines = [];
     if(this.selected instanceof Fleet){
-      const f = <Fleet>this.selected;
+      const f = this.selected;
       if (f.isTravelling) {
-        lines.push({ id: '', x1: f.x, y1: f.y, x2: f.origin.x, y2: f.origin.y });
+        lines.push({ id: '', x1: f.x, y1: f.y, x2: f.destination.x, y2: f.destination.y });
       }
       if (this.constraintService.canStartTravelTo(this.selected, this.hoverService.hovered)) {
         const ss = this.hoverService.hovered;

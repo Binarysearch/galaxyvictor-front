@@ -24,9 +24,9 @@ export class VisiblePlanetsService {
   private camera: Camera;
   private cameraChanges: CameraChangeRecorder;
 
-  private planets: Planet[] = [];
-  private viewportPlanets: BehaviorSubject<Planet[]> = new BehaviorSubject([]);
-  private visiblePlanets: BehaviorSubject<VisiblePlanet[]> = new BehaviorSubject([]);
+  private planets: Set<Planet> = new Set();
+  private viewportPlanets: BehaviorSubject<Set<Planet>> = new BehaviorSubject(new Set());
+  private visiblePlanets: BehaviorSubject<Set<VisiblePlanet>> = new BehaviorSubject(new Set());
   private planetsChanged: boolean;
 
   constructor(
@@ -53,20 +53,25 @@ export class VisiblePlanetsService {
 
   public recalculate(): void {
     if (this.cameraChanges.changed() || this.planetsChanged) {
-      const viewportPlanets = this.planets.filter(p => {
-        return this.isVisible(p);
-      });
+      const viewportPlanets: Set<Planet> = new Set();
       
+      this.planets.forEach(p => {
+        if (this.isVisible(p)) {
+          viewportPlanets.add(p);
+        }
+      });
       
       this.viewportPlanets.next(viewportPlanets);
       this.planetsChanged = false;
     }
 
     if(this.camera.zoom < MIN_ZOOM_TO_VIEW_PLANET_NAMES){
-      this.visiblePlanets.next([]);
+      this.visiblePlanets.next(new Set());
     } else {
-      const visiblePlanets = this.viewportPlanets.value.map(p => {
-        return ({ x: this.getX(p), y: this.getY(p), planet: p });
+      const visiblePlanets: Set<VisiblePlanet> = new Set();
+
+      this.viewportPlanets.value.forEach(p => {
+        visiblePlanets.add({ x: this.getX(p), y: this.getY(p), planet: p });
       });
 
       this.visiblePlanets.next(visiblePlanets);
@@ -90,11 +95,11 @@ export class VisiblePlanetsService {
     return (1 - (p.y - camera.y - this.planetRenderer.getRenderScale(p, camera.zoom)*3) * camera.zoom) * this.viewport.h / 2;
   }
 
-  public getVisiblePlanets(): Observable<VisiblePlanet[]> {
+  public getVisiblePlanets(): Observable<Set<VisiblePlanet>> {
     return this.visiblePlanets.asObservable();
   }
 
-  public getViewportPlanets(): Observable<Planet[]> {
+  public getViewportPlanets(): Observable<Set<Planet>> {
     return this.viewportPlanets.asObservable();
   }
 

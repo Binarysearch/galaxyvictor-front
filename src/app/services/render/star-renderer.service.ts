@@ -71,7 +71,7 @@ export class StarRendererService implements Renderer{
     entities.forEach(
       star => {
         const scale = this.getRenderScale(star, zoom);
-        const color = STAR_COLORS[star.type - 1];
+        const color = star.type.color;
 
         gl.uniform1f(this.scaleUniformLocation, scale);
         gl.uniform2f(this.positionUniformLocation, star.x - camera.x, star.y - camera.y);
@@ -83,7 +83,7 @@ export class StarRendererService implements Renderer{
   }
 
   getRenderScale(star: StarSystem, zoom: number): number {
-    return (STAR_RENDER_SCALE_ZI * star.size * star.size + STAR_RENDER_SCALE_ZI_SI) / zoom + STAR_RENDER_SCALE_ZD;
+    return (STAR_RENDER_SCALE_ZI * star.size.id * star.size.id + STAR_RENDER_SCALE_ZI_SI) / zoom + STAR_RENDER_SCALE_ZD;
   }
 
 }

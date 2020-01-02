@@ -1,0 +1,13 @@
+.planet{
+    padding: 5px;
+    margin-bottom: 3px;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+.star-info{
+    padding: 5px;
+}
+.star-info:hover{
+    cursor: pointer;
+    background-color: rgba(0,0,0,0.2);
+}

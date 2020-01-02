@@ -5,6 +5,7 @@
       <canvas id='main-canvas' #canvasRef></canvas>
       <app-text-renderer></app-text-renderer>
     </div>
+    <app-selected-entity></app-selected-entity>
     <div *ngIf="!sessionStarted || civilization"><router-outlet></router-outlet></div>
     <div *ngIf="!(!sessionStarted || civilization)"><create-civilization></create-civilization></div>
   </div>

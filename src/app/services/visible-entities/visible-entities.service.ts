@@ -41,11 +41,11 @@ export class VisibleEntitiesService {
     this.visibleStarsService.recalculate();
   }
 
-  public getVisiblePlanets(): Observable<VisiblePlanet[]> {
+  public getVisiblePlanets(): Observable<Set<VisiblePlanet>> {
     return this.visiblePlanetsService.getVisiblePlanets();
   }
 
-  public getViewportPlanets(): Observable<Planet[]> {
+  public getViewportPlanets(): Observable<Set<Planet>> {
     return this.visiblePlanetsService.getViewportPlanets();
   }
 

@@ -21,6 +21,10 @@ import { ApiModule } from '@piros/api';
 import { CreateCivilizationComponent } from './components/create-civilization/create-civilization.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TextRendererComponent } from './components/text-renderer/text-renderer.component';
+import { SelectedEntityComponent } from './components/selected-entity/selected-entity.component';
+import { StarSystemInfoComponent } from './components/selected-entity/star-system-info/star-system-info.component';
+import { FleetInfoComponent } from './components/selected-entity/fleet-info/fleet-info.component';
+import { PlanetInfoComponent } from './components/selected-entity/planet-info/planet-info.component';
 
 
 @NgModule({
@@ -28,7 +32,11 @@ import { TextRendererComponent } from './components/text-renderer/text-renderer.
     AppComponent,
     IndexComponent,
     CreateCivilizationComponent,
-    TextRendererComponent
+    TextRendererComponent,
+    SelectedEntityComponent,
+    StarSystemInfoComponent,
+    FleetInfoComponent,
+    PlanetInfoComponent
   ],
   imports: [
     BrowserModule,

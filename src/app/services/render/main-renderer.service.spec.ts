@@ -154,7 +154,7 @@ describe('MainRendererService', () => {
     const ss2 = new StarSystem('ss2', '', 0, 0, 1, 1);
     const timeServiceSpy = jasmine.createSpyObj('TimeService', ['getGameTime']);
 
-    const fleet = new Fleet('f1', 1, 1, 0, ss1, ss2, timeServiceSpy);
+    const fleet = new Fleet('f1', 1, 1, 0, ss1, ss2, null, timeServiceSpy);
     
     const animate = windowSpy.requestAnimationFrame.calls.argsFor(0)[0];
 

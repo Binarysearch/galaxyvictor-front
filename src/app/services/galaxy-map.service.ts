@@ -192,6 +192,11 @@ export class GalaxyMapService {
   get selected(): Entity {
     return this.store.getEntity(this.selectedId);
   }
+  
+  select(id: string) {
+    this.selectedId = id;
+    this.renderer.setSelectedId(this.selectedId);
+  }
 
   private startAutosaveState() {
     let interval;

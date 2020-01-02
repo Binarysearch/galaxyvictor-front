@@ -44,10 +44,10 @@ export class FleetManagerService {
     if (fleetDto.destinationId === fleetDto.originId) {
       existing.origin.addOrbitingFleet(existing);
     } else {
-      existing.origin.addIncomingFleet(existing);
+      existing.destination.addIncomingFleet(existing);
     }
     existing.civilization.addFleet(existing);
-    console.log(existing);
+    
   }
 
   private addFleet(fleetDto: FleetInfoDto) {
@@ -66,9 +66,23 @@ export class FleetManagerService {
     if (fleetDto.destinationId === fleetDto.originId) {
       fleet.origin.addOrbitingFleet(fleet);
     } else {
-      fleet.origin.addIncomingFleet(fleet);
+      fleet.destination.addIncomingFleet(fleet);
     }
     fleet.civilization.addFleet(fleet);
+  }
+
+  public removeFleetById(fleetId: string) {
+    const fleet = this.store.getFleetById(fleetId);
+    this.removeFleet(fleet);
+  }
+
+  public removeFleet(fleet: Fleet) {
+    this.store.removeFleet(fleet);
+    fleet.destination.incomingFleets.delete(fleet);
+    fleet.destination.orbitingFleets.delete(fleet);
+    fleet.origin.incomingFleets.delete(fleet);
+    fleet.origin.orbitingFleets.delete(fleet);
+    fleet.civilization.fleets.delete(fleet);
   }
 
 }

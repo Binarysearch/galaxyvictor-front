@@ -10,6 +10,7 @@ export interface Entity {
     id: string;
     x?: number;
     y?: number;
+    name?: string;
 }
 
 export interface Segment {
@@ -23,7 +24,7 @@ export interface Segment {
 export interface Renderer {
     setup(context: RenderContext): void;
     prepare(context: RenderContext): void;
-    render(entities: Entity[], context: RenderContext): void;
+    render(entities: Entity[] | Set<Entity>, context: RenderContext): void;
     getRenderScale(entity: Entity, zoom: number): number;
 }
 

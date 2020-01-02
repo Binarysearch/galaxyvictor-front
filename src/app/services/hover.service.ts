@@ -22,8 +22,8 @@ export class HoverService {
 
   private _hovered: Entity;
   private starSystems: StarSystem[] = [];
-  private planets: Planet[] = [];
-  private fleets: Fleet[] = [];
+  private planets: Set<Planet> = new Set();
+  private fleets: Set<Fleet> = new Set();
 
   constructor(
     private starRenderer: StarRendererService,
@@ -84,7 +84,7 @@ export class HoverService {
     return this.getIntersectingElements(x, y, context, this.planets, this.planetRenderer);
   }
 
-  getIntersectingElements(x: number, y: number, context: RenderContext, elements: Entity[], renderer: Renderer): IntersectingElement[] {
+  getIntersectingElements(x: number, y: number, context: RenderContext, elements: Entity[] | Set<Entity>, renderer: Renderer): IntersectingElement[] {
     const intersectingElements = [];
 
     elements.forEach(ss => {

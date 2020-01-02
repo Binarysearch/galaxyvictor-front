@@ -1,0 +1,20 @@
+.planet{
+    padding: 5px;
+    margin-bottom: 3px;
+}
+.planet:hover{
+    cursor: pointer;
+    background-color: rgba(0,0,0,0.2);
+}
+.fleet{
+    padding: 5px;
+    margin-bottom: 3px;
+}
+.fleet:hover{
+    cursor: pointer;
+    background-color: rgba(0,0,0,0.2);
+}
+.star-info{
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}

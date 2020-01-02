@@ -1,0 +1,12 @@
+<div class="container" *ngIf="selected">
+    <div class="gv-panel">
+        <div class='header'>
+            <h1 class='title'>{{ title }}</h1>
+        </div>
+        <div class='body'>
+            <app-star-system-info *ngIf="isStarSystem" [starSystem]="selected"></app-star-system-info>
+            <app-fleet-info *ngIf="isFleet" [fleet]="selected"></app-fleet-info>
+            <app-planet-info *ngIf="isPlanet" [planet]="selected"></app-planet-info>
+        </div>
+    </div>
+</div>

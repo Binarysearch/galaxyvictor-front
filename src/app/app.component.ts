@@ -1,11 +1,11 @@
 import { Component, ElementRef, AfterViewInit, ViewChildren, QueryList, HostListener } from '@angular/core';
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
-import { ApiService, SocketStatus } from '@piros/api';
+import { ApiService } from '@piros/api';
 import { GalaxyMapService } from './services/galaxy-map.service';
-import { first } from 'rxjs/operators';
 import { Store } from './services/data/store';
 import { Civilization } from './model/civilization';
 import { EventManagerService } from './services/events/event-manager.service';
+import { GalaxyManagerService } from './services/data/galaxy-manager.service';
 
 export interface AppRoute {
   path: string;
@@ -50,7 +50,8 @@ export class AppComponent implements AfterViewInit{
     private api: ApiService,
     private galaxyMap: GalaxyMapService,
     private store: Store,
-    private eventManagerService: EventManagerService
+    private eventManagerService: EventManagerService,
+    private galaxyManagerService: GalaxyManagerService
   ) {
     api.isReady().subscribe(ready => {
       this.sessionStarted = ready;

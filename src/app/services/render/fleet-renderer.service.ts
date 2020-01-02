@@ -64,7 +64,7 @@ export class FleetRendererService implements Renderer{
     gl.uniform1f(this.aspectUniformLocation, aspect);
   }
 
-  render(entities: Fleet[], context: RenderContext): void {
+  render(entities: Fleet[] | Set<Fleet>, context: RenderContext): void {
     this.prepare(context);
     const gl = context.gl;
     const camera = context.camera;

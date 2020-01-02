@@ -7,8 +7,6 @@ import { Civilization } from './civilization';
 export class Fleet implements Entity {
 
     private orbit = 4;
-    private destinationId: string;
-    private originId: string;
 
     constructor(
         public id: string,
@@ -20,8 +18,7 @@ export class Fleet implements Entity {
         public civilization: Civilization,
         private timeService: TimeService
     ) {
-        this.destinationId = destination.id;
-        this.originId = origin.id;
+        
     }
 
     get x(): number {
@@ -61,7 +58,7 @@ export class Fleet implements Entity {
     }
 
     get travelPercent() {
-        if (this.destinationId !== this.originId) {
+        if (this.destination.id !== this.origin.id) {
 
             const travelTime = this.travelDistance / this.speed;
             const timeElapsed = this.timeService.getGameTime() - this.startTravelTime;
@@ -72,6 +69,10 @@ export class Fleet implements Entity {
     }
 
     get isTravelling(): boolean {
-        return this.destinationId !== this.originId && this.travelPercent < 1;
+        return this.destination.id !== this.origin.id && this.travelPercent < 1;
+    }
+
+    get name(): string {
+        return `Flota de ${this.civilization.name}`;
     }
 }

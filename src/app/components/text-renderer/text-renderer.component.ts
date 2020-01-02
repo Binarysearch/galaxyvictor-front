@@ -15,7 +15,7 @@ import { ColorService } from 'src/app/services/color.service';
 export class TextRendererComponent implements OnInit, OnDestroy {
 
   private destroyed: Subject<void> = new Subject();
-  public visiblePlanets: VisiblePlanet[] = [];
+  public visiblePlanets: Set<VisiblePlanet> = new Set();
   public visibleStars: VisibleStar[] = [];
 
   constructor(
