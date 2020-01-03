@@ -49,8 +49,6 @@ class PlanetDataSource implements DataSource<Planet> {
     'orbit': (a, b) => a.orbit - b.orbit
   }
 
-  private planets: Planet[] = [];
-
   constructor(private store: Store) {
     
   }

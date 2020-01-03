@@ -3,9 +3,11 @@ import { TimeService } from '../services/time.service';
 import { StarSystem } from './star-system';
 import { FLEET_ROTATION_SPEED_MULT } from '../galaxy-constants';
 import { Civilization } from './civilization';
+import { Observable, Subject } from 'rxjs';
 
 export class Fleet implements Entity {
 
+    private changes: Subject<void> = new Subject();
     private orbit = 4;
 
     constructor(
@@ -74,5 +76,13 @@ export class Fleet implements Entity {
 
     get name(): string {
         return `Flota de ${this.civilization.name}`;
+    }
+
+    public getChanges(): Observable<void> {
+        return this.changes.asObservable();
+    }
+
+    public sendChanges(): void {
+        this.changes.next();
     }
 }

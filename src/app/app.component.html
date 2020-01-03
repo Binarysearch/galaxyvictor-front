@@ -5,8 +5,9 @@
       <canvas id='main-canvas' #canvasRef></canvas>
       <app-text-renderer></app-text-renderer>
     </div>
-    <app-selected-entity></app-selected-entity>
-    <app-planets-index *ngIf="isPlanetListWindowOpen"></app-planets-index>
+    <app-selected-entity *ngIf="openWindow === ''"></app-selected-entity>
+    <app-planets-index *ngIf="openWindow === 'planets'"></app-planets-index>
+    <app-fleets-index *ngIf="openWindow === 'fleets'"></app-fleets-index>
     <div *ngIf="!sessionStarted || civilization"><router-outlet></router-outlet></div>
     <div *ngIf="!(!sessionStarted || civilization)"><create-civilization></create-civilization></div>
   </div>

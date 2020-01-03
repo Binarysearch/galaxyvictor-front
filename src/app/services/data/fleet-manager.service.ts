@@ -47,7 +47,7 @@ export class FleetManagerService {
       existing.destination.addIncomingFleet(existing);
     }
     existing.civilization.addFleet(existing);
-    
+    existing.sendChanges();
   }
 
   private addFleet(fleetDto: FleetInfoDto) {
