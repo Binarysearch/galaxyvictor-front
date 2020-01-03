@@ -1,0 +1,7 @@
+<div class="container">
+    <span>{{ starSystem.name }}</span>
+    <div class='right'>
+        <span *ngIf="hasFleets()" class="fas fa-rocket"></span>
+        <span *ngIf="hasColony()" class="fas fa-globe"></span>
+    </div>
+</div>

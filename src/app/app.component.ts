@@ -27,6 +27,8 @@ export class AppComponent implements AfterViewInit{
 
   public civilization: Civilization;
 
+  public isPlanetListWindowOpen: boolean = false;
+
   config: DsConfig = {
     routes: [
       { path: '/', title: 'Home', faIcon: 'fas fa-home' },
@@ -36,7 +38,7 @@ export class AppComponent implements AfterViewInit{
       { path: '/civilizations', title: 'Civilizations', faIcon: 'fab fa-galactic-senate', show: this.isSessionStarted.bind(this) },
       { path: '/colonies', title: 'Colonies', faIcon: 'fas fa-globe', show: this.isSessionStarted.bind(this) },
       { path: '/fleets', title: 'Fleets', faIcon: 'fas fa-rocket', show: this.isSessionStarted.bind(this) },
-      { path: '/planets', title: 'Planets', faIcon: 'fas fa-globe-europe', show: this.isSessionStarted.bind(this) },
+      { onClick: this.togglePlanetListWindow.bind(this), title: 'Planets', faIcon: 'fas fa-globe-europe', show: this.isSessionStarted.bind(this) },
       { path: '/trade', title: 'Trade', faIcon: 'fas fa-handshake', show: this.isSessionStarted.bind(this) },
       { path: '/research', title: 'Research', faIcon: 'fas fa-flask', show: this.isSessionStarted.bind(this) },
       { path: '/battles', title: 'Battles', faIcon: 'fas fa-fighter-jet', show: this.isSessionStarted.bind(this)  },
@@ -57,6 +59,9 @@ export class AppComponent implements AfterViewInit{
       this.sessionStarted = ready;
     });
     store.getCivilization().subscribe(civilization => this.civilization = civilization);
+    this.galaxyMap.getOnSelectEntity().subscribe(selected => {
+      this.requestCloseWindows();
+    });
   } 
 
   ngAfterViewInit(): void {
@@ -111,5 +116,16 @@ export class AppComponent implements AfterViewInit{
 
   isHovering(): boolean {
     return this.galaxyMap.hovered != null;
+  }
+
+  togglePlanetListWindow(): void {
+    if (this.galaxyMap.selected) {
+      this.galaxyMap.select(null);
+    }
+    this.isPlanetListWindowOpen = !this.isPlanetListWindowOpen;
+  }
+
+  requestCloseWindows() {
+    this.isPlanetListWindowOpen = false;
   }
 }

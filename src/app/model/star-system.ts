@@ -1,6 +1,7 @@
 import { Entity } from '../services/render/renderer.interface';
 import { Fleet } from './fleet';
 import { Planet } from './planet';
+import { Subject, Observable } from 'rxjs';
 
 export interface StarType {
     id: number;
@@ -18,6 +19,7 @@ export interface StarSize {
 
 export class StarSystem implements Entity {
 
+    private changes: Subject<void> = new Subject();
     public incomingFleets: Set<Fleet> = new Set();
     public orbitingFleets: Set<Fleet> = new Set();
     public planets: Set<Planet> = new Set();
@@ -35,17 +37,25 @@ export class StarSystem implements Entity {
 
     public addIncomingFleet(fleet: Fleet) {
         this.incomingFleets.add(fleet);
+        this.changes.next();
     }
 
     public removeIncomingFleet(fleet: Fleet) {
         this.incomingFleets.delete(fleet);
+        this.changes.next();
     }
     
     public addOrbitingFleet(fleet: Fleet) {
         this.orbitingFleets.add(fleet);
+        this.changes.next();
     }
 
     public removeOrbitingFleet(fleet: Fleet) {
         this.orbitingFleets.delete(fleet);
+        this.changes.next();
+    }
+
+    public getChanges(): Observable<void> {
+        return this.changes.asObservable();
     }
 }

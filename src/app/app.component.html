@@ -6,6 +6,7 @@
       <app-text-renderer></app-text-renderer>
     </div>
     <app-selected-entity></app-selected-entity>
+    <app-planets-index *ngIf="isPlanetListWindowOpen"></app-planets-index>
     <div *ngIf="!sessionStarted || civilization"><router-outlet></router-outlet></div>
     <div *ngIf="!(!sessionStarted || civilization)"><create-civilization></create-civilization></div>
   </div>

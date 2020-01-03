@@ -1,0 +1,15 @@
+.container{
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    top: 5%;
+    left: 5%;
+}
+.gv-panel{
+    width: 100%;
+    height: 100%;
+}
+.body {
+    overflow-y: scroll;
+    height: calc(100% - 50px);
+}

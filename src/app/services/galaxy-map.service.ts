@@ -7,7 +7,7 @@ import { ApiService, SocketStatus } from '@piros/api';
 import { Store } from './data/store';
 import { first, mergeMap, map } from 'rxjs/operators';
 import { SessionState } from '../model/session.interface';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable, Subject } from 'rxjs';
 import { Civilization } from '../model/civilization';
 import { Fleet } from '../model/fleet';
 import { StarSystem } from '../model/star-system';
@@ -19,6 +19,7 @@ import { ConstraintService } from './constraint.service';
 })
 export class GalaxyMapService {
 
+  private onSelectEntity: Subject<Entity> = new Subject();
   private canvas: HTMLCanvasElement;
   private context: RenderContext = {
     gl: null,
@@ -139,6 +140,7 @@ export class GalaxyMapService {
     }
     this.selectedId = (this.hovered) ? this.hovered.id: null;
     this.renderer.setSelectedId(this.selectedId);
+    this.onSelectEntity.next(this.selected);
   }
 
   onMouseDown(event: MouseEvent) {
@@ -196,6 +198,18 @@ export class GalaxyMapService {
   select(id: string) {
     this.selectedId = id;
     this.renderer.setSelectedId(this.selectedId);
+    this.onSelectEntity.next(this.selected);
+  }
+  
+  selectAndGo(id: string) {
+    this.select(id);
+    if (this.selected.x && this.selected.y) {
+      this.context.camera.setPosition(this.selected.x, this.selected.y, 0.5);
+    }
+  }
+
+  public getOnSelectEntity(): Observable<Entity> {
+    return this.onSelectEntity.asObservable();
   }
 
   private startAutosaveState() {

@@ -41,16 +41,16 @@ export const PLANET_COLORS = [
 
 export const PLANET_TYPES: PlanetType[] = [
   { id: 1, name: 'Volcanico', description: '', color: {r: 1, g: 0, b: 0}, colorHex: '#ff0000' },
-  { id: 1, name: 'Esteril', description: '', color: {r: 1, g: 1, b: 1}, colorHex: '#aaaaaa' },
-  { id: 1, name: 'Ferreo', description: '', color: {r: 1, g: 0.3, b: 0.3}, colorHex: '#ff6060' },
-  { id: 1, name: 'Carbonico', description: '', color: {r: 0.2, g: 0.2, b: 0.2}, colorHex: '#0f0f0f' },
-  { id: 1, name: 'Desertico', description: '', color: {r: 0.8, g: 0.8, b: 0.3}, colorHex: '#888808' },
-  { id: 1, name: 'Helado', description: '', color: {r: 1, g: 1, b: 1.3}, colorHex: '#8888ff' },
-  { id: 1, name: 'Arido', description: '', color: {r: 1, g: 1, b: 0.4}, colorHex: '#aaaa40' },
-  { id: 1, name: 'Tundra', description: '', color: {r: 0.6, g: 0.6, b: 1}, colorHex: '#4444ff' },
-  { id: 1, name: 'Oceanico', description: '', color: {r: 0.7, g: 0.7, b: 2}, colorHex: '#2222ff' },
-  { id: 1, name: 'Terrestre', description: '', color: {r: 0.0, g: 0.8, b: 0.3}, colorHex: '#009930' },
-  { id: 1, name: 'Gaia', description: '', color: {r: 0.2, g: 2.2, b: 0.2}, colorHex: '#04ff04' }
+  { id: 2, name: 'Esteril', description: '', color: {r: 1, g: 1, b: 1}, colorHex: '#aaaaaa' },
+  { id: 3, name: 'Ferreo', description: '', color: {r: 1, g: 0.3, b: 0.3}, colorHex: '#ff6060' },
+  { id: 4, name: 'Carbonico', description: '', color: {r: 0.2, g: 0.2, b: 0.2}, colorHex: '#0f0f0f' },
+  { id: 5, name: 'Desertico', description: '', color: {r: 0.8, g: 0.8, b: 0.3}, colorHex: '#888808' },
+  { id: 6, name: 'Helado', description: '', color: {r: 1, g: 1, b: 1.3}, colorHex: '#8888ff' },
+  { id: 7, name: 'Arido', description: '', color: {r: 1, g: 1, b: 0.4}, colorHex: '#aaaa40' },
+  { id: 8, name: 'Tundra', description: '', color: {r: 0.6, g: 0.6, b: 1}, colorHex: '#4444ff' },
+  { id: 9, name: 'Oceanico', description: '', color: {r: 0.7, g: 0.7, b: 2}, colorHex: '#2222ff' },
+  { id: 10, name: 'Terrestre', description: '', color: {r: 0.0, g: 0.8, b: 0.3}, colorHex: '#009930' },
+  { id: 11, name: 'Gaia', description: '', color: {r: 0.2, g: 2.2, b: 0.2}, colorHex: '#04ff04' }
 ];
 
 export const PLANET_SIZES: PlanetSize[] = [

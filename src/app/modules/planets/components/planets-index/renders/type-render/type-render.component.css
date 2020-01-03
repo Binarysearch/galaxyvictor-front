@@ -1,0 +1,16 @@
+.badge-inner{
+    padding: 2px 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+.badge{
+    color: white;
+    background-color: rgba(255, 255, 255, 0.3);
+    display: block;
+    width: 80px;
+    text-align: center;
+    border: 1px solid rgb(155, 155, 255);
+    border-radius: 5px;
+    box-shadow: 2px 2px 3px rgba(155, 155, 255, 0.2);
+    overflow: hidden;
+}
