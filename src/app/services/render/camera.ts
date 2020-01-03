@@ -19,6 +19,7 @@ export class Camera {
 
     cX: number;
     cY: number;
+    private animation: Animation;
 
     constructor() {
         this._zoom = 0.00002;
@@ -41,15 +42,26 @@ export class Camera {
     }
 
     set x(x: number) {
+        this.stopAnimation();
         this._x = x;
     }
 
     set y(y: number) {
+        this.stopAnimation();
         this._y = y;
     }
 
     set zoom(zoom: number) {
+        this.stopAnimation();
         this._zoom = zoom;
+    }
+
+    public setAnimation(animation: Animation): void {
+        this.animation = animation
+    }
+
+    public stopAnimation(){
+        this.animation = null;
     }
 
     get zoom() {
@@ -71,10 +83,10 @@ export class Camera {
         this._vZoom -= 0.02 * this._zoom;
     }
 
-    public setPosition(x: number, y: number, zoom: number) {
+    public setPosition(x: number, y: number, zoom?: number) {
         this._x = x;
         this._y = y;
-        this._zoom = zoom;
+        this._zoom = (zoom) ? zoom : this._zoom;
     }
 
     public update() {
@@ -103,4 +115,21 @@ export class Camera {
         this._speedY *= 0.95;
 
     }
+}
+
+
+export interface Animation {
+
+    animationSteps: AnimationStep[];
+    startedTime: number;
+
+}
+
+export interface AnimationStep {
+
+    time: number;
+    x: number;
+    y: number;
+    zoom: number;
+
 }

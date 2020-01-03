@@ -174,8 +174,10 @@ export class GalaxyMapService {
       }
       const offseX = (x - this.mouseDownX) / this.context.camera.zoom * this.context.aspectRatio;
       const offseY = (y - this.mouseDownY) / this.context.camera.zoom;
-      this.context.camera.x = this.mouseDownCameraX - offseX;
-      this.context.camera.y = this.mouseDownCameraY - offseY;
+      this.context.camera.setPosition(
+        this.mouseDownCameraX - offseX,
+        this.mouseDownCameraY - offseY
+      );
     }
   }
 
