@@ -28,14 +28,6 @@ export class StarSystemRenderComponent implements OnDestroy, CellRenderer<Planet
     });
   }
 
-  hasFleets(): boolean {
-    return this.starSystem.orbitingFleets.size > 0;
-  }
-  
-  hasColony(): boolean {
-    return this.planet.colony != null;
-  }
-
   ngOnDestroy(): void {
     this.destroyed.next();
     this.destroyed.complete();

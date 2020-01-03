@@ -61,7 +61,7 @@ class PlanetDataSource implements DataSource<Planet> {
     return paramsChange.pipe(
       switchMap(params => {
         return this.store.getPlanets().pipe(map(planetSet => {
-          let planets = Array.from(planetSet);
+          let planets = Array.from(planetSet).filter(p => p.colony === undefined || p.colony === null);
           if (params && params.sortStatus) {
             const reverseSortStatus = Array.from(params.sortStatus);
             reverseSortStatus.reverse();

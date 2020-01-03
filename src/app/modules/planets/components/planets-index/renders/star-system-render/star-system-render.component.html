@@ -1,7 +1,7 @@
 <div class="container">
     <span>{{ starSystem.name }}</span>
     <div class='right'>
-        <span *ngIf="hasFleets()" class="fas fa-rocket"></span>
-        <span *ngIf="hasColony()" class="fas fa-globe"></span>
+        <span *ngIf="starSystem.hasAlliedFleets" class="fas fa-rocket green info-icon" title='Hay flotas aliadas en el sistema'></span>
+        <span *ngIf="starSystem.hasEnemyFleets" class="fas fa-rocket red info-icon" title='Hay flotas enemigas en el sistema'></span>
     </div>
 </div>

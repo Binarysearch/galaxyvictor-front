@@ -20,6 +20,9 @@ export interface StarSize {
 export class StarSystem implements Entity {
 
     private changes: Subject<void> = new Subject();
+    private _hasAlliedFleets: boolean = false;
+    private _hasEnemyFleets: boolean = false;
+
     public incomingFleets: Set<Fleet> = new Set();
     public orbitingFleets: Set<Fleet> = new Set();
     public planets: Set<Planet> = new Set();
@@ -47,15 +50,39 @@ export class StarSystem implements Entity {
     
     public addOrbitingFleet(fleet: Fleet) {
         this.orbitingFleets.add(fleet);
+        this.totalize();
         this.changes.next();
+    }
+
+    private totalize() {
+        this._hasAlliedFleets = false;
+        this._hasEnemyFleets = false;
+        this.orbitingFleets.forEach(f => {
+            if (f.civilization.playerCivilization) {
+                this._hasAlliedFleets = true;
+            } else {
+                this._hasEnemyFleets = true;
+            }
+        });
     }
 
     public removeOrbitingFleet(fleet: Fleet) {
         this.orbitingFleets.delete(fleet);
+        this.totalize();
         this.changes.next();
     }
 
     public getChanges(): Observable<void> {
         return this.changes.asObservable();
     }
+
+    public get hasAlliedFleets(): boolean {
+        return this._hasAlliedFleets;
+    }
+
+    public get hasEnemyFleets(): boolean {
+        return this._hasEnemyFleets;
+    }
+
+
 }
