@@ -22,7 +22,7 @@ export class Fleet implements Entity {
     }
 
     get x(): number {
-        let travelX = this.origin.x;
+        let travelX = this.destination.x;
         if (this.isTravelling) {
             const p = this.travelPercent;
             travelX = this.destination.x * p + this.origin.x * (1 - p);
@@ -32,7 +32,7 @@ export class Fleet implements Entity {
     }
 
     get y(): number {
-        let travelY = this.origin.y;
+        let travelY = this.destination.y;
         if (this.isTravelling) {
             const p = this.travelPercent;
             travelY = this.destination.y * p + this.origin.y * (1 - p);

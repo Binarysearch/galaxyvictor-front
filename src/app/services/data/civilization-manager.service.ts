@@ -29,7 +29,11 @@ export class CivilizationManagerService {
       //Add planets
       if (civilizationDto.exploredStarSystems.length > 0) {
         civilizationDto.exploredStarSystems.forEach(
-          ss => this.planetManager.addPlanets(ss.planets)
+          ss => {
+            if (ss.planets) {
+              this.planetManager.addPlanets(ss.planets);
+            }
+          }
         );
       }
       
