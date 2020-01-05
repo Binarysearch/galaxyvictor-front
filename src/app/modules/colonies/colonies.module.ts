@@ -1,14 +1,24 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ColoniesRoutingModule } from './colonies-routing.module';
 import { ColoniesIndexComponent } from './components/colonies-index/colonies-index.component';
+import { TableModule } from '@piros/table';
+import { NameRenderComponent } from './components/colonies-index/renders/name-render/name-render.component';
 
 @NgModule({
-  declarations: [ColoniesIndexComponent],
+  declarations: [
+    ColoniesIndexComponent,
+    NameRenderComponent
+  ],
   imports: [
     CommonModule,
-    ColoniesRoutingModule
+    TableModule
+  ],
+  exports: [
+    ColoniesIndexComponent
+  ],
+  entryComponents: [
+    NameRenderComponent
   ]
 })
 export class ColoniesModule { }

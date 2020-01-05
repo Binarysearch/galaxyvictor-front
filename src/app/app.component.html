@@ -8,6 +8,7 @@
     <app-selected-entity *ngIf="openWindow === ''"></app-selected-entity>
     <app-planets-index *ngIf="openWindow === 'planets'"></app-planets-index>
     <app-fleets-index *ngIf="openWindow === 'fleets'"></app-fleets-index>
+    <app-colonies-index *ngIf="openWindow === 'colonies'"></app-colonies-index>
     <div *ngIf="!sessionStarted || civilization"><router-outlet></router-outlet></div>
     <div *ngIf="!(!sessionStarted || civilization)"><create-civilization></create-civilization></div>
   </div>

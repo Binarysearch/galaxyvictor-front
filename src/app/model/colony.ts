@@ -19,4 +19,8 @@ export class Colony implements Entity {
     get y(): number {
         return this.planet.y;
     }
+
+    get name(): string {
+        return this.planet.name;
+    }
 }
