@@ -12,6 +12,10 @@ export class ColonyManagerService {
     private store: Store
   ) { }
 
+  public addColony(colony: ColonyInfoDto) {
+    this.addColonies([colony]);
+  }
+
   public addColonies(colonyDtos: ColonyInfoDto[]) {        
     const colonies: Colony[] = colonyDtos.map(c => {
       const planet = this.store.getPlanetById(c.planet);

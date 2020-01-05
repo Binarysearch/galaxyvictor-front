@@ -2,6 +2,9 @@
     <span class='fas fa-globe-europe' [style.font-size]="(planet.size.id * 5 + 5) + 'px'" [style.color]="planet.type.colorHex"> </span>
     <span> {{ planet.name }} </span>
 </div>
+<div *ngIf="!planet.colony">
+    <button class="btn" (click)="colonizePlanet()">Colonize planet</button>
+</div>
 <div class='star-info' (click)='selectStar(planet.starSystem)'>
     <strong>Estrella Tipo: </strong>
     <span title='{{ planet.starSystem.size.description }}'>{{ planet.starSystem.size.name }} </span>

@@ -13,5 +13,9 @@ export class CommandService {
   public startTravel(fleet: string, destination: string) {
     this.api.request('start-travel', { fleet: fleet, destination: destination });
   }
+
+  public colonizePlanet(planet: string) {
+    this.api.request('colonize-planet', { planet: planet });
+  }
   
 }
