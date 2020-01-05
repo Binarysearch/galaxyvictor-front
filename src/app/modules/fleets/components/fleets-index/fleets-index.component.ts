@@ -51,8 +51,6 @@ class FleetDataSource implements DataSource<Fleet> {
   }
 
   connect(paramsChange: Observable<QueryParams>): Observable<QueryResult<Fleet>> {
-    paramsChange.subscribe();
-
     return paramsChange.pipe(
       switchMap(params => {
         return this.store.getFleets().pipe(map(FleetSet => {

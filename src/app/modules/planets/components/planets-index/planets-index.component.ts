@@ -54,9 +54,8 @@ class PlanetDataSource implements DataSource<Planet> {
   }
 
   connect(paramsChange: Observable<QueryParams>): Observable<QueryResult<Planet>> {
-    paramsChange.subscribe();
-
     return paramsChange.pipe(
+      switchMap(params => this.store.getColonies().pipe(map(colonies => params))),
       switchMap(params => {
         return this.store.getPlanets().pipe(map(planetSet => {
           let planets = Array.from(planetSet).filter(p => p.colony === undefined || p.colony === null);

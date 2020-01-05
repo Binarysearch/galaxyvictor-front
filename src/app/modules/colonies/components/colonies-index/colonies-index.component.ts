@@ -43,8 +43,6 @@ class ColonyDataSource implements DataSource<Colony> {
   }
 
   connect(paramsChange: Observable<QueryParams>): Observable<QueryResult<Colony>> {
-    paramsChange.subscribe();
-
     return paramsChange.pipe(
       switchMap(params => {
         return this.store.getColonies().pipe(map(colonySet => {
@@ -60,7 +58,6 @@ class ColonyDataSource implements DataSource<Colony> {
               }
             });
           }
-          
           return { data: colonies, total: colonies.length };
         }))
       })
