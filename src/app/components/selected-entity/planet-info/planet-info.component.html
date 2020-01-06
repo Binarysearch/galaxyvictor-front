@@ -5,6 +5,9 @@
 <div *ngIf="!planet.colony">
     <button class="btn" (click)="colonizePlanet()">Colonize planet</button>
 </div>
+<div *ngIf="planet.colony">
+    <button class="btn" (click)="buildShip()">Build ship</button>
+</div>
 <div class='star-info' (click)='selectStar(planet.starSystem)'>
     <strong>Estrella Tipo: </strong>
     <span title='{{ planet.starSystem.size.description }}'>{{ planet.starSystem.size.name }} </span>

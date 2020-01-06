@@ -28,4 +28,10 @@ export class PlanetInfoComponent implements OnInit {
   colonizePlanet(){
     this.commandService.colonizePlanet(this.planet.id);
   }
+
+  buildShip(){
+    this.commandService.buildShip(this.planet.colony.id);
+  }
+
+
 }
