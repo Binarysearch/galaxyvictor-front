@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { StarSystem } from '../../../model/star-system';
 import { Fleet } from 'src/app/model/fleet';
+import { ShipsService } from 'src/app/services/data/getters/ships.service';
+import { Ship } from 'src/app/model/ship';
 
 @Component({
   selector: 'app-fleet-info',
@@ -10,10 +11,15 @@ import { Fleet } from 'src/app/model/fleet';
 export class FleetInfoComponent implements OnInit {
 
   @Input() fleet: Fleet;
+
+  ships: Ship[] = [];
   
-  constructor() { }
+  constructor(
+    private shipsService: ShipsService
+  ) { }
 
   ngOnInit() {
+    this.shipsService.getFleetDetail(this.fleet.id).subscribe(detail => this.ships = detail.ships);
   }
 
 }
