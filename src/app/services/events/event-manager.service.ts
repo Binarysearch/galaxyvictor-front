@@ -7,6 +7,7 @@ import { VisibilityLostEventService } from './visibility-lost-event.service';
 import { DeleteFleetEventService } from './delete-fleet-event.service';
 import { ColonizePlanetEventService } from './colonize-planet-event.service';
 import { FinishBuildingShipEventService } from './finish-building-ship-event.service';
+import { CreateBuildingOrderEventService } from './create-building-order-event.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,7 @@ export class EventManagerService {
     private deleteFleetEventService: DeleteFleetEventService,
     private colonizePlanetEventService: ColonizePlanetEventService,
     private finishBuildingShipEventService: FinishBuildingShipEventService,
+    private createBuildingOrderEventService: CreateBuildingOrderEventService,
   ) {
     
   }

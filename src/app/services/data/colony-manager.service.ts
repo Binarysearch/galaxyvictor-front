@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ColonyInfoDto } from 'src/app/dto/colony-info';
 import { Store } from './store';
 import { Colony } from 'src/app/model/colony';
+import { BuildingOrder } from 'src/app/model/building-order';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,8 @@ export class ColonyManagerService {
       const colony = new Colony(
         c.id,
         planet, 
-        this.store.getCivilizationById(c.civilizationId)
+        this.store.getCivilizationById(c.civilizationId),
+        c.buildingOrder ? new BuildingOrder(c.buildingOrder.id) : null
       );
       planet.colony = colony;
       return colony;
@@ -35,4 +37,21 @@ export class ColonyManagerService {
     colony.planet.colony = undefined;
   }
 
+  public updateColony(colonyDto: ColonyInfoDto): void {
+    const existing = this.store.getColonyById(colonyDto.id);
+    if (!existing) {
+      this.addColony(colonyDto);
+    } else {
+      this.updateExistingColony(existing, colonyDto);
+    }
+  }
+
+  
+  private updateExistingColony(existing: Colony, colonyDto: ColonyInfoDto) {
+    existing.civilization = this.store.getCivilizationById(colonyDto.civilizationId);
+
+    existing.buildingOrder = (colonyDto.buildingOrder) ? new BuildingOrder(colonyDto.buildingOrder.id) : null;
+    
+    existing.sendChanges();
+  }
 }

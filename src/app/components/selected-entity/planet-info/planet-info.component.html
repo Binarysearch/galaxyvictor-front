@@ -5,7 +5,7 @@
 <div *ngIf="!planet.colony">
     <button class="btn" (click)="colonizePlanet()">Colonize planet</button>
 </div>
-<div *ngIf="planet.colony">
+<div *ngIf="planet.colony && !planet.colony.buildingOrder">
     <button class="btn" (click)="buildShip()">Build ship</button>
 </div>
 <div class='star-info' (click)='selectStar(planet.starSystem)'>

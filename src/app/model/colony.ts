@@ -1,13 +1,18 @@
 import { Planet } from './planet';
 import { Civilization } from './civilization';
 import { Entity } from '../services/render/renderer.interface';
+import { Observable, Subject } from 'rxjs';
+import { BuildingOrder } from './building-order';
 
 export class Colony implements Entity {
 
+    private changes: Subject<void> = new Subject();
+    
     constructor(
         public id: string,
         public planet: Planet,
-        public civilization: Civilization
+        public civilization: Civilization,
+        public buildingOrder: BuildingOrder
     ){
 
     }
@@ -22,5 +27,13 @@ export class Colony implements Entity {
 
     get name(): string {
         return this.planet.name;
+    }
+    
+    public getChanges(): Observable<void> {
+        return this.changes.asObservable();
+    }
+    
+    public sendChanges(): void {
+        this.changes.next();
     }
 }
