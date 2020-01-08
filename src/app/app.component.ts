@@ -1,4 +1,4 @@
-import { Component, ElementRef, AfterViewInit, ViewChildren, QueryList, HostListener } from '@angular/core';
+import { Component, ElementRef, AfterViewInit, ViewChildren, QueryList, HostListener, ViewChild, ViewContainerRef, OnInit } from '@angular/core';
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { ApiService } from '@piros/api';
 import { GalaxyMapService } from './services/galaxy-map.service';
@@ -6,6 +6,7 @@ import { Store } from './services/data/store';
 import { Civilization } from './model/civilization';
 import { EventManagerService } from './services/events/event-manager.service';
 import { GalaxyManagerService } from './services/data/galaxy-manager.service';
+import { WindowManagerService } from './services/window-manager.service-abstract';
 
 export interface AppRoute {
   path: string;
@@ -18,7 +19,7 @@ export interface AppRoute {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements AfterViewInit{
+export class AppComponent implements AfterViewInit, OnInit {
 
   @ViewChildren('canvasRef') 
   private canvasRef: QueryList<ElementRef>;
@@ -27,8 +28,6 @@ export class AppComponent implements AfterViewInit{
 
   public civilization: Civilization;
 
-  public openWindow: string = '';
-
   config: DsConfig = {
     routes: [
       { path: '/', title: 'Home', faIcon: 'fas fa-home' },
@@ -36,9 +35,9 @@ export class AppComponent implements AfterViewInit{
       { path: '/universe', title: 'Universe', faIcon: 'fab fa-galactic-republic', show: this.isSessionStarted.bind(this) },
       { path: '/galaxy', title: 'Galaxy', faIcon: 'fa fa-atom', show: this.isSessionStarted.bind(this) },
       { path: '/civilizations', title: 'Civilizations', faIcon: 'fab fa-galactic-senate', show: this.isSessionStarted.bind(this) },
-      { onClick: () => this.openWindow = 'colonies', title: 'Colonies', faIcon: 'fas fa-globe', show: this.isSessionStarted.bind(this) },
-      { onClick: () => this.openWindow = 'fleets', title: 'Fleets', faIcon: 'fas fa-rocket', show: this.isSessionStarted.bind(this) },
-      { onClick: () => this.openWindow = 'planets', title: 'Planets', faIcon: 'fas fa-globe-europe', show: this.isSessionStarted.bind(this) },
+      { onClick: () => this.windowManagerService.openColonyListWindow(), title: 'Colonies', faIcon: 'fas fa-globe', show: this.isSessionStarted.bind(this) },
+      { onClick: () => this.windowManagerService.openFleetsListWindow(), title: 'Fleets', faIcon: 'fas fa-rocket', show: this.isSessionStarted.bind(this) },
+      { onClick: () => this.windowManagerService.openPlanetListWindow(), title: 'Planets', faIcon: 'fas fa-globe-europe', show: this.isSessionStarted.bind(this) },
       { path: '/trade', title: 'Trade', faIcon: 'fas fa-handshake', show: this.isSessionStarted.bind(this) },
       { path: '/research', title: 'Research', faIcon: 'fas fa-flask', show: this.isSessionStarted.bind(this) },
       { path: '/battles', title: 'Battles', faIcon: 'fas fa-fighter-jet', show: this.isSessionStarted.bind(this)  },
@@ -53,7 +52,8 @@ export class AppComponent implements AfterViewInit{
     private galaxyMap: GalaxyMapService,
     private store: Store,
     private eventManagerService: EventManagerService,
-    private galaxyManagerService: GalaxyManagerService
+    private galaxyManagerService: GalaxyManagerService,
+    private windowManagerService: WindowManagerService
   ) {
     api.isReady().subscribe(ready => {
       this.sessionStarted = ready;
@@ -62,7 +62,11 @@ export class AppComponent implements AfterViewInit{
     this.galaxyMap.getOnSelectEntity().subscribe(selected => {
       this.requestCloseWindows();
     });
-  } 
+  }
+
+  ngOnInit(): void {
+    
+  }
 
   ngAfterViewInit(): void {
     this.galaxyMap.setCanvas(<HTMLCanvasElement>this.canvasRef.first.nativeElement);
@@ -119,6 +123,10 @@ export class AppComponent implements AfterViewInit{
   }
 
   requestCloseWindows() {
-    this.openWindow = '';
+    this.windowManagerService.closeAll();
+  }
+
+  get openWindow() {
+    return this.windowManagerService.getOpenWindow();
   }
 }

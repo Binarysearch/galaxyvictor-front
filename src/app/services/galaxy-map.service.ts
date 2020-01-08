@@ -13,6 +13,7 @@ import { Fleet } from '../model/fleet';
 import { StarSystem } from '../model/star-system';
 import { CommandService } from './command.service';
 import { ConstraintService } from './constraint.service';
+import { MapActionResolverService, MapAction } from './map-action-resolver.service';
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +48,8 @@ export class GalaxyMapService {
     private api: ApiService,
     private command: CommandService,
     private constraintService: ConstraintService,
-    private store: Store
+    private store: Store,
+    private actionResolver: MapActionResolverService
   ){
     this.subscribeToStartingPosition();
     this.startAutosaveState();
@@ -125,8 +127,8 @@ export class GalaxyMapService {
   }
 
   onRightButtonMouseClick(event: MouseEvent) {
-    if (this.constraintService.canStartTravelTo(this.selected, this.hovered)) {
-      this.command.startTravel(this.selected.id, this.hovered.id);
+    if (this.posibleRightClickAction) {
+      this.posibleRightClickAction.execute();
     }
   }
 
@@ -212,6 +214,10 @@ export class GalaxyMapService {
 
   public getOnSelectEntity(): Observable<Entity> {
     return this.onSelectEntity.asObservable();
+  }
+
+  public get posibleRightClickAction(): MapAction {
+    return this.actionResolver.getPosibleAction(this.selected, this.hovered);
   }
 
   private startAutosaveState() {

@@ -18,7 +18,8 @@ import { NameRenderComponent } from './components/colonies-index/renders/name-re
     ColoniesIndexComponent
   ],
   entryComponents: [
-    NameRenderComponent
+    NameRenderComponent,
+    ColoniesIndexComponent
   ]
 })
 export class ColoniesModule { }

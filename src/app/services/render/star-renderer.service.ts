@@ -62,7 +62,7 @@ export class StarRendererService implements Renderer{
     gl.uniform1f(this.aspectUniformLocation, aspect);
   }
 
-  render(entities: StarSystem[], context: RenderContext): void {
+  render(entities: StarSystem[] | Set<StarSystem>, context: RenderContext): void {
     this.prepare(context);
     const gl = context.gl;
     const camera = context.camera;

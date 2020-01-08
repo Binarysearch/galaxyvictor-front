@@ -7,6 +7,7 @@ import { StarSystemRenderComponent } from './components/fleets-index/renders/sta
 import { StatusRenderComponent } from './components/fleets-index/renders/status-render/status-render.component';
 import { CivilizationRenderComponent } from './components/fleets-index/renders/civilization-render/civilization-render.component';
 import { NameRenderComponent } from './components/fleets-index/renders/name-render/name-render.component';
+import { FleetExchangeWindowComponent } from './components/fleet-exchange-window/fleet-exchange-window.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { NameRenderComponent } from './components/fleets-index/renders/name-rend
     StarSystemRenderComponent,
     StatusRenderComponent,
     CivilizationRenderComponent,
-    NameRenderComponent
+    NameRenderComponent,
+    FleetExchangeWindowComponent
   ],
   imports: [
     CommonModule,
@@ -27,7 +29,9 @@ import { NameRenderComponent } from './components/fleets-index/renders/name-rend
     StarSystemRenderComponent,
     CivilizationRenderComponent,
     StatusRenderComponent,
-    NameRenderComponent
+    NameRenderComponent,
+    FleetExchangeWindowComponent,
+    FleetsIndexComponent
   ]
 })
 export class FleetsModule { }

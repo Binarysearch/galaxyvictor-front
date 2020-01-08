@@ -27,7 +27,8 @@ import { NameRenderComponent } from './components/planets-index/renders/name-ren
     TypeRenderComponent,
     SizeRenderComponent,
     StarSystemRenderComponent,
-    NameRenderComponent
+    NameRenderComponent,
+    PlanetsIndexComponent
   ]
 })
 export class PlanetsModule { }

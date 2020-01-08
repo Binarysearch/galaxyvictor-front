@@ -25,6 +25,10 @@ import { SelectedEntityComponent } from './components/selected-entity/selected-e
 import { StarSystemInfoComponent } from './components/selected-entity/star-system-info/star-system-info.component';
 import { FleetInfoComponent } from './components/selected-entity/fleet-info/fleet-info.component';
 import { PlanetInfoComponent } from './components/selected-entity/planet-info/planet-info.component';
+import { HoveredInfoComponent } from './components/hovered-info/hovered-info.component';
+import { CentralWindowComponent } from './components/central-window/central-window.component';
+import { WindowManagerServiceImpl } from './services/window-manager.service';
+import { WindowManagerService } from './services/window-manager.service-abstract';
 
 
 @NgModule({
@@ -36,7 +40,9 @@ import { PlanetInfoComponent } from './components/selected-entity/planet-info/pl
     SelectedEntityComponent,
     StarSystemInfoComponent,
     FleetInfoComponent,
-    PlanetInfoComponent
+    PlanetInfoComponent,
+    HoveredInfoComponent,
+    CentralWindowComponent
   ],
   imports: [
     BrowserModule,
@@ -58,7 +64,8 @@ import { PlanetInfoComponent } from './components/selected-entity/planet-info/pl
     ReactiveFormsModule
   ],
   providers: [
-    { provide: 'Window', useValue: window }
+    { provide: 'Window', useValue: window },
+    { provide: WindowManagerService, useClass: WindowManagerServiceImpl },
   ],
   bootstrap: [AppComponent]
 })
