@@ -3,16 +3,12 @@ import { MainRendererService } from './render/main-renderer.service';
 import { RenderContext, Entity } from './render/renderer.interface';
 import { Camera } from './render/camera';
 import { HoverService } from './hover.service';
-import { ApiService, SocketStatus } from '@piros/api';
+import { ApiService } from '@piros/api';
 import { Store } from './data/store';
-import { first, mergeMap, map } from 'rxjs/operators';
+import { mergeMap, map } from 'rxjs/operators';
 import { SessionState } from '../model/session.interface';
-import { forkJoin, Observable, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Civilization } from '../model/civilization';
-import { Fleet } from '../model/fleet';
-import { StarSystem } from '../model/star-system';
-import { CommandService } from './command.service';
-import { ConstraintService } from './constraint.service';
 import { MapActionResolverService, MapAction } from './map-action-resolver.service';
 
 @Injectable({
@@ -46,8 +42,6 @@ export class GalaxyMapService {
     private renderer: MainRendererService,
     private hoverService: HoverService,
     private api: ApiService,
-    private command: CommandService,
-    private constraintService: ConstraintService,
     private store: Store,
     private actionResolver: MapActionResolverService
   ){
@@ -111,10 +105,7 @@ export class GalaxyMapService {
     let x = this._mouseX / this.context.camera.zoom * this.context.aspectRatio + this.context.camera.x;
     let y = this._mouseY / this.context.camera.zoom + this.context.camera.y;
 
-    if (this.selected) {
-      x = this.selected.x;
-      y = this.selected.y;
-    } else if (this.hovered) {
+    if (this.hovered) {
       x = this.hovered.x;
       y = this.hovered.y;
     }
