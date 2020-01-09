@@ -5,11 +5,15 @@
         </div>
         <div class='body'>
             <div class='fleet1-panel'>
-                <div *ngFor="let ship of ships1">{{ ship.id }}</div>
+                <div *ngFor="let ship of ships1" class='ship-container' (click)='transferShip(ship)'>{{ ship.id }}</div>
             </div>
             
             <div class='fleet2-panel'>
-                <div *ngFor="let ship of ships2">{{ ship.id }}</div>
+                <div *ngFor="let ship of ships2" class='ship-container' (click)='transferShip(ship)'>{{ ship.id }}</div>
+            </div>
+            <div class='action-buttons'>
+                <button class='btn' (click)="accept()">Aceptar</button>
+                <button class='btn' (click)="cancel()">Cancelar</button>
             </div>
         </div>
     </div>

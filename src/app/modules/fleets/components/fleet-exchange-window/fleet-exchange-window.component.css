@@ -19,7 +19,7 @@
     top: 5%;
     left: 5%;
     width: 40%;
-    height: 90%;
+    height: 80%;
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 .fleet2-panel{
@@ -27,6 +27,19 @@
     top: 5%;
     left: 55%;
     width: 40%;
-    height: 90%;
+    height: 80%;
     border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.ship-container {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    padding: 4px;
+}
+.ship-container:hover {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.action-buttons {
+    position: absolute;
+    right: 40px;
+    bottom: 20px;
 }
