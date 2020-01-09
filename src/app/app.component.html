@@ -8,6 +8,7 @@
     <app-selected-entity *ngIf="!openWindow"></app-selected-entity>
     <app-hovered-info></app-hovered-info>
     <app-central-window></app-central-window>
+    <app-modal-container></app-modal-container>
     <div *ngIf="!sessionStarted || civilization"><router-outlet></router-outlet></div>
     <div *ngIf="!(!sessionStarted || civilization)"><create-civilization></create-civilization></div>
   </div>

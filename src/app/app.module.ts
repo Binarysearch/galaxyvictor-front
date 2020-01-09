@@ -29,6 +29,10 @@ import { HoveredInfoComponent } from './components/hovered-info/hovered-info.com
 import { CentralWindowComponent } from './components/central-window/central-window.component';
 import { WindowManagerServiceImpl } from './services/window-manager.service';
 import { WindowManagerService } from './services/window-manager.service-abstract';
+import { ModalFrameComponent } from './components/modals/modal-frame/modal-frame.component';
+import { ModalContainerComponent } from './components/modals/modal-container/modal-container.component';
+import { ModalService } from './services/modal.service-abstract';
+import { ModalServiceImpl } from './services/modal.service';
 
 
 @NgModule({
@@ -42,7 +46,9 @@ import { WindowManagerService } from './services/window-manager.service-abstract
     FleetInfoComponent,
     PlanetInfoComponent,
     HoveredInfoComponent,
-    CentralWindowComponent
+    CentralWindowComponent,
+    ModalFrameComponent,
+    ModalContainerComponent
   ],
   imports: [
     BrowserModule,
@@ -65,8 +71,12 @@ import { WindowManagerService } from './services/window-manager.service-abstract
   ],
   providers: [
     { provide: 'Window', useValue: window },
+    { provide: ModalService, useClass: ModalServiceImpl },
     { provide: WindowManagerService, useClass: WindowManagerServiceImpl },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    ModalFrameComponent
+  ]
 })
 export class AppModule { }

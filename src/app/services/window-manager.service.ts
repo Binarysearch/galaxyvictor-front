@@ -5,6 +5,7 @@ import { PlanetsIndexComponent } from '../modules/planets/components/planets-ind
 import { FleetsIndexComponent } from '../modules/fleets/components/fleets-index/fleets-index.component';
 import { ColoniesIndexComponent } from '../modules/colonies/components/colonies-index/colonies-index.component';
 import { WindowManagerService } from './window-manager.service-abstract';
+import { ModalService } from './modal.service-abstract';
 
 @Injectable({
   providedIn: 'root'
@@ -15,13 +16,15 @@ export class WindowManagerServiceImpl extends WindowManagerService {
   private openWindow: ComponentRef<any>;
   
   constructor(
-    private resolver: ComponentFactoryResolver
+    private resolver: ComponentFactoryResolver,
+    private modalService: ModalService
   ) {
     super();
   }
 
   public openFleetExchangeWindow(selected: Fleet, hovered: Fleet): void {
-    this.open(FleetExchangeWindowComponent).setFleets(selected, hovered);
+    this.modalService.openWindow(FleetExchangeWindowComponent, { fleet1: selected, fleet2: hovered });
+    //this.open(FleetExchangeWindowComponent).setFleets(selected, hovered);
   }
 
   public openPlanetListWindow(): void {
@@ -43,6 +46,7 @@ export class WindowManagerServiceImpl extends WindowManagerService {
   public closeAll() {
     this.openWindow = null;
     this.windowContainer.clear();
+    this.modalService.closeAll();
   }
 
   private open<T>(component: Type<T>): T {
