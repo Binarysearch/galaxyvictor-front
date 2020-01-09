@@ -1,0 +1,32 @@
+.container{
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    top: 5%;
+    left: 5%;
+}
+.gv-panel{
+    width: 100%;
+    height: 100%;
+}
+.body {
+    overflow-y: scroll;
+    height: calc(100% - 50px);
+    position: relative;
+}
+.fleet1-panel{
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 40%;
+    height: 90%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.fleet2-panel{
+    position: absolute;
+    top: 5%;
+    left: 55%;
+    width: 40%;
+    height: 90%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}

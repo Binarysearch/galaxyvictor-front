@@ -46,7 +46,7 @@ export class MapActionResolverService {
     }
 
     // Si se hace click derecho sobre otra flota aliada se abre la ventana de intercambio entre flotas
-    if (hovered instanceof Fleet && hovered.civilization.playerCivilization) {
+    if (hovered instanceof Fleet && hovered.civilization.playerCivilization && selected.destination.id === hovered.destination.id) {
       return {
         description: `Intercambiar`,
         execute: () => this.windowManager.openFleetExchangeWindow(selected, hovered)

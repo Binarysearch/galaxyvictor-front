@@ -1,1 +1,16 @@
-<p>fleet-exchange-window works!</p>
+<div class="container" >
+    <div class="gv-panel">
+        <div class='header'>
+            <h1 class='title'>INTERCAMBIO ({{ fleet1.name }} - {{ fleet2.name }})</h1>
+        </div>
+        <div class='body'>
+            <div class='fleet1-panel'>
+                <div *ngFor="let ship of ships1">{{ ship.id }}</div>
+            </div>
+            
+            <div class='fleet2-panel'>
+                <div *ngFor="let ship of ships2">{{ ship.id }}</div>
+            </div>
+        </div>
+    </div>
+</div>
