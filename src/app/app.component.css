@@ -1,26 +1,15 @@
-.box{
-    border: 1px solid rgba(0,0,0,0.2);
-    display: inline-block;
-    margin: 1em;
-    padding: 1em;
-    background-color: rgba(0,0,0,0.1);
-    box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
+.container{
+    position: relative;
+    
+    width: 512px;
+    height: 512px;
 }
-#main-content{
+.child{
     position: absolute;
+    background-color: rgba(0, 0, 0, 0.1);
 }
-#main-container{
-    z-index: 1;
+canvas {
     width: 100%;
     height: 100%;
-    position: absolute;
-}
-#main-canvas{
-    z-index: -1;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-}
-.pointer{
-    cursor: pointer;
+    border: 1px solid #000;
 }

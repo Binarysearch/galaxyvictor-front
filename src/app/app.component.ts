@@ -7,6 +7,7 @@ import { Civilization } from './model/civilization';
 import { EventManagerService } from './services/events/event-manager.service';
 import { GalaxyManagerService } from './services/data/galaxy-manager.service';
 import { WindowManagerService } from './services/window-manager.service-abstract';
+import { BordersService, QuadTree } from './services/borders.service';
 
 export interface AppRoute {
   path: string;
@@ -19,114 +20,71 @@ export interface AppRoute {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements AfterViewInit, OnInit {
-
-  @ViewChildren('canvasRef') 
-  private canvasRef: QueryList<ElementRef>;
+export class AppComponent implements AfterViewInit { 
   
-  public sessionStarted: boolean = false;
+  @ViewChild('canvas', { static: true }) public canvas: ElementRef;
 
-  public civilization: Civilization;
+  points: { x: number; y: number; r: number }[] = [];
 
-  config: DsConfig = {
-    routes: [
-      { path: '/', title: 'Home', faIcon: 'fas fa-home' },
-      { path: '/admin', title: 'Admin', faIcon: 'fas fa-tools', show: this.isSessionStarted.bind(this) },
-      { path: '/universe', title: 'Universe', faIcon: 'fab fa-galactic-republic', show: this.isSessionStarted.bind(this) },
-      { path: '/galaxy', title: 'Galaxy', faIcon: 'fa fa-atom', show: this.isSessionStarted.bind(this) },
-      { path: '/civilizations', title: 'Civilizations', faIcon: 'fab fa-galactic-senate', show: this.isSessionStarted.bind(this) },
-      { onClick: () => this.windowManagerService.openColonyListWindow(), title: 'Colonies', faIcon: 'fas fa-globe', show: this.isSessionStarted.bind(this) },
-      { onClick: () => this.windowManagerService.openFleetsListWindow(), title: 'Fleets', faIcon: 'fas fa-rocket', show: this.isSessionStarted.bind(this) },
-      { onClick: () => this.windowManagerService.openPlanetListWindow(), title: 'Planets', faIcon: 'fas fa-globe-europe', show: this.isSessionStarted.bind(this) },
-      { path: '/trade', title: 'Trade', faIcon: 'fas fa-handshake', show: this.isSessionStarted.bind(this) },
-      { path: '/research', title: 'Research', faIcon: 'fas fa-flask', show: this.isSessionStarted.bind(this) },
-      { path: '/battles', title: 'Battles', faIcon: 'fas fa-fighter-jet', show: this.isSessionStarted.bind(this)  },
-      { onClick: this.logout.bind(this), title: 'Logout', faIcon: 'fas fa-sign-out-alt', topbarPosition: TopbarPosition.RIGHT, show: this.isSessionStarted.bind(this) },
-      { path: '/login', title: 'Login', faIcon: 'fas fa-sign-in-alt', topbarPosition: TopbarPosition.RIGHT, show: this.isNotSessionStarted.bind(this) },
-      { path: '/register', title: 'Register', faIcon: 'fas fa-user-plus', topbarPosition: TopbarPosition.RIGHT, show: this.isNotSessionStarted.bind(this) },
-    ]
-  }
+  children: Set<QuadTree> = new Set();
+  maxLevel: number = 8;
+  width: number = 512;
+  height: number = 512;
+  cantidad: number = 0;
+
+  root: QuadTree;
+  inside: boolean;
+  cx: CanvasRenderingContext2D;
 
   constructor(
-    private api: ApiService,
-    private galaxyMap: GalaxyMapService,
-    private store: Store,
-    private eventManagerService: EventManagerService,
-    private galaxyManagerService: GalaxyManagerService,
-    private windowManagerService: WindowManagerService
-  ) {
-    api.isReady().subscribe(ready => {
-      this.sessionStarted = ready;
-    });
-    store.getCivilization().subscribe(civilization => this.civilization = civilization);
-    this.galaxyMap.getOnSelectEntity().subscribe(selected => {
-      this.requestCloseWindows();
-    });
-  }
-
-  ngOnInit(): void {
+    private borderService: BordersService
+  ){ 
+    this.root = new QuadTree(0, this.width, 0, this.height);
     
   }
 
-  ngAfterViewInit(): void {
-    this.galaxyMap.setCanvas(<HTMLCanvasElement>this.canvasRef.first.nativeElement);
+  public ngAfterViewInit() {
+    const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
+    this.cx = canvasEl.getContext('2d');
+
+    canvasEl.width = this.width;
+    canvasEl.height = this.height;
+
   }
 
-  private isSessionStarted(): boolean {
-    return this.sessionStarted;
+  clickContainer(ev: MouseEvent) {
+    this.points.push({ x: ev.x, y: ev.y, r: 10 });
+
+    const values: number[][] = this.borderService.generateValues(this.points, 512, 512);
+
+    this.cx.clearRect(0, 0, this.width, this.height);
+
+    values.forEach((fila, y) => fila.forEach((value, x) => {
+      if (value > 1) {
+        this.addPosition(x, y);
+        this.cx.fillRect(x, y, 1, 1);
+      }
+    }));
+    
+
   }
 
-  private isNotSessionStarted(): boolean {
-    return !this.sessionStarted;
+  addPosition(x, y) {
+    this.root.add(x, y, 0, this.maxLevel);
+    this.children = new Set();
+    this.addChildren(this.root, 1);
   }
 
-  private logout(): void {
-    this.api.closeSession();
-    this.store.clear();
+  mouseMove(ev: MouseEvent){
+    this.inside = this.root.check(ev.x, ev.y, 0, this.maxLevel);
   }
 
-  @HostListener('window:resize')
-  onResize() {
-    this.galaxyMap.onResize();
+  addChildren(e: QuadTree, level: number){
+    if (this.maxLevel === level) this.children.add(e);
+    if (e.tl) this.addChildren(e.tl, level + 1);
+    if (e.tr) this.addChildren(e.tr, level + 1);
+    if (e.bl) this.addChildren(e.bl, level + 1);
+    if (e.br) this.addChildren(e.br, level + 1);
   }
 
-  @HostListener('window:mousemove', ['$event'])
-  windowMouseMove(event: MouseEvent) {
-    this.galaxyMap.onMouseMove(event);;
-  }
-
-  onMouseWheel(event: MouseWheelEvent){
-    this.galaxyMap.onMouseWheel(event);
-    event.preventDefault();
-  }
-
-  onMouseClick(event){
-    this.galaxyMap.onMouseClick(event);
-  }
-
-  onMouseDown(event){
-    this.galaxyMap.onMouseDown(event);
-  }
-
-  @HostListener('window:mouseup', ['$event'])
-  windowMouseUp(event: MouseEvent) {
-    this.galaxyMap.onMouseUp(event);
-  }
-
-  onContextMenu(event){
-    this.galaxyMap.onRightButtonMouseClick(event);
-    event.preventDefault();
-  }
-
-  isHovering(): boolean {
-    return this.galaxyMap.hovered != null;
-  }
-
-  requestCloseWindows() {
-    this.windowManagerService.closeAll();
-  }
-
-  get openWindow() {
-    return this.windowManagerService.getOpenWindow();
-  }
 }

@@ -70,7 +70,6 @@ body{
   user-select: none;
   font: normal 100 14px/1.2em "Exo 2", Arial, sans-serif;
   color: var(--text-color-normal);
-  background-color: rgb(0, 0, 0);
 }
 
 /**********           PANEL            *******/
