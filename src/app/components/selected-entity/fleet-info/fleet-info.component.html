@@ -1,2 +1,2 @@
 
-<div *ngFor="let ship of ships">{{ ship.id }}</div>
+<div *ngFor="let ship of ships" class='ship' [class.selected]="isSelected(ship)" (click)="toggleSelected(ship)">{{ ship.id }}</div>

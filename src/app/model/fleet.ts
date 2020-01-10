@@ -4,11 +4,13 @@ import { StarSystem } from './star-system';
 import { FLEET_ROTATION_SPEED_MULT } from '../galaxy-constants';
 import { Civilization } from './civilization';
 import { Observable, Subject } from 'rxjs';
+import { Ship } from './ship';
 
 export class Fleet implements Entity {
 
     private changes: Subject<void> = new Subject();
     private orbit = 4;
+    unSelectedShips: Set<string>;
 
     constructor(
         public id: string,

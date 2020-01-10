@@ -39,9 +39,22 @@ export class MapActionResolverService {
 
     // Si se hace click derecho sobre una estrella se inicia un viaje si no se esta ya en la estrella
     if (hovered instanceof StarSystem && selected.destination.id !== hovered.id) {
-      return {
-        description: `Viajar al sistema ${hovered.name}`,
-        execute: () => this.command.startTravel(selected.id, hovered.id)
+
+      // Si hay alguna nave sin seleccionar se dividira la flota, sino se iniciara un viaje normal
+      if (selected.unSelectedShips && selected.unSelectedShips.size > 0) {
+        return {
+          description: `Dividir la flota y enviar naves a ${hovered.name}`,
+          execute: () => {
+            this.command.startTravel(selected.id, hovered.id);
+          }
+        }
+      } else {
+        return {
+          description: `Viajar al sistema ${hovered.name}`,
+          execute: () => {
+            this.command.startTravel(selected.id, hovered.id);
+          }
+        }
       }
     }
 
