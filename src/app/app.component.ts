@@ -7,7 +7,7 @@ import { Civilization } from './model/civilization';
 import { EventManagerService } from './services/events/event-manager.service';
 import { GalaxyManagerService } from './services/data/galaxy-manager.service';
 import { WindowManagerService } from './services/window-manager.service-abstract';
-import { BordersService, QuadTree } from './services/borders.service';
+import { BordersService, QuadTree, BorderPoint, BorderRect } from './services/borders.service';
 
 export interface AppRoute {
   path: string;
@@ -28,8 +28,8 @@ export class AppComponent implements AfterViewInit {
 
   children: Set<QuadTree> = new Set();
   maxLevel: number = 8;
-  width: number = 512;
-  height: number = 512;
+  width: number = 1024;
+  height: number = 1024;
   cantidad: number = 0;
 
   root: QuadTree;
@@ -53,18 +53,20 @@ export class AppComponent implements AfterViewInit {
   }
 
   clickContainer(ev: MouseEvent) {
-    this.points.push({ x: ev.x, y: ev.y, r: 10 });
+    this.points.push({ x: ev.x, y: ev.y, r: 50 });
 
-    const values: number[][] = this.borderService.generateValues(this.points, 512, 512);
+    const rect: BorderRect = this.borderService.generateValues(this.points, 2048, 2048);
 
     this.cx.clearRect(0, 0, this.width, this.height);
 
-    values.forEach((fila, y) => fila.forEach((value, x) => {
-      if (value > 1) {
-        this.addPosition(x, y);
-        this.cx.fillRect(x, y, 1, 1);
-      }
-    }));
+    rect.iterate(r => {
+      if (r.tlp.value < 1) return;
+      const x1 = r.tlp.x;
+      const y1 = r.tlp.y;
+      const w = r.brp.x - x1;
+      const h = r.brp.y - y1;
+      this.cx.strokeRect(x1, y1, w, h);
+    });
     
 
   }

@@ -9,26 +9,19 @@ export class BordersService {
 
   constructor() { }
 
-  generateValues(points: { x: number; y: number; r: number }[], width: number, height: number): number[][] {
+  generateValues(points: { x: number; y: number; r: number }[], width: number, height: number): BorderRect {
     this.operations = 0;
-    const result = new Array(height);
 
-    const divisions = Math.log2(width) * 2;
+    const divisions = 16;
 
     const subdivisions = this.generateSubdivisions(points, width, height, divisions);
 
-    for (let y = 0; y < height; y++) {
-      const fila = new Array(width);
+    //const valueGetter = (x, y) => this.getValueSubdivided(x, y, width, height, divisions, subdivisions);
+    const valueGetter = (x, y) => this.getValue(x, y, points);
 
-      for (let x = 0; x < width; x++) {
-        fila[x] = this.getValueSubdivided(x, y, width, height, divisions, subdivisions);
-      }
-
-      result[y] = fila;
-    }
     
     console.log('Operations:', this.operations);
-    return result;
+    return new BorderRect(0, width, 0, height, 0, 5, 12, valueGetter, 1);
   }
 
   private generateSubdivisions(points: { x: number; y: number; r: number }[], width: number, height: number, divisions: number): { points: { x: number; y: number; r: number }[] }[][] {
@@ -181,3 +174,82 @@ export class QuadTree {
   }
 
 }
+
+export class BorderPoint {
+  x: number;
+  y: number;
+  value: number;
+}
+
+export class BorderRect {
+
+  private tl: BorderRect;
+  private tr: BorderRect;
+  private bl: BorderRect;
+  private br: BorderRect;
+
+  public tlp: BorderPoint;
+  public trp: BorderPoint;
+  public blp: BorderPoint;
+  public brp: BorderPoint;
+
+  value: number;
+
+  constructor(
+    x1: number,
+    x2: number,
+    y1: number,
+    y2: number,
+    depth: number,
+    minDepth: number,
+    maxDepth: number,
+    valueGetter: (x: number, y: number) => number,
+    threshold: number
+  ) {
+    //Calcular puntos
+    this.tlp = { x: x1, y: y1, value: valueGetter.call(this, x1, y1) };
+    this.trp = { x: x2, y: y1, value: valueGetter.call(this, x2, y1) };
+    this.blp = { x: x1, y: y2, value: valueGetter.call(this, x1, y2) };
+    this.brp = { x: x2, y: y2, value: valueGetter.call(this, x2, y2) };
+    this.value = valueGetter.call(this, (x1 + x2) / 2, (y1 + y2) / 2);
+    
+    if (depth < maxDepth) {
+
+      // Si la profundidad es menos q la profundidad minima
+      // o hay puntos con el valor a los dos lados del limite
+      // generar los 4 hijos
+      if (depth < minDepth || this.inThreshold(threshold)) {
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+        this.tl = new BorderRect(x1, mx, y1, my, depth + 1, minDepth, maxDepth, valueGetter, threshold);
+        this.tr = new BorderRect(mx, x2, y1, my, depth + 1, minDepth, maxDepth, valueGetter, threshold);
+        this.bl = new BorderRect(x1, mx, my, y2, depth + 1, minDepth, maxDepth, valueGetter, threshold);
+        this.br = new BorderRect(mx, x2, my, y2, depth + 1, minDepth, maxDepth, valueGetter, threshold);
+      }
+    }
+  }
+
+  inThreshold(threshold: number): boolean {
+    let beyondThreshold = 0;
+
+    if (this.tlp.value > threshold) beyondThreshold++;
+    if (this.trp.value > threshold) beyondThreshold++;
+    if (this.blp.value > threshold) beyondThreshold++;
+    if (this.brp.value > threshold) beyondThreshold++;
+    if (this.value > threshold) beyondThreshold++;
+
+    return beyondThreshold > 0 && beyondThreshold < 5;
+  }
+
+  public iterate(iterator: ((rect: BorderRect) => void)) {
+    if (this.tl) {
+      this.tl.iterate(iterator);
+      this.tr.iterate(iterator);
+      this.bl.iterate(iterator);
+      this.br.iterate(iterator);
+    } else {
+      iterator.call(this, this);
+    }
+  }
+}
+

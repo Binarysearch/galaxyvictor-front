@@ -1,8 +1,8 @@
 .container{
     position: relative;
     
-    width: 512px;
-    height: 512px;
+    width: 1024px;
+    height: 1024px;
 }
 .child{
     position: absolute;
