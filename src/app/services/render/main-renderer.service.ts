@@ -15,6 +15,8 @@ import { LineRendererService } from './line-renderer.service';
 import { Colony } from 'src/app/model/colony';
 import { VisibleEntitiesService } from '../visible-entities/visible-entities.service';
 import { ConstraintService } from '../constraint.service';
+import { BordersRendererService } from './borders-renderer.service';
+import { BorderRect, BordersService } from '../borders.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +31,8 @@ export class MainRendererService {
   private planets: Set<Planet> = new Set();
   private fleets: Set<Fleet> = new Set();
   private colonies: Set<Colony> = new Set();
+  private borders: Set<BorderRect>;
+  private borders2: Set<BorderRect>;
 
   constructor(
     @Inject('Window') private window: Window,
@@ -38,15 +42,36 @@ export class MainRendererService {
     private colonyRenderer: ColonyRendererService,
     private hoverRenderer: HoverRendererService,
     private travelLineRenderer: LineRendererService,
+    private bordersRenderer: BordersRendererService,
     private hoverService: HoverService,
     private store: Store,
     private visibleEntitiesService: VisibleEntitiesService,
-    private constraintService: ConstraintService
+    private constraintService: ConstraintService,
+    private bordersService: BordersService
   ) {
     this.visibleEntitiesService.getViewportStars().subscribe(ss => this.starSystems = ss);
     this.visibleEntitiesService.getViewportPlanets().subscribe(planets => this.planets = planets);
     this.store.getFleets().subscribe(fleets => this.fleets = fleets);
-    this.store.getColonies().subscribe(colonies => this.colonies = colonies);
+    this.store.getColonies().subscribe(colonies => {
+      this.colonies = colonies;
+
+      const worker = new Worker('../../workers/border-generator.worker', { type: 'module' });
+      
+      worker.onmessage = ({ data }) => {
+        if (data === 'START') {
+          this.borders2 = new Set<BorderRect>();
+        } else if (data === 'END') {
+          this.borders = this.borders2;
+          this.borders2 = new Set<BorderRect>();
+        } else {
+          data.forEach(br => this.borders2.add(br));
+        }
+      };
+
+      worker.postMessage({ colonies: colonies });
+
+    });
+    
   }
 
   public init(context: RenderContext): void {
@@ -74,6 +99,7 @@ export class MainRendererService {
     this.colonyRenderer.setup(context);
     this.hoverRenderer.setup(context);
     this.travelLineRenderer.setup(context);
+    this.bordersRenderer.setup(context);
     this.visibleEntitiesService.setup(context);
   }
 
@@ -96,6 +122,8 @@ export class MainRendererService {
     this.colonyRenderer.render(this.colonies, context);
 
     this.travelLineRenderer.render(this.getTravelLines(), context);
+
+    if (this.borders) this.bordersRenderer.render(this.borders, context);
   }
 
   getTravelLines(): Segment[] {

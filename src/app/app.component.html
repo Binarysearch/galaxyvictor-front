@@ -1,11 +1,15 @@
-<div class='container' [style.width.px]="width" [style.height.px]="height" (click)="clickContainer($event)" (mousemove)="mouseMove($event)">
-  <!--<div *ngFor='let child of children' class='child'
-    [style.left.px]="child.x1"
-    [style.bottom.px]="height - child.y2"
-    [style.width.px]="child.x2 - child.x1"
-    [style.height.px]="child.y2 - child.y1"
-  ></div>-->
-  <canvas #canvas></canvas>
-</div>
-<div>{{ inside }}</div>
-<div>{{ cantidad }}</div>
+<dashboard [content]="main" [config]="config"></dashboard>
+<ng-template #main>
+  <div id='main-container'>
+    <div [class.pointer]="isHovering()" (mousewheel)="onMouseWheel($event)"  (click)="onMouseClick($event);" (mousedown)="onMouseDown($event);" (contextmenu)="onContextMenu($event);">
+      <canvas id='main-canvas' #canvasRef></canvas>
+      <app-text-renderer></app-text-renderer>
+    </div>
+    <app-selected-entity *ngIf="!openWindow"></app-selected-entity>
+    <app-hovered-info></app-hovered-info>
+    <app-central-window></app-central-window>
+    <app-modal-container></app-modal-container>
+    <div *ngIf="!sessionStarted || civilization"><router-outlet></router-outlet></div>
+    <div *ngIf="!(!sessionStarted || civilization)"><create-civilization></create-civilization></div>
+  </div>
+</ng-template>

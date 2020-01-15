@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { RecursiveIterable, Entity } from './render/renderer.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class BordersService {
 
     
     console.log('Operations:', this.operations);
-    return new BorderRect(0, width, 0, height, 0, 5, 12, valueGetter, 1);
+    return new BorderRect(-width, width, -height, height, 0, 9, 12, valueGetter, 1);
   }
 
   private generateSubdivisions(points: { x: number; y: number; r: number }[], width: number, height: number, divisions: number): { points: { x: number; y: number; r: number }[] }[][] {
@@ -181,7 +182,7 @@ export class BorderPoint {
   value: number;
 }
 
-export class BorderRect {
+export class BorderRect implements Entity, RecursiveIterable<BorderRect> {
 
   private tl: BorderRect;
   private tr: BorderRect;
@@ -241,15 +242,19 @@ export class BorderRect {
     return beyondThreshold > 0 && beyondThreshold < 5;
   }
 
-  public iterate(iterator: ((rect: BorderRect) => void)) {
+  public forEach(iterator: ((rect: BorderRect) => void)) {
     if (this.tl) {
-      this.tl.iterate(iterator);
-      this.tr.iterate(iterator);
-      this.bl.iterate(iterator);
-      this.br.iterate(iterator);
+      this.tl.forEach(iterator);
+      this.tr.forEach(iterator);
+      this.bl.forEach(iterator);
+      this.br.forEach(iterator);
     } else {
       iterator.call(this, this);
     }
+  }
+
+  get id(): string {
+    return '';
   }
 }
 

@@ -24,7 +24,7 @@ export interface Segment {
 export interface Renderer {
     setup(context: RenderContext): void;
     prepare(context: RenderContext): void;
-    render(entities: Entity[] | Set<Entity>, context: RenderContext): void;
+    render(entities: Entity[] | Set<Entity> | RecursiveIterable<Entity>, context: RenderContext): void;
     getRenderScale(entity: Entity, zoom: number): number;
 }
 
@@ -32,4 +32,8 @@ export interface SegmentRenderer {
     setup(context: RenderContext): void;
     prepare(context: RenderContext): void;
     render(segments: Segment[], context: RenderContext): void;
+}
+
+export interface RecursiveIterable<T> {
+    forEach(iterFunc: ((e: T) => void)): void;
 }
