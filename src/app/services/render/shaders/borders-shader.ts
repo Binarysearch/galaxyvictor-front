@@ -22,13 +22,11 @@ export const BORDERS_FS_SOURCE = `#version 300 es
 precision mediump float;
 out vec4 fragColor;
 in vec3 coord;
-uniform vec3 color;
+uniform vec4 color;
 
 uniform float time;
 
 void main() {
-    float a = 0.2;
-
-    fragColor = vec4(color, a);
+    fragColor = color;
 }
 `;

@@ -3,7 +3,7 @@ import { Renderer, RenderContext, Entity } from './renderer.interface';
 import { ShaderCompilerService } from '../gl-utils/shader-compiler.service';
 import { COLONY_VS_SOURCE, COLONY_FS_SOURCE } from './shaders/colony-shader';
 import { Colony } from '../../model/colony';
-import { PLANET_RENDER_SCALE_ZI, PLANET_RENDER_SCALE_ZI_SI, PLANET_RENDER_SCALE_ZD } from 'src/app/galaxy-constants';
+import { PLANET_RENDER_SCALE_ZI, PLANET_RENDER_SCALE_ZI_SI, PLANET_RENDER_SCALE_ZD, MIN_ZOOM_TO_VIEW_COLONIES } from 'src/app/galaxy-constants';
 import { ColorService } from '../color.service';
 
 @Injectable({
@@ -67,6 +67,9 @@ export class ColonyRendererService implements Renderer{
   }
 
   render(colonies: Set<Colony>, context: RenderContext): void {
+    if (context.camera.zoom < MIN_ZOOM_TO_VIEW_COLONIES) {
+      return;
+    }
     this.prepare(context);
     const gl = context.gl;
     const camera = context.camera;

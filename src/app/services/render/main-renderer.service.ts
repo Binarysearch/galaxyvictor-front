@@ -33,6 +33,7 @@ export class MainRendererService {
   private colonies: Set<Colony> = new Set();
   private borders: Set<BorderRect>;
   private borders2: Set<BorderRect>;
+  private worker: Worker;
 
   constructor(
     @Inject('Window') private window: Window,
@@ -55,9 +56,13 @@ export class MainRendererService {
     this.store.getColonies().subscribe(colonies => {
       this.colonies = colonies;
 
-      const worker = new Worker('../../workers/border-generator.worker', { type: 'module' });
+      if (this.worker) {
+        this.worker.terminate();
+      }
+
+      this.worker = new Worker('../../workers/border-generator.worker', { type: 'module' });
       
-      worker.onmessage = ({ data }) => {
+      this.worker.onmessage = ({ data }) => {
         if (data === 'START') {
           this.borders2 = new Set<BorderRect>();
         } else if (data === 'END') {
@@ -68,7 +73,7 @@ export class MainRendererService {
         }
       };
 
-      worker.postMessage({ colonies: colonies });
+      this.worker.postMessage({ colonies: colonies });
 
     });
     

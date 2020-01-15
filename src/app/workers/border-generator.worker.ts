@@ -1,24 +1,39 @@
 /// <reference lib="webworker" />
 
-function getValue(x: number, y: number, points: { x: number; y: number; r: number }[]): number {
-  let result = 0;
+function getValue(x: number, y: number, civilizations: Map<string, { points: { x: number; y: number; r: number; }[]; civilizationId: string }>): { civilization: string; value: number } {
+  let resultValue = 0;
+  let resultCivilization;
 
-  points.forEach(p => {
-    result += (p.r * p.r) / ((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y));
+  civilizations.forEach(civ => {
+    let civResult = 0;
+
+    civ.points.forEach(p => {
+      civResult += (p.r * p.r) / ((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y));
+    });
+
+    if (civResult > resultValue) {
+      resultValue = civResult;
+      resultCivilization = civ.civilizationId;
+    }
   });
 
-  return result
+  return { civilization: resultCivilization, value: resultValue };
 }
 
 addEventListener('message', (event) => {
-  const points = [];
-  console.log(event);
+  const civilizations = new Map<string, { points: { x: number; y: number; r: number; }[]; civilizationId: string }>();
 
-  (<any>event.data).colonies.forEach(c => points.push({ x: c.planet.starSystem.x, y: c.planet.starSystem.y, r: 100 }));
+  (<any>event.data).colonies.forEach(c => {
+    if (!civilizations.has(c.civilization.id)) {
+      civilizations.set(c.civilization.id, { civilizationId: c.civilization.id, points: [] } );
+    }
+    civilizations.get(c.civilization.id).points.push({ x: c.planet.starSystem.x, y: c.planet.starSystem.y, r: 100 });
+  });
   
-  const valueGetter = (x, y) => getValue(x, y, points);
+  console.log(civilizations.values());
+  const valueGetter = (x, y) => getValue(x, y, civilizations);
   
-  const borders = new BorderRect(-60000, 60000, -60000, 60000, 0, 9, 12, valueGetter, 1);
+  const borders = new BorderRect(-60000, 60000, -60000, 60000, 0, 9, 16, valueGetter, 1);
 
   let result: Set<BorderRect> = new Set<BorderRect>();
 
@@ -43,11 +58,13 @@ addEventListener('message', (event) => {
   postMessage('END');
 });
 
-
 export class BorderPoint {
   x: number;
   y: number;
-  value: number;
+  data: {
+    value: number;
+    civilization: string;
+  };
 }
 
 export class BorderRect  {
@@ -63,6 +80,7 @@ export class BorderRect  {
   public brp: BorderPoint;
 
   value: number;
+  civilization: string;
 
   constructor(
     x1: number,
@@ -72,15 +90,17 @@ export class BorderRect  {
     depth: number,
     minDepth: number,
     maxDepth: number,
-    valueGetter: (x: number, y: number) => number,
+    valueGetter: (x: number, y: number) => { civilization: string; value: number },
     threshold: number
   ) {
     //Calcular puntos
-    this.tlp = { x: x1, y: y1, value: valueGetter.call(this, x1, y1) };
-    this.trp = { x: x2, y: y1, value: valueGetter.call(this, x2, y1) };
-    this.blp = { x: x1, y: y2, value: valueGetter.call(this, x1, y2) };
-    this.brp = { x: x2, y: y2, value: valueGetter.call(this, x2, y2) };
-    this.value = valueGetter.call(this, (x1 + x2) / 2, (y1 + y2) / 2);
+    this.tlp = { x: x1, y: y1, data: valueGetter.call(this, x1, y1) };
+    this.trp = { x: x2, y: y1, data: valueGetter.call(this, x2, y1) };
+    this.blp = { x: x1, y: y2, data: valueGetter.call(this, x1, y2) };
+    this.brp = { x: x2, y: y2, data: valueGetter.call(this, x2, y2) };
+    const result = valueGetter.call(this, (x1 + x2) / 2, (y1 + y2) / 2);
+    this.value = result.value
+    this.civilization = result.civilization;
     
     if (depth < maxDepth) {
 
@@ -100,14 +120,21 @@ export class BorderRect  {
 
   inThreshold(threshold: number): boolean {
     let beyondThreshold = 0;
+    const civs: Set<string> = new Set();
 
-    if (this.tlp.value > threshold) beyondThreshold++;
-    if (this.trp.value > threshold) beyondThreshold++;
-    if (this.blp.value > threshold) beyondThreshold++;
-    if (this.brp.value > threshold) beyondThreshold++;
+    if (this.tlp.data.value > threshold) beyondThreshold++;
+    if (this.trp.data.value > threshold) beyondThreshold++;
+    if (this.blp.data.value > threshold) beyondThreshold++;
+    if (this.brp.data.value > threshold) beyondThreshold++;
     if (this.value > threshold) beyondThreshold++;
 
-    return beyondThreshold > 0 && beyondThreshold < 5;
+    civs.add(this.civilization);
+    civs.add(this.tlp.data.civilization);
+    civs.add(this.trp.data.civilization);
+    civs.add(this.blp.data.civilization);
+    civs.add(this.brp.data.civilization);
+
+    return beyondThreshold > 0 && beyondThreshold < 5 || civs.size > 1;
   }
 
   public forEach(iterator: ((rect: BorderRect) => void)) {

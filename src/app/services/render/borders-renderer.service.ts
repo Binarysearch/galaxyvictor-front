@@ -72,14 +72,16 @@ export class BordersRendererService implements Renderer {
         if (rect.value < 1) return;
         const scale = this.getRenderScale(rect, zoom);
         //console.log(rect.tlp.x - camera.x, rect.tlp.y - camera.y, scale);
-        const { r, g, b } = { r: 1, g: 0, b: 0 };
+        const { r, g, b } = this.colorService.getCivilizationColor(rect.civilization);
+
+        const a = 0.2;//Math.min(rect.value / 10, 0.2);
 
         const x = (rect.tlp.x + rect.brp.x) / 2;
         const y = (rect.tlp.y + rect.brp.y) / 2;
 
         gl.uniform1f(this.scaleUniformLocation, scale);
         gl.uniform2f(this.positionUniformLocation,  x - camera.x, y - camera.y);
-        gl.uniform3f(this.colorUniformLocation, r, g, b);
+        gl.uniform4f(this.colorUniformLocation, r, g, b, a);
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
       }

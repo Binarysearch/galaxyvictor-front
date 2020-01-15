@@ -179,7 +179,10 @@ export class QuadTree {
 export class BorderPoint {
   x: number;
   y: number;
-  value: number;
+  data: {
+    value: number;
+    civilization: number;
+  };
 }
 
 export class BorderRect implements Entity, RecursiveIterable<BorderRect> {
@@ -195,6 +198,7 @@ export class BorderRect implements Entity, RecursiveIterable<BorderRect> {
   public brp: BorderPoint;
 
   value: number;
+  civilization: string;
 
   constructor(
     x1: number,
@@ -208,11 +212,13 @@ export class BorderRect implements Entity, RecursiveIterable<BorderRect> {
     threshold: number
   ) {
     //Calcular puntos
-    this.tlp = { x: x1, y: y1, value: valueGetter.call(this, x1, y1) };
-    this.trp = { x: x2, y: y1, value: valueGetter.call(this, x2, y1) };
-    this.blp = { x: x1, y: y2, value: valueGetter.call(this, x1, y2) };
-    this.brp = { x: x2, y: y2, value: valueGetter.call(this, x2, y2) };
-    this.value = valueGetter.call(this, (x1 + x2) / 2, (y1 + y2) / 2);
+    this.tlp = { x: x1, y: y1, data: valueGetter.call(this, x1, y1) };
+    this.trp = { x: x2, y: y1, data: valueGetter.call(this, x2, y1) };
+    this.blp = { x: x1, y: y2, data: valueGetter.call(this, x1, y2) };
+    this.brp = { x: x2, y: y2, data: valueGetter.call(this, x2, y2) };
+    const result = valueGetter.call(this, (x1 + x2) / 2, (y1 + y2) / 2);
+    this.value = result.value
+    this.civilization = result.civilization;
     
     if (depth < maxDepth) {
 
@@ -233,10 +239,10 @@ export class BorderRect implements Entity, RecursiveIterable<BorderRect> {
   inThreshold(threshold: number): boolean {
     let beyondThreshold = 0;
 
-    if (this.tlp.value > threshold) beyondThreshold++;
-    if (this.trp.value > threshold) beyondThreshold++;
-    if (this.blp.value > threshold) beyondThreshold++;
-    if (this.brp.value > threshold) beyondThreshold++;
+    if (this.tlp.data.value > threshold) beyondThreshold++;
+    if (this.trp.data.value > threshold) beyondThreshold++;
+    if (this.blp.data.value > threshold) beyondThreshold++;
+    if (this.brp.data.value > threshold) beyondThreshold++;
     if (this.value > threshold) beyondThreshold++;
 
     return beyondThreshold > 0 && beyondThreshold < 5;
