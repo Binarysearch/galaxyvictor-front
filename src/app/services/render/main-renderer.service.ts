@@ -17,6 +17,7 @@ import { VisibleEntitiesService } from '../visible-entities/visible-entities.ser
 import { ConstraintService } from '../constraint.service';
 import { BordersRendererService } from './borders-renderer.service';
 import { BorderRect, BordersService } from '../borders.service';
+import { ColorService } from '../color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -48,13 +49,18 @@ export class MainRendererService {
     private store: Store,
     private visibleEntitiesService: VisibleEntitiesService,
     private constraintService: ConstraintService,
-    private bordersService: BordersService
+    private bordersService: BordersService,
+    private colorService: ColorService
   ) {
     this.visibleEntitiesService.getViewportStars().subscribe(ss => this.starSystems = ss);
     this.visibleEntitiesService.getViewportPlanets().subscribe(planets => this.planets = planets);
     this.store.getFleets().subscribe(fleets => this.fleets = fleets);
     this.store.getColonies().subscribe(colonies => {
       this.colonies = colonies;
+
+
+      const civilizationColors: Map<string, {r: number; g: number; b: number; }> = new Map();
+      colonies.forEach(c => civilizationColors.set(c.civilization.id, this.colorService.getCivilizationColor(c.civilization.id)));
 
       if (this.worker) {
         this.worker.terminate();
@@ -64,16 +70,15 @@ export class MainRendererService {
       
       this.worker.onmessage = ({ data }) => {
         if (data === 'START') {
-          this.borders2 = new Set<BorderRect>();
+          console.log('START');
         } else if (data === 'END') {
-          this.borders = this.borders2;
-          this.borders2 = new Set<BorderRect>();
+          console.log('END');
         } else {
-          data.forEach(br => this.borders2.add(br));
+          console.log(data);
         }
       };
 
-      this.worker.postMessage({ colonies: colonies });
+      this.worker.postMessage({ colonies: colonies, civilizationColors: civilizationColors });
 
     });
     
