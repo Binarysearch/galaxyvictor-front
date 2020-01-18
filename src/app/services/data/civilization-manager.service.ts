@@ -25,6 +25,7 @@ export class CivilizationManagerService {
       const civilization = new Civilization(civilizationDto.id, civilizationDto.name, true);
       
       this.store.addCivilization(civilization);
+      //this.store.setCivilization(civilization);
       
       //Add planets
       if (civilizationDto.exploredStarSystems.length > 0) {

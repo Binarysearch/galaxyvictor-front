@@ -16,6 +16,7 @@ export class BordersRendererService {
   zoomUniformLocation: WebGLUniformLocation;
   positionUniformLocation: WebGLUniformLocation;
   borderChunks: BordersChunk[] = [];
+  backgroundBorderChunks: BordersChunk[] = [];
 
   private worker: Worker;
 
@@ -47,12 +48,11 @@ export class BordersRendererService {
       
       this.worker.onmessage = ({ data }) => {
         if (data === 'START') {
-          console.log('start');
-          this.borderChunks = [];
+          this.backgroundBorderChunks = [];
         } else if (data === 'END') {
-          console.log('END');
-        } else {
-          this.borderChunks.push(new BordersChunk(gl, this.program, data.data, data.triangleCount));
+          this.borderChunks = this.backgroundBorderChunks;
+        } else if (data.triangleCount > 0) {
+          this.backgroundBorderChunks.push(new BordersChunk(gl, this.program, data.data, data.triangleCount));
         }
       };
 

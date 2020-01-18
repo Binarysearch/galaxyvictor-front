@@ -38,14 +38,14 @@ addEventListener('message', (event) => {
     if (!civilizations.has(c.civilization.id)) {
       civilizations.set(c.civilization.id, { civilizationId: c.civilization.id, points: [], color: civColors.get(c.civilization.id) } );
     }
-    civilizations.get(c.civilization.id).points.push({ x: c.planet.starSystem.x, y: c.planet.starSystem.y, r: 100 });
+    civilizations.get(c.civilization.id).points.push({ x: c.planet.starSystem.x, y: c.planet.starSystem.y, r: 300 });
   });
   
   const rectCollector: RectCollector = new RectCollector();
 
   postMessage('START');
   if (civilizations.size > 0) {
-    calculateBorders(-60000, 60000, 60000, -60000, 0, 9, 14, civilizations, 1, rectCollector);
+    calculateBorders(-60000, 60000, 60000, -60000, 0, 9, 12, civilizations, 1, rectCollector);
     rectCollector.sendBuffer();
   }
   postMessage('END');
@@ -161,21 +161,21 @@ class TriangleBuffer {
     this.data[this.index++] = a.r;
     this.data[this.index++] = a.g;
     this.data[this.index++] = a.b;
-    this.data[this.index++] = Math.min(a.a / 10, 0.2);
+    this.data[this.index++] = Math.pow(Math.min(a.a / 20, 0.7), 4);
 
     this.data[this.index++] = b.x;
     this.data[this.index++] = b.y;
     this.data[this.index++] = b.r;
     this.data[this.index++] = b.g;
     this.data[this.index++] = b.b;
-    this.data[this.index++] = Math.min(b.a / 10, 0.2);
+    this.data[this.index++] = Math.pow(Math.min(b.a / 20, 0.7), 4);
 
     this.data[this.index++] = c.x;
     this.data[this.index++] = c.y;
     this.data[this.index++] = c.r;
     this.data[this.index++] = c.g;
     this.data[this.index++] = c.b;
-    this.data[this.index++] = Math.min(c.a / 10, 0.2);
+    this.data[this.index++] = Math.pow(Math.min(c.a / 20, 0.7), 4);
   }
 
   isFull(): boolean {
