@@ -2,7 +2,7 @@
 
 
 
-const BUFFER_TRIANGLE_COUNT = 1000;
+const BUFFER_TRIANGLE_COUNT = 10000;
 const VERTICE_COMPONENT_COUNT = 6;
 const TRIANGLE_COMPONENT_COUNT = 3 * VERTICE_COMPONENT_COUNT
 const BUFFER_SIZE = BUFFER_TRIANGLE_COUNT * TRIANGLE_COMPONENT_COUNT;
@@ -45,7 +45,7 @@ addEventListener('message', (event) => {
 
   postMessage('START');
   if (civilizations.size > 0) {
-    calculateBorders(-60000, 60000, -60000, 60000, 0, 9, 16, civilizations, 1, rectCollector);
+    calculateBorders(-60000, 60000, 60000, -60000, 0, 9, 14, civilizations, 1, rectCollector);
     rectCollector.sendBuffer();
   }
   postMessage('END');
@@ -71,16 +71,6 @@ function calculateBorders(
   const brp = getPoint(x2, y2, civilizations);
   const center = getPoint((x1 + x2) / 2, (y1 + y2) / 2, civilizations);
 
-  // Enviar resultado
-  if (
-    tlp.a > threshold || 
-    trp.a > threshold || 
-    blp.a > threshold || 
-    brp.a > threshold
-  ) {
-    collector.onNewRect({ tlp: tlp, trp: trp, blp: blp, brp: brp });
-  }
-
   //Calcular recursivamente
   if (depth < maxDepth) {
 
@@ -99,7 +89,7 @@ function calculateBorders(
     civs.add(blp.civ);
     civs.add(brp.civ);
 
-    const inThreshold: boolean = beyondThreshold > 0 && beyondThreshold < 5 || civs.size > 1;
+    const inThreshold: boolean = beyondThreshold > 0 || civs.size > 1;
 
 
     // Si la profundidad es menos q la profundidad minima
@@ -110,8 +100,21 @@ function calculateBorders(
       const my = (y1 + y2) / 2;
       calculateBorders(x1, mx, y1, my, depth + 1, minDepth, maxDepth, civilizations, threshold, collector);
       calculateBorders(mx, x2, y1, my, depth + 1, minDepth, maxDepth, civilizations, threshold, collector);
+      
       calculateBorders(x1, mx, my, y2, depth + 1, minDepth, maxDepth, civilizations, threshold, collector);
       calculateBorders(mx, x2, my, y2, depth + 1, minDepth, maxDepth, civilizations, threshold, collector);
+    } else {
+      if (
+        center.a > threshold
+      ) {
+        collector.onNewRect({ tlp: tlp, trp: trp, blp: blp, brp: brp });
+      }
+    }
+  } else {
+    if (
+      center.a > threshold
+    ) {
+      collector.onNewRect({ tlp: tlp, trp: trp, blp: blp, brp: brp });
     }
   }
 
@@ -158,21 +161,21 @@ class TriangleBuffer {
     this.data[this.index++] = a.r;
     this.data[this.index++] = a.g;
     this.data[this.index++] = a.b;
-    this.data[this.index++] = a.a;
+    this.data[this.index++] = Math.min(a.a / 10, 0.2);
 
     this.data[this.index++] = b.x;
     this.data[this.index++] = b.y;
     this.data[this.index++] = b.r;
     this.data[this.index++] = b.g;
     this.data[this.index++] = b.b;
-    this.data[this.index++] = b.a;
+    this.data[this.index++] = Math.min(b.a / 10, 0.2);
 
     this.data[this.index++] = c.x;
     this.data[this.index++] = c.y;
     this.data[this.index++] = c.r;
     this.data[this.index++] = c.g;
     this.data[this.index++] = c.b;
-    this.data[this.index++] = c.a;
+    this.data[this.index++] = Math.min(c.a / 10, 0.2);
   }
 
   isFull(): boolean {

@@ -4,47 +4,67 @@ import { ShaderCompilerService } from '../gl-utils/shader-compiler.service';
 import { BORDERS_VS_SOURCE, BORDERS_FS_SOURCE } from './shaders/borders-shader';
 import { ColorService } from '../color.service';
 import { BorderRect } from '../borders.service';
+import { Store } from '../data/store';
 
 @Injectable({
   providedIn: 'root'
 })
-export class BordersRendererService implements Renderer {
+export class BordersRendererService {
 
   program: WebGLShader;
-  vao: WebGLVertexArrayObjectOES;
   aspectUniformLocation: WebGLUniformLocation;
-  scaleUniformLocation: WebGLUniformLocation;
   zoomUniformLocation: WebGLUniformLocation;
   positionUniformLocation: WebGLUniformLocation;
-  colorUniformLocation: WebGLUniformLocation;
+  borderChunks: BordersChunk[] = [];
+
+  private worker: Worker;
 
   constructor(
     private shaderCompiler: ShaderCompilerService,
-    private colorService: ColorService
+    private colorService: ColorService,
+    private store: Store
   ) { }
 
   setup(context: RenderContext): void {
     const gl = context.gl;
     this.program = this.shaderCompiler.createShaderProgram(gl, BORDERS_VS_SOURCE, BORDERS_FS_SOURCE);
 
-    this.vao = (gl as any).createVertexArray();
-    (gl as any).bindVertexArray(this.vao);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, 1, 0,  -1, -1, 0,  1, -1, 0,  1, 1, 0, -1, 1, 0, 1, -1, 0]), gl.STATIC_DRAW);
-
-    const coord = gl.getAttribLocation(this.program, 'position');
-    gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(coord);
-
     this.aspectUniformLocation = gl.getUniformLocation(this.program, 'aspect');
-    this.scaleUniformLocation = gl.getUniformLocation(this.program, 'scale');
     this.zoomUniformLocation = gl.getUniformLocation(this.program, 'zoom');
     this.positionUniformLocation = gl.getUniformLocation(this.program, 'pos');
-    this.colorUniformLocation = gl.getUniformLocation(this.program, 'color');
+
+
+    this.store.getColonies().subscribe(colonies => {
+
+      const civilizationColors: Map<string, {r: number; g: number; b: number; }> = new Map();
+      colonies.forEach(c => civilizationColors.set(c.civilization.id, this.colorService.getCivilizationColor(c.civilization.id)));
+
+      if (this.worker) {
+        this.worker.terminate();
+      }
+
+      this.worker = new Worker('../../workers/border-generator.worker', { type: 'module' });
+      
+      this.worker.onmessage = ({ data }) => {
+        if (data === 'START') {
+          console.log('start');
+          this.borderChunks = [];
+        } else if (data === 'END') {
+          console.log('END');
+        } else {
+          this.borderChunks.push(new BordersChunk(gl, this.program, data.data, data.triangleCount));
+        }
+      };
+
+      this.worker.postMessage({ colonies: colonies, civilizationColors: civilizationColors });
+
+    });
+
+    
+    //this.borderChunks.push(new BordersChunk(gl, this.program, new Float32Array([-1, 0, 1,0,0,0.2,  -1, -1, 1,0,0,0.2,  0, -1, 1,0,0,0.2,  0, 0, 1,0,0,0.2,  -1, 0, 1,0,0,0.2,  0, -1, 1,0,0,0.2]), 6));
   }
 
-  prepare(context: RenderContext): void {
+  render(context: RenderContext): void {
     const camera = context.camera;
     const aspect = context.aspectRatio;
     const gl = context.gl;
@@ -54,41 +74,37 @@ export class BordersRendererService implements Renderer {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.useProgram(this.program);
-    gl2.bindVertexArray(this.vao);
-
 
     gl.uniform1f(this.zoomUniformLocation, zoom);
     gl.uniform1f(this.aspectUniformLocation, aspect);
+
+    gl.uniform2f(this.positionUniformLocation, -camera.x, -camera.y);
+
+    this.borderChunks.forEach(bc => {
+      gl2.bindVertexArray(bc.vao);
+      gl.drawArrays(gl.TRIANGLES, 0, bc.triangleCount*3);
+    });
+    
+
   }
+}
 
-  render(entities: Set<BorderRect>, context: RenderContext): void {
-    this.prepare(context);
-    const gl = context.gl;
-    const camera = context.camera;
-    const zoom = context.camera.zoom;
+class BordersChunk {
+  vao: WebGLVertexArrayObjectOES;
 
-    entities.forEach(
-      rect => {
-        if (rect.value < 1) return;
-        const scale = this.getRenderScale(rect, zoom);
-        //console.log(rect.tlp.x - camera.x, rect.tlp.y - camera.y, scale);
-        const { r, g, b } = this.colorService.getCivilizationColor(rect.civilization);
+  constructor(gl: WebGLRenderingContext, program: WebGLShader, vertices: Float32Array, public triangleCount: number) {
+    this.vao = (gl as any).createVertexArray();
+    (gl as any).bindVertexArray(this.vao);
 
-        const a = 0.2;//Math.min(rect.value / 10, 0.2);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
-        const x = (rect.tlp.x + rect.brp.x) / 2;
-        const y = (rect.tlp.y + rect.brp.y) / 2;
+    const coord = gl.getAttribLocation(program, 'position');
+    gl.vertexAttribPointer(coord, 2, gl.FLOAT, false, 6*4, 0);
+    gl.enableVertexAttribArray(coord);
 
-        gl.uniform1f(this.scaleUniformLocation, scale);
-        gl.uniform2f(this.positionUniformLocation,  x - camera.x, y - camera.y);
-        gl.uniform4f(this.colorUniformLocation, r, g, b, a);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-      }
-    );
-  }
-
-  getRenderScale(rect: BorderRect, zoom: number): number {
-    return (rect.tlp.x - rect.brp.x)/2;
+    const color = gl.getAttribLocation(program, 'v_color');
+    gl.vertexAttribPointer(color, 4, gl.FLOAT, false, 6*4, 2*4);
+    gl.enableVertexAttribArray(color);
   }
 }

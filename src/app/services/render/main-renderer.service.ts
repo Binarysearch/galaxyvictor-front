@@ -34,7 +34,6 @@ export class MainRendererService {
   private colonies: Set<Colony> = new Set();
   private borders: Set<BorderRect>;
   private borders2: Set<BorderRect>;
-  private worker: Worker;
 
   constructor(
     @Inject('Window') private window: Window,
@@ -57,29 +56,6 @@ export class MainRendererService {
     this.store.getFleets().subscribe(fleets => this.fleets = fleets);
     this.store.getColonies().subscribe(colonies => {
       this.colonies = colonies;
-
-
-      const civilizationColors: Map<string, {r: number; g: number; b: number; }> = new Map();
-      colonies.forEach(c => civilizationColors.set(c.civilization.id, this.colorService.getCivilizationColor(c.civilization.id)));
-
-      if (this.worker) {
-        this.worker.terminate();
-      }
-
-      this.worker = new Worker('../../workers/border-generator.worker', { type: 'module' });
-      
-      this.worker.onmessage = ({ data }) => {
-        if (data === 'START') {
-          console.log('START');
-        } else if (data === 'END') {
-          console.log('END');
-        } else {
-          console.log(data);
-        }
-      };
-
-      this.worker.postMessage({ colonies: colonies, civilizationColors: civilizationColors });
-
     });
     
   }
@@ -133,7 +109,7 @@ export class MainRendererService {
 
     this.travelLineRenderer.render(this.getTravelLines(), context);
 
-    if (this.borders) this.bordersRenderer.render(this.borders, context);
+    this.bordersRenderer.render(context);
   }
 
   getTravelLines(): Segment[] {
