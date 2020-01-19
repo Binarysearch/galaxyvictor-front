@@ -108,3 +108,75 @@ class BordersChunk {
     gl.enableVertexAttribArray(color);
   }
 }
+
+class BordersTree {
+
+  tl: BordersTree;
+  tr: BordersTree;
+  bl: BordersTree;
+  br: BordersTree;
+
+  x1: number;
+  x2: number;
+  y1: number;
+  y2: number;
+
+  render(context: RenderContext, vp: Rect) {
+    if (this.enoughtResolution(vp)) {
+      this._render(context);
+      return;
+    }
+    
+    const mx = (this.x1 + this.x2) / 2;
+    const my = (this.y1 + this.y2) / 2;
+    
+    const tl = vp.x1 < mx && vp.y1 < my;
+    const tr = vp.x2 > mx && vp.y1 < my;
+    const bl = vp.x1 < mx && vp.y2 > my;
+    const br = vp.x2 > mx && vp.y2 > my;
+
+    let childrenCanRender = true;
+
+    if (tl && !this.tl) {
+      //crear hijo tl
+      childrenCanRender = false;
+    }
+    if (tr && !this.tr) {
+      //crear hijo tr
+      childrenCanRender = false;
+    }
+    if (bl && !this.bl) {
+      //crear hijo tbll
+      childrenCanRender = false;
+    }
+    if (br && !this.br) {
+      //crear hijo br
+      childrenCanRender = false;
+    }
+
+    if (!childrenCanRender) {
+      this._render(context);
+    } else {
+      tl || this.tl.render(context, vp);
+      tr || this.tr.render(context, vp);
+      bl || this.bl.render(context, vp);
+      br || this.br.render(context, vp);
+    }
+  }
+
+  private enoughtResolution(vp: Rect) {
+    //La pantalla abarca mas de la mitad
+    return vp.x2 - vp.x1 > (this.x2 - this.x1) / 2;
+  }
+
+  private _render(context: RenderContext) {
+
+  }
+}
+
+interface Rect {
+  x1: number;
+  x2: number;
+  y1: number;
+  y2: number;
+}

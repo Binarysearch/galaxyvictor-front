@@ -45,7 +45,7 @@ addEventListener('message', (event) => {
 
   postMessage('START');
   if (civilizations.size > 0) {
-    calculateBorders(-60000, 60000, 60000, -60000, 0, 9, 12, civilizations, 1, rectCollector);
+    calculateBorders(-60000, 60000, 60000, -60000, 0, 9, 16, civilizations, 1, rectCollector);
     rectCollector.sendBuffer();
   }
   postMessage('END');
