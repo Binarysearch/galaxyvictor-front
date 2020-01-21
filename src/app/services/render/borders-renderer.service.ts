@@ -17,6 +17,8 @@ export class BordersRendererService {
   zoomUniformLocation: WebGLUniformLocation;
   positionUniformLocation: WebGLUniformLocation;
   vao: WebGLVertexArrayObjectOES;
+  colonyCountUniformLocation: WebGLUniformLocation;
+  timeUniformLocation: WebGLUniformLocation;
 
   private worker: Worker;
   texture: WebGLTexture;
@@ -36,6 +38,8 @@ export class BordersRendererService {
     this.aspectUniformLocation = gl.getUniformLocation(this.program, 'aspect');
     this.zoomUniformLocation = gl.getUniformLocation(this.program, 'zoom');
     this.positionUniformLocation = gl.getUniformLocation(this.program, 'pos');
+    this.colonyCountUniformLocation = gl.getUniformLocation(this.program, 'colonyCount');
+    this.timeUniformLocation = gl.getUniformLocation(this.program, 'time');
 
 
     this.store.getColonies().subscribe(colonies => {
@@ -48,21 +52,31 @@ export class BordersRendererService {
       if(c){
         this.colonies = colonies;
 
-        const f = 256*256*256*255;
-        const cx = 60000;
-        const x = f*(1 + cx / 60000) / 2;
-        const x1 = x / (256.0 * 256.0 * 256.0);
-        const x2 = x / (256.0 * 256.0) % 256;
-        const x3 = x / (256.0) % 256;
-        const x4 = x % 256;
-
-        const arr = new Uint8Array([x1, x2, x3, x4]);
-        console.log([x1, x2, x3, x4]);
-        console.log(arr);
 
         this.texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl2.RGBA, 1, 1, 0, gl2.RGBA, gl2.UNSIGNED_BYTE, arr);
+
+        const size = 100;
+        const src = [];
+        for (let i = 0; i < size; i++) {
+          src.push(6000 * (Math.random()*2-1));
+          src.push(6000 * (Math.random()*2-1));
+          src.push(100);
+          src.push(1);
+        }
+
+        let i=0;
+        this.colonies.forEach((c) => {
+
+          src[i++] = (c.planet.starSystem.x);
+          src[i++] = (c.planet.starSystem.y);
+          src[i++] = (300);
+          src[i++] = (1);
+        });
+    
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl2.RGBA32F, 10, 10, 0, gl2.RGBA, gl.FLOAT, new Float32Array(src));
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
       }
@@ -105,7 +119,11 @@ export class BordersRendererService {
     gl.uniform1f(this.aspectUniformLocation, aspect);
 
     gl.uniform2f(this.positionUniformLocation, -camera.x, -camera.y);
-    gl.uniform2f(this.positionUniformLocation, -60000, 0);
+    gl.uniform1i(this.colonyCountUniformLocation, this.colonies.size);
+
+    const time = ((new Date().getTime()/10) % (Math.PI * 2000)) * 0.1;
+
+    gl.uniform1f(this.timeUniformLocation, time);
 
     //////////////////
     gl.bindTexture(gl.TEXTURE_2D, this.texture);

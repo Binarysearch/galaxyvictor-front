@@ -23,26 +23,36 @@ out vec4 fragColor;
 in vec2 coord;
 
 uniform sampler2D uSampler;
+uniform int colonyCount;
+uniform float time;
 
-
-float getFloatValue(vec4 v) {
-    return 2.0 *
-        ((v.r * 256.0 * 256.0 * 256.0 * 255.0 +
-        v.g * 256.0 * 256.0 * 255.0 +
-        v.b * 256.0 * 255.0 +
-        v.a * 255.0) / (256.0 * 256.0 * 256.0 * 256.0)) - 1.0;
+ivec2 texcoordFromIndex(int ndx, ivec2 size) {
+    int column = ndx % size.x;
+    int row = ndx / size.x;
+    return ivec2(column, row);
 }
 
 float getValue() {
-    float x = 60000.0 * getFloatValue(texelFetch(uSampler, ivec2(0, 0), 0));
-    return length(coord.xy - vec2(x, 0.0));
+    float value = 0.0;
+    ivec2 size = textureSize(uSampler, 0);
+  
+    for(int i=0;i<colonyCount;i++) {
+        ivec2 idx = texcoordFromIndex(i, size);
+        vec4 tx = texelFetch(uSampler, idx, 0);
+        float x = coord.x - tx.r;
+        float y = coord.y - tx.g;
+        float r = tx.b;
+        value = value + (r * r) / (x * x + y * y);
+    }
+  
+    return value;
 }
 
 void main() {
-    float r = getValue();
-    for(int i =0;i<100000;i++){
-        r = getValue();
-    }
-    fragColor = vec4(r, 0.0, 0.0, 1.0);
+    float v = getValue();
+
+    float a = min(v / 20.0, 0.7);
+
+    fragColor = vec4(1.0, 1.0, 0.0, pow(a, 4.0));
 }
 `;
