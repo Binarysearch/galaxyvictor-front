@@ -2,7 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Validators, FormBuilder, FormControl } from '@angular/forms';
 import { TranslateService } from '../../../../services/translate.service';
 import { Router } from '@angular/router';
-import { ApiService } from '@piros/api';
+import { GvApiService } from 'src/app/services/gv-api.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +20,12 @@ export class LoginComponent implements OnInit {
 
   errorMessage: string;
 
-  constructor(private router: Router ,public api: ApiService, public ts: TranslateService, private fb: FormBuilder) { }
+  constructor(
+    private router: Router, 
+    public api: GvApiService, 
+    public ts: TranslateService, 
+    private fb: FormBuilder
+  ) { }
 
   ngOnInit() {
 

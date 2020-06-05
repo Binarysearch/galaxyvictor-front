@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from '@piros/api';
-import { GalaxyDetailDto } from '../../dto/galaxy-detail';
 import { StarSystem } from '../../model/star-system';
 import { CivilizationManagerService } from './civilization-manager.service';
 import { Store } from './store';
 import { StarSystemInfoDto } from '../../dto/star-system-info';
+import { GvApiService } from '../gv-api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,14 +11,14 @@ import { StarSystemInfoDto } from '../../dto/star-system-info';
 export class GalaxyManagerService {
 
   constructor(
-    private api: ApiService,
+    private api: GvApiService,
     private civilizationManager: CivilizationManagerService,
     private store: Store
   ) {
     this.api.isReady()
     .subscribe(ready => {
       if (ready) {
-        this.api.request<GalaxyDetailDto>('get-galaxy', 'test-galaxy')
+        this.api.getGalaxy()
           .subscribe(galaxy => {
             this.setStarSystems(galaxy.starSystems);
             this.civilizationManager.setCivilization(galaxy.civilization);

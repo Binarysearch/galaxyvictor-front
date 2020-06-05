@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../../../model/user.interface';
-import { ApiService } from '@piros/api';
+import { GvApiService } from '../../../services/gv-api.service';
 
 export interface UserListDto {
   total: number;
@@ -13,9 +13,9 @@ export interface UserListDto {
 })
 export class UsersService {
 
-  constructor(private api: ApiService) { }
+  constructor(private api: GvApiService) { }
 
   public getUsers(): Observable<UserListDto> {
-    return this.api.request<UserListDto>('get-users', '');
+    return this.api.getUsers();
   }
 }

@@ -4,8 +4,8 @@ import { Civilization } from '../../model/civilization';
 import { Store } from './store';
 import { PlanetManagerService } from './planet-manager.service';
 import { ColonyManagerService } from './colony-manager.service';
-import { ChannelConnection, ApiService } from '@piros/api';
 import { FleetManagerService } from './fleet-manager.service';
+import { EventService } from '../event.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,7 @@ import { FleetManagerService } from './fleet-manager.service';
 export class CivilizationManagerService {
 
   constructor(
-    private api: ApiService,
+    private eventService: EventService,
     private store: Store,
     private planetManager: PlanetManagerService,
     private fleetManager: FleetManagerService,
@@ -52,10 +52,8 @@ export class CivilizationManagerService {
     } else {
       this.store.setCivilization(undefined);
 
-      const createCivilizationChannel: ChannelConnection<CivilizationDetailDto> = this.api.connectToChannel<CivilizationDetailDto>('create-civilization');
-      createCivilizationChannel.observable.subscribe(civilization => {
+      this.eventService.getCreateCivilizationEvents().subscribe(civilization => {
         this.setCivilization(civilization);
-        createCivilizationChannel.disconnect();
       });
     }
   }

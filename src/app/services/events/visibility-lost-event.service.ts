@@ -1,34 +1,25 @@
 import { Injectable } from '@angular/core';
-import { ChannelConnection, ApiService } from '@piros/api';
 import { VisibilityLostEvent } from '../../dto/visibility-lost-event';
 import { Store } from '../data/store';
 import { FleetManagerService } from '../data/fleet-manager.service';
 import { ColonyManagerService } from '../data/colony-manager.service';
 import { Fleet } from 'src/app/model/fleet';
+import { EventService } from '../event.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VisibilityLostEventService {
 
-  private connection: ChannelConnection<VisibilityLostEvent>;
-
   constructor(
-    private api: ApiService,
+    private eventService: EventService,
     private store: Store,
     private fleetManagerService: FleetManagerService,
     private colonyManagerService: ColonyManagerService
   ) {
-    this.api.isReady().subscribe(
-      ready => {
-        if (ready) {
-          this.connection = this.api.connectToChannel<VisibilityLostEvent>('visibility-lost-events');
-          this.connection.observable.subscribe(event => {
-            this.processEvent(event);
-          });
-        }
-      }
-    );
+    this.eventService.getVisibilityLostEvents().subscribe(event => {
+      this.processEvent(event);
+    });
   }
 
   private processEvent(event: VisibilityLostEvent) {

@@ -3,13 +3,13 @@ import { MainRendererService } from './render/main-renderer.service';
 import { RenderContext, Entity } from './render/renderer.interface';
 import { Camera } from './render/camera';
 import { HoverService } from './hover.service';
-import { ApiService } from '@piros/api';
 import { Store } from './data/store';
 import { mergeMap, map } from 'rxjs/operators';
 import { SessionState } from '../model/session.interface';
 import { Observable, Subject } from 'rxjs';
 import { Civilization } from '../model/civilization';
 import { MapActionResolverService, MapAction } from './map-action-resolver.service';
+import { GvApiService } from './gv-api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +41,7 @@ export class GalaxyMapService {
   constructor(
     private renderer: MainRendererService,
     private hoverService: HoverService,
-    private api: ApiService,
+    private api: GvApiService,
     private store: Store,
     private actionResolver: MapActionResolverService
   ){
@@ -52,7 +52,7 @@ export class GalaxyMapService {
   private subscribeToStartingPosition() {
     this.api.isReady().subscribe(ready => {
       if (ready) {
-        this.api.getSessionState<SessionState>().pipe(mergeMap(state => this.store.getCivilization().pipe(map(civ => ({ state: state, civilization: civ }))))).subscribe(result => {
+        this.api.getSessionState().pipe(mergeMap(state => this.store.getCivilization().pipe(map(civ => ({ state: state, civilization: civ }))))).subscribe(result => {
           const sessionState: SessionState = result.state;
           const civilization: Civilization = result.civilization;
           
@@ -233,7 +233,7 @@ export class GalaxyMapService {
               galaxyId: null,
               selectedId: this.selectedId
             };
-            this.api.request('set-session-state', newState).subscribe(()=>{
+            this.api.setSessionstate(newState).subscribe(()=>{
               savedX = newState.cameraX;
               savedY = newState.cameraY;
               savedZ = newState.cameraZ;

@@ -1,8 +1,7 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder, FormControl } from '@angular/forms';
 import { TranslateService } from '../../services/translate.service';
-import { Router } from '@angular/router';
-import { ApiService } from '@piros/api';
+import { GvApiService } from '../../services/gv-api.service';
 
 @Component({
   selector: 'create-civilization',
@@ -17,14 +16,14 @@ export class CreateCivilizationComponent implements OnInit {
 
   errorMessage: string;
 
-  constructor(public api: ApiService, public ts: TranslateService, private fb: FormBuilder) { }
+  constructor(public api: GvApiService, public ts: TranslateService, private fb: FormBuilder) { }
 
   ngOnInit() {
 
   }
 
   create() {
-    this.api.request('create-civilization', this.form.value.name).subscribe();
+    this.api.createCivilization(this.form.value.name).subscribe();
   }
 
   get name (): FormControl {

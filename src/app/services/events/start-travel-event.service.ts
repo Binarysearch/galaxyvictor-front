@@ -1,29 +1,19 @@
 import { Injectable } from '@angular/core';
-import { ChannelConnection, ApiService } from '@piros/api';
-import { StartTravelEvent } from '../../dto/start-travel-event';
 import { FleetManagerService } from '../data/fleet-manager.service';
+import { EventService } from '../event.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StartTravelEventService {
 
-  private connection: ChannelConnection<StartTravelEvent>;
-
   constructor(
-    private api: ApiService,
+    private eventService: EventService,
     private fleetManagerService: FleetManagerService
   ) {
-    this.api.isReady().subscribe(
-      ready => {
-        if (ready) {
-          this.connection = this.api.connectToChannel<StartTravelEvent>('start-travel-events');
-          this.connection.observable.subscribe(event => {
-            this.fleetManagerService.updateFleet(event.fleet);
-          });
-        }
-      }
-    );
+    this.eventService.getStartTravelEvents().subscribe(event => {
+      this.fleetManagerService.updateFleet(event.fleet);
+    });
   }
   
 }
