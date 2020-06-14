@@ -230,7 +230,6 @@ export class GalaxyMapService {
               cameraX: this.context.camera.x,
               cameraY: this.context.camera.y,
               cameraZ: this.context.camera.zoom,
-              galaxyId: null,
               selectedId: this.selectedId
             };
             this.api.setSessionstate(newState).subscribe(()=>{

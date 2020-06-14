@@ -4,7 +4,6 @@ export interface SessionState{
     cameraX: number;
     cameraY: number;
     cameraZ: number;
-    galaxyId: string;
     selectedId: string;
 }
 
