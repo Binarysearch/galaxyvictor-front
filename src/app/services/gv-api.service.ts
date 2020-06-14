@@ -12,6 +12,7 @@ import { LocalStorageService } from './local-storage.service';
 import { GvApiServiceStatus } from '../model/gv-api-service-status';
 import { tap } from 'rxjs/operators';
 import { StarSystemInfoDto } from '../dto/star-system-info';
+import { CivilizationDto } from '../dto/civilization/civilization-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -42,15 +43,14 @@ export class GvApiService {
 
   private fetchInitialData(): void {
     forkJoin(
-      this.api.request<StarSystemInfoDto[]>('galaxy.get-stars')
+      this.api.request<StarSystemInfoDto[]>('galaxy.get-stars'),
+      this.api.request<CivilizationDto>('civilizations.get-civilization')
     ).subscribe(
       results => {
         const stars = results[0];
+        const civilization = results[1];
 
-        this.status.next({ sessionStarted: true, stars: stars });
-      }
-      ,(e)=>{
-        console.log('HHHHHHHHHHHHHHHHHHHHHHH',e);
+        this.status.next({ sessionStarted: true, stars: stars, civilization: civilization });
       }
     );
   }

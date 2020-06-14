@@ -11,6 +11,7 @@ const config: PirosApiServiceConfig = {
       id: 'civilizations',
       url: 'ws://localhost:3001/',
       requestTypes: [
+        'get-civilization',
         'create-civilization'
       ]
     },
@@ -290,6 +291,94 @@ describe('GvApiService', () => {
         expect(status.stars[0].size).toBeDefined();
         expect(status.stars[0].type).toBeDefined();
         done();
+      }
+    });
+
+    service.register(user, password).subscribe(() => {
+      
+      service.login(user, password).subscribe((session) => {
+        expect(session.authToken).toBeDefined();
+      });
+
+    });
+
+  });
+
+  it('should not get civilization when is new user', (done) => {
+    const service: GvApiService = TestBed.get(GvApiService);
+    
+    const user = 'user-' + Math.random();
+    const password = '12345';
+    
+    service.getStatus().subscribe(status => {
+      if (status.sessionStarted) {
+        expect(status.civilization).toBeNull();
+        done();
+      }
+    });
+
+    service.register(user, password).subscribe(() => {
+      
+      service.login(user, password).subscribe((session) => {
+        expect(session.authToken).toBeDefined();
+      });
+
+    });
+
+  });
+
+  it('should create civilization', (done) => {
+    const service: GvApiService = TestBed.get(GvApiService);
+    
+    const user = 'user-' + Math.random();
+    const civilizationName = 'civilization-' + Math.random();
+    const password = '12345';
+    
+    service.getStatus().subscribe(status => {
+      if (status.sessionStarted) {
+        expect(status.civilization).toBeNull();
+        service.createCivilization(civilizationName).subscribe(id => {
+          expect(id).toBeDefined();
+          done();
+        })
+      }
+    });
+
+    service.register(user, password).subscribe(() => {
+      
+      service.login(user, password).subscribe((session) => {
+        expect(session.authToken).toBeDefined();
+      });
+
+    });
+
+  });
+
+  it('should get civilization when login with an user thas has civilization', (done) => {
+    const service: GvApiService = TestBed.get(GvApiService);
+    
+    const user = 'user-' + Math.random();
+    const civilizationName = 'civilization-' + Math.random();
+    const password = '12345';
+    
+    let civilizationId;
+
+    service.getStatus().subscribe(status => {
+      if (status.sessionStarted) {
+        if (!civilizationId) {
+          expect(status.civilization).toBeNull();
+          service.createCivilization(civilizationName).subscribe(id => {
+            expect(id).toBeDefined();
+            civilizationId = id;
+
+            service.closeSession();
+            service.login(user, password).subscribe();
+          });
+        } else {
+          expect(status.civilization.id).toEqual(civilizationId);
+          expect(status.civilization.name).toEqual(civilizationName);
+          done();
+        }
       }
     });
 
