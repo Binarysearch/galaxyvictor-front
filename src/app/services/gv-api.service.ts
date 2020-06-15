@@ -20,18 +20,23 @@ import { CivilizationDto } from '../dto/civilization/civilization-dto';
 export class GvApiService {
 
   private status: BehaviorSubject<GvApiServiceStatus>;
+  private civilizationSubject: BehaviorSubject<CivilizationDto>;
 
   constructor(
     private api: PirosApiService,
     private localStorageService: LocalStorageService
   ) {
     this.status = new BehaviorSubject({ sessionStarted: false });
+    this.civilizationSubject = new BehaviorSubject(null);
+    
 
     this.api.getStatus().subscribe(status => {
       if (status.connectionStatus === ConnectionStatus.FULLY_CONNECTED) {
         this.fetchInitialData();
+        this.connectToChannels();
       } else {
         this.status.next({ sessionStarted: false });
+        this.civilizationSubject.next(null);
       }
     });
 
@@ -40,10 +45,18 @@ export class GvApiService {
       this.api.connectWithToken(savedToken).subscribe();
     }
   }
+  
+  private connectToChannels() {
+    this.api.connectToChannel<CivilizationDto>('create-civilization').subscribe((channelConnection) => {
+      channelConnection.messages.subscribe(message => {
+        this.civilizationSubject.next(message);
+      });
+    });
+  }
 
   private fetchInitialData(): void {
     forkJoin(
-      this.api.request<StarSystemInfoDto[]>('galaxy.get-stars'),
+      this.api.request<StarSystemInfoDto[]>('civilizations.get-stars'),
       this.api.request<CivilizationDto>('civilizations.get-civilization')
     ).subscribe(
       results => {
@@ -100,12 +113,17 @@ export class GvApiService {
     return this.api.request('create-civilization', name);
   }
 
+  public getCivilization(): Observable<CivilizationDto> {
+    return this.civilizationSubject.asObservable();
+  }
+
   public getUsers(): Observable<UserListDto> {
     return this.api.request<UserListDto>('get-users', '');
   }
   
   public closeSession() {
     this.localStorageService.deleteSavedToken();
+    this.civilizationSubject.next(null);
   }
   
   public login(username: string, password: string): Observable<ApiServiceSession> {
