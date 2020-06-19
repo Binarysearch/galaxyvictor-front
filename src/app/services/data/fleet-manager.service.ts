@@ -3,6 +3,7 @@ import { FleetInfoDto } from '../../dto/fleet-info';
 import { Store } from './store';
 import { TimeService } from '../time.service';
 import { Fleet } from '../../model/fleet';
+import { StarsService } from './stars.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,8 @@ export class FleetManagerService {
 
   constructor(
     private store: Store,
-    private timeService: TimeService
+    private timeService: TimeService,
+    private starsService: StarsService
   ) { }
 
   public updateFleets(fleetDtos: FleetInfoDto[]): void {
@@ -34,8 +36,8 @@ export class FleetManagerService {
     existing.destination.removeOrbitingFleet(existing);
     existing.civilization.removeFleet(existing);
 
-    existing.origin = this.store.getStarSystemById(fleetDto.originId);
-    existing.destination = this.store.getStarSystemById(fleetDto.destinationId);
+    existing.origin = this.starsService.getStarById(fleetDto.originId);
+    existing.destination = this.starsService.getStarById(fleetDto.destinationId);
     existing.civilization = this.store.getCivilizationById(fleetDto.civilizationId);
     existing.startTravelTime = fleetDto.startTravelTime;
     existing.speed = fleetDto.speed;
@@ -56,8 +58,8 @@ export class FleetManagerService {
       fleetDto.seed,
       fleetDto.speed,
       fleetDto.startTravelTime,
-      this.store.getStarSystemById(fleetDto.originId),
-      this.store.getStarSystemById(fleetDto.destinationId),
+      this.starsService.getStarById(fleetDto.originId),
+      this.starsService.getStarById(fleetDto.destinationId),
       this.store.getCivilizationById(fleetDto.civilizationId),
       this.timeService
     );

@@ -5,6 +5,7 @@ import { FleetManagerService } from '../data/fleet-manager.service';
 import { ColonyManagerService } from '../data/colony-manager.service';
 import { Fleet } from 'src/app/model/fleet';
 import { EventService } from '../event.service';
+import { StarsService } from '../data/stars.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,7 @@ export class VisibilityLostEventService {
 
   constructor(
     private eventService: EventService,
+    private starsService: StarsService,
     private store: Store,
     private fleetManagerService: FleetManagerService,
     private colonyManagerService: ColonyManagerService
@@ -23,7 +25,7 @@ export class VisibilityLostEventService {
   }
 
   private processEvent(event: VisibilityLostEvent) {
-    const starSystem = this.store.getStarSystemById(event.starSystem);
+    const starSystem = this.starsService.getStarById(event.starSystem);
     this.removeFleets(starSystem.incomingFleets);
     this.removeFleets(starSystem.orbitingFleets);
     starSystem.planets.forEach(p => {

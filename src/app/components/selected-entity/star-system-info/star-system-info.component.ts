@@ -3,6 +3,7 @@ import { StarSystem } from '../../../model/star-system';
 import { Planet } from '../../../model/planet';
 import { GalaxyMapService } from '../../../services/galaxy-map.service';
 import { ColorService } from '../../../services/color.service';
+import { Entity } from 'src/app/services/render/renderer.interface';
 
 @Component({
   selector: 'app-star-system-info',
@@ -21,8 +22,8 @@ export class StarSystemInfoComponent implements OnInit {
   ngOnInit() {
   }
 
-  select(id: string) {
-    this.map.select(id);
+  select(entity: Entity) {
+    this.map.select(entity);
   }
   
 }

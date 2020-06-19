@@ -21,6 +21,6 @@ export class NameRenderComponent implements CellRenderer<Fleet> {
   }
 
   goToFleet(){
-    this.map.selectAndGo(this.fleet.id);
+    this.map.selectAndGo(this.fleet);
   }
 }

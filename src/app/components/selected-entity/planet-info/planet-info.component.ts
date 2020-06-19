@@ -22,7 +22,7 @@ export class PlanetInfoComponent implements OnInit {
   }
 
   selectStar(starSystem: StarSystem){
-    this.map.select(starSystem.id);
+    this.map.select(starSystem);
   }
 
   colonizePlanet(){

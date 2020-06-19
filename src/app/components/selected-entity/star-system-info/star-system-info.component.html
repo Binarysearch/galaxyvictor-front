@@ -5,18 +5,18 @@
 </div>
 <div class='planet-list'>
     <h4>Planetas: </h4>
-    <div class='planet' *ngFor="let planet of starSystem.planets" title='{{ planet.size.name }} {{ planet.type.name }}' (click)='select(planet.id)'>
+    <div class='planet' *ngFor="let planet of starSystem.planets" title='{{ planet.size.name }} {{ planet.type.name }}' (click)='select(planet)'>
         <span class='fas fa-globe-europe' [style.font-size]="(planet.size.id * 5 + 5) + 'px'" [style.color]="planet.type.colorHex"> </span>
         <span> {{ planet.name }} </span>
     </div>
 </div>
 <div class='fleet-list'>
     <h4>Flotas: </h4>
-    <div class='fleet' *ngFor="let fleet of starSystem.orbitingFleets" (click)='select(fleet.id)'>
+    <div class='fleet' *ngFor="let fleet of starSystem.orbitingFleets" (click)='select(fleet)'>
         <span class='fas fa-rocket' [style.color]="colorService.getCivilizationColorHex(fleet.civilization.id)"> </span>
         <span> {{ fleet.civilization.name }} </span>
     </div>
-    <div class='fleet' *ngFor="let fleet of starSystem.incomingFleets" (click)='select(fleet.id)'>
+    <div class='fleet' *ngFor="let fleet of starSystem.incomingFleets" (click)='select(fleet)'>
         <span class='fas fa-rocket' [style.color]="colorService.getCivilizationColorHex(fleet.civilization.id)"> </span>
         <span> {{ fleet.civilization.name }} </span>
     </div>

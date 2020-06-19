@@ -193,14 +193,14 @@ export class GalaxyMapService {
     return this.mapEntitiesService.getEntity(this.selectedId);
   }
   
-  select(id: string) {
-    this.selectedId = id;
+  select(entity: Entity) {
+    this.selectedId = entity ? entity.id : null;
     this.renderer.setSelectedId(this.selectedId);
     this.onSelectEntity.next(this.selected);
   }
   
-  selectAndGo(id: string) {
-    this.select(id);
+  selectAndGo(entity: Entity) {
+    this.select(entity);
     if (this.selected.x && this.selected.y) {
       this.context.camera.setPosition(this.selected.x, this.selected.y, 0.5);
     }

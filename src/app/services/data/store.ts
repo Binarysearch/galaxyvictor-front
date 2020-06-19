@@ -1,16 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Entity } from '../render/renderer.interface';
-import { StarSystem, StarType, StarSize } from '../../model/star-system';
+import { StarSystem } from '../../model/star-system';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Planet, PlanetType, PlanetSize } from '../../model/planet';
 import { Fleet } from '../../model/fleet';
 import { Civilization } from '../../model/civilization';
 import { Colony } from '../../model/colony';
-import { STAR_TYPES, STAR_SIZES, PLANET_TYPES, PLANET_SIZES } from '../../galaxy-constants';
-import { GvApiService } from '../gv-api.service';
-import { Status } from 'src/app/model/gv-api-service-status';
-import { EventService } from '../event.service';
-import { PlanetInfoDto } from '../../dto/planet-info';
 import { StarsService } from './stars.service';
 
 @Injectable({
@@ -20,8 +14,6 @@ export class Store {
 
   private entityMap: Map<string, Entity> = new Map();
 
-
-
   private coloniesSubject: BehaviorSubject<Set<Colony>> = new BehaviorSubject(new Set());
 
   private fleetsSubject: BehaviorSubject<Set<Fleet>> = new BehaviorSubject(new Set());
@@ -29,10 +21,8 @@ export class Store {
   private civilizationSubject: BehaviorSubject<Civilization> = new BehaviorSubject(undefined);
   
   private unknownCivilization: Civilization = new Civilization('', 'Desconocida', false);
-  private unknownStarSystem: StarSystem = new StarSystem('', 'Desconocido', 0, 0, STAR_SIZES[0], STAR_TYPES[0]);
 
   constructor(
-    private api: GvApiService,
     private starsService: StarsService
   ) {
     
@@ -44,14 +34,6 @@ export class Store {
   
   public addCivilization(civilization: Civilization) {
     this.entityMap.set(civilization.id, civilization);
-  }
-
-  public getStarSystemById(id: string): StarSystem {
-    if (this.entityMap.has(id)) {
-      return <StarSystem>this.entityMap.get(id);
-    } else {
-      return this.unknownStarSystem;
-    }
   }
 
   public getFleetById(id: string): Fleet {

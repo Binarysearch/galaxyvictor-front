@@ -21,6 +21,6 @@ export class NameRenderComponent implements CellRenderer<Colony> {
   }
 
   goToColony(){
-    this.map.selectAndGo(this.colony.planet.id);
+    this.map.selectAndGo(this.colony.planet);
   }
 }
