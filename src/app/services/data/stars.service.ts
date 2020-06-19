@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { StarSystem, StarType, StarSize } from 'src/app/model/star-system';
-import { GvApiService } from '../gv-api.service';
 import { STAR_TYPES, STAR_SIZES } from 'src/app/galaxy-constants';
-import { Status } from 'src/app/model/gv-api-service-status';
+import { PirosApiService, ConnectionStatus } from '@piros/api';
+import { StarSystemInfoDto } from 'src/app/dto/star-system-info';
 
 @Injectable({
   providedIn: 'root'
@@ -17,11 +17,11 @@ export class StarsService {
   private stars: BehaviorSubject<StarSystem[]> = new BehaviorSubject([]);
 
   constructor(
-    private api: GvApiService
+    private api: PirosApiService,
   ) {
     this.api.getStatus().subscribe((status) => {
-      if (status.sessionStarted === Status.SESSION_STARTED) {
-        this.api.getStars().subscribe(stars => {
+      if (status.connectionStatus === ConnectionStatus.FULLY_CONNECTED) {
+        this.api.request<StarSystemInfoDto[]>('get-stars').subscribe(stars => {
           const starSystems: StarSystem[] = stars.map(
             ss => new StarSystem(
               ss.id, 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PirosApiService, ApiServiceSession, ConnectionStatus, ChannelConnection } from '@piros/api';
-import { Observable, BehaviorSubject, of, forkJoin, Subscription, Subject } from 'rxjs';
+import { Observable, BehaviorSubject, of, Subscription, Subject } from 'rxjs';
 import { FleetDetailDto } from '../dto/fleet-detail';
 import * as API from './api-constants';
 import { TransferShipsDto } from '../dto/transfer-ships-dto';
@@ -61,16 +61,11 @@ export class GvApiService {
   }
 
   private fetchInitialData(): void {
-    forkJoin(
-      this.getStars(),
-      this.api.request<CivilizationDto>('civilizations.get-civilization')
-    ).subscribe(
-      results => {
-        const stars = results[0];
-        const civilization = results[1];
+    this.api.request<CivilizationDto>('civilizations.get-civilization').subscribe(
+      civilization => {
 
         this.civilizationSubject.next(civilization);
-        this.status.next({ sessionStarted: Status.SESSION_STARTED, stars: stars, civilization: civilization });
+        this.status.next({ sessionStarted: Status.SESSION_STARTED, civilization: civilization });
       },
       (err) => {
         console.log(err);

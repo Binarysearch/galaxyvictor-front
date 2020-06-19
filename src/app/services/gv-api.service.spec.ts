@@ -5,7 +5,6 @@ import { ApiService, PIROS_API_SERVICE_CONFIG, PirosApiService, ConnectorManager
 import { HttpClientModule, HttpErrorResponse, HttpClient } from '@angular/common/http';
 import { LocalStorageService } from './local-storage.service';
 import { PlanetInfoDto } from '../dto/planet-info';
-import { StarSystemInfoDto } from '../dto/star-system-info';
 import { config } from './config';
 import { Status } from '../model/gv-api-service-status';
 import { loginWithCivilization } from './login-utils';
@@ -260,36 +259,6 @@ describe('GvApiService', () => {
 
   });
 
-  it('should get stars data when login', (done) => {
-    const service: GvApiService = TestBed.get(GvApiService);
-
-    const user = 'user-' + Math.random();
-    const password = '12345';
-
-    service.getStatus().subscribe(status => {
-      if (status.sessionStarted === Status.SESSION_STARTED) {
-        expect(status.stars).toBeDefined();
-        expect(status.stars[0]).toBeDefined();
-        expect(status.stars[0].id).toBeDefined();
-        expect(status.stars[0].x).toBeDefined();
-        expect(status.stars[0].y).toBeDefined();
-        expect(status.stars[0].name).toBeDefined();
-        expect(status.stars[0].size).toBeDefined();
-        expect(status.stars[0].type).toBeDefined();
-        done();
-      }
-    });
-
-    service.register(user, password).subscribe(() => {
-
-      service.login(user, password).subscribe((session) => {
-        expect(session.authToken).toBeDefined();
-      });
-
-    });
-
-  });
-
   it('should not get civilization when is new user', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
 
@@ -512,17 +481,7 @@ describe('GvApiService', () => {
           expect(homeworld.starSystem).toBeDefined();
           expect(homeworld.type).toBeDefined();
 
-          service.getStars().subscribe(stars => {
-            const homeworldStarSystem: StarSystemInfoDto = stars.find(s => s.id === homeworld.starSystem);
-            expect(homeworldStarSystem).toBeDefined();
-            expect(homeworldStarSystem.id).toBeDefined();
-            expect(homeworldStarSystem.name).toBeDefined();
-            expect(homeworldStarSystem.size).toBeDefined();
-            expect(homeworldStarSystem.type).toBeDefined();
-            expect(homeworldStarSystem.x).toBeDefined();
-            expect(homeworldStarSystem.y).toBeDefined();
-            done();
-          });
+          done();
         });
       });
     });

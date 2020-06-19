@@ -26,17 +26,15 @@ export class PlanetsService {
   ) {
     this.api.getStatus().subscribe(status => {
       if (status.sessionStarted === Status.SESSION_STARTED) {
-        if (status.stars) {
-          this.api.getCivilization().subscribe(civilization => {
-            if (civilization) {
-              this.api.getPlanets().subscribe(
-                planets => {
-                  this.addPlanets(planets.map(p => this.mapPlanetInfoToPlanet(p)));
-                }
-              );
-            }
-          });
-        }
+        this.api.getCivilization().subscribe(civilization => {
+          if (civilization) {
+            this.api.getPlanets().subscribe(
+              planets => {
+                this.addPlanets(planets.map(p => this.mapPlanetInfoToPlanet(p)));
+              }
+            );
+          }
+        });
       }
     });
 
@@ -60,7 +58,7 @@ export class PlanetsService {
       return this.unknownPlanet;
     }
   }
-  
+
   private addPlanets(planets: Planet[]): void {
     planets.forEach(p => {
       this.planetMap.set(p.id, p);
@@ -68,20 +66,20 @@ export class PlanetsService {
     });
     this.planets.next(this.planets.value);
   }
-  
+
   private mapPlanetInfoToPlanet(p: PlanetInfoDto) {
     const starSystem = this.starsService.getStarById(p.starSystem);
     const planet = new Planet(p.id, this.getPlanetTypeById(p.type), this.getPlanetSizeById(p.size), p.orbit, starSystem);
     starSystem.planets.add(planet);
     return planet;
   }
-  
+
   public getPlanetTypeById(type: number): PlanetType {
     return PLANET_TYPES[type - 1];
   }
-  
+
   public getPlanetSizeById(size: number): PlanetSize {
     return PLANET_SIZES[size - 1];
   }
-  
+
 }

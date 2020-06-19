@@ -1,4 +1,3 @@
-import { StarSystemInfoDto } from '../dto/star-system-info';
 import { CivilizationDto } from '../dto/civilization/civilization-dto';
 
 export enum Status {
@@ -10,7 +9,6 @@ export enum Status {
 export interface GvApiServiceStatus {
 
     sessionStarted: Status;
-    stars?: StarSystemInfoDto[];
     civilization?: CivilizationDto;
 
 }
