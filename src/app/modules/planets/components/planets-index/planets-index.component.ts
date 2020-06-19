@@ -8,6 +8,7 @@ import { TypeRenderComponent } from './renders/type-render/type-render.component
 import { SizeRenderComponent } from './renders/size-render/size-render.component';
 import { StarSystemRenderComponent } from './renders/star-system-render/star-system-render.component';
 import { NameRenderComponent } from './renders/name-render/name-render.component';
+import { PlanetsService } from 'src/app/services/data/planets.service';
 
 @Component({
   selector: 'app-planets-index',
@@ -19,7 +20,8 @@ export class PlanetsIndexComponent implements OnInit {
   config: TableConfig<Planet>;
   
   constructor(
-    private store: Store
+    private store: Store,
+    private planetsService: PlanetsService
   ) { }
 
   ngOnInit() {
@@ -31,7 +33,7 @@ export class PlanetsIndexComponent implements OnInit {
         { id: 'orbit', name: 'Orbita', sortable: true },
         { id: 'starSystem', name: 'Sistema', cellRenderer: StarSystemRenderComponent, sortable: true }
       ],
-      dataSource: new PlanetDataSource(this.store),
+      dataSource: new PlanetDataSource(this.store, this.planetsService),
       pagination: false,
       tableClasses: ['gv-table']
     };
@@ -49,7 +51,10 @@ class PlanetDataSource implements DataSource<Planet> {
     'orbit': (a, b) => a.orbit - b.orbit
   }
 
-  constructor(private store: Store) {
+  constructor(
+    private store: Store,
+    private planetsService: PlanetsService
+  ) {
     
   }
 
@@ -57,7 +62,7 @@ class PlanetDataSource implements DataSource<Planet> {
     return paramsChange.pipe(
       switchMap(params => this.store.getColonies().pipe(map(colonies => params))),
       switchMap(params => {
-        return this.store.getPlanets().pipe(map(planetSet => {
+        return this.planetsService.getPlanets().pipe(map(planetSet => {
           let planets = Array.from(planetSet).filter(p => p.colony === undefined || p.colony === null);
           if (params && params.sortStatus) {
             const reverseSortStatus = Array.from(params.sortStatus);

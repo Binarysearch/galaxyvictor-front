@@ -15,6 +15,7 @@ import { LineRendererService } from './line-renderer.service';
 import { Colony } from 'src/app/model/colony';
 import { VisibleEntitiesService } from '../visible-entities/visible-entities.service';
 import { ConstraintService } from '../constraint.service';
+import { MapEntitiesService } from '../data/map-entities.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +42,8 @@ export class MainRendererService {
     private hoverService: HoverService,
     private store: Store,
     private visibleEntitiesService: VisibleEntitiesService,
-    private constraintService: ConstraintService
+    private constraintService: ConstraintService,
+    private mapEntitiesService: MapEntitiesService
   ) {
     this.visibleEntitiesService.getViewportStars().subscribe(ss => this.starSystems = ss);
     this.visibleEntitiesService.getViewportPlanets().subscribe(planets => this.planets = planets);
@@ -126,7 +128,7 @@ export class MainRendererService {
   }
 
   get selected(): Entity {
-    return this.store.getEntity(this.selectedId);
+    return this.mapEntitiesService.getEntity(this.selectedId);
   }
 
 }

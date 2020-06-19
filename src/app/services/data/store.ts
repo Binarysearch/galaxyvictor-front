@@ -7,6 +7,11 @@ import { Fleet } from '../../model/fleet';
 import { Civilization } from '../../model/civilization';
 import { Colony } from '../../model/colony';
 import { STAR_TYPES, STAR_SIZES, PLANET_TYPES, PLANET_SIZES } from '../../galaxy-constants';
+import { GvApiService } from '../gv-api.service';
+import { Status } from 'src/app/model/gv-api-service-status';
+import { EventService } from '../event.service';
+import { PlanetInfoDto } from '../../dto/planet-info';
+import { StarsService } from './stars.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +20,7 @@ export class Store {
 
   private entityMap: Map<string, Entity> = new Map();
 
-  private starSystemsSubject: BehaviorSubject<StarSystem[]> = new BehaviorSubject([]);
 
-  private planetsSubject: BehaviorSubject<Set<Planet>> = new BehaviorSubject(new Set());
 
   private coloniesSubject: BehaviorSubject<Set<Colony>> = new BehaviorSubject(new Set());
 
@@ -27,12 +30,14 @@ export class Store {
   
   private unknownCivilization: Civilization = new Civilization('', 'Desconocida', false);
   private unknownStarSystem: StarSystem = new StarSystem('', 'Desconocido', 0, 0, STAR_SIZES[0], STAR_TYPES[0]);
-  private unknownPlanet: Planet = new Planet('', PLANET_TYPES[0], PLANET_SIZES[0], 0, this.unknownStarSystem);
 
+  constructor(
+    private api: GvApiService,
+    private starsService: StarsService
+  ) {
+    
+  }
 
-
-  constructor() { }
-  
   public setCivilization(civilization: Civilization) {
     this.civilizationSubject.next(civilization);
   }
@@ -46,14 +51,6 @@ export class Store {
       return <StarSystem>this.entityMap.get(id);
     } else {
       return this.unknownStarSystem;
-    }
-  }
-
-  public getPlanetById(id: string): Planet {
-    if (this.entityMap.has(id)) {
-      return <Planet>this.entityMap.get(id);
-    } else {
-      return this.unknownPlanet;
     }
   }
 
@@ -87,20 +84,6 @@ export class Store {
     this.coloniesSubject.next(this.coloniesSubject.value);
   }
 
-  public setStarSystems(starSystems: StarSystem[]): void {
-    this.starSystemsSubject.value.forEach(ss => this.entityMap.delete(ss.id));
-    starSystems.forEach(ss => this.entityMap.set(ss.id, ss));
-    this.starSystemsSubject.next(starSystems);
-  }
-
-  public addPlanets(planets: Planet[]): void {
-    planets.forEach(p => {
-      this.entityMap.set(p.id, p);
-      this.planetsSubject.value.add(p);
-    });
-    this.planetsSubject.next(this.planetsSubject.value);
-  }
-
   public addFleets(fleets: Fleet[]): void {
     fleets.forEach(f => {
       this.entityMap.set(f.id, f);
@@ -115,10 +98,6 @@ export class Store {
     this.fleetsSubject.next(this.fleetsSubject.value);
   }
 
-  public getPlanets(): Observable<Set<Planet>> {
-    return this.planetsSubject.asObservable();
-  }
-
   public getColonies(): Observable<Set<Colony>> {
     return this.coloniesSubject.asObservable();
   }
@@ -128,36 +107,14 @@ export class Store {
   }
 
   public getStarSystems(): Observable<StarSystem[]> {
-    return this.starSystemsSubject.asObservable();
+    return this.starsService.getStars();
   }
 
   public getCivilization(): Observable<Civilization> {
     return this.civilizationSubject.asObservable();
   }
 
-  public getEntity(id: string): Entity {
-    return this.entityMap.get(id);
-  }
-  
-  public getStarTypeById(type: number): StarType {
-    return STAR_TYPES[type - 1];
-  }
-  
-  public getStarSizeById(size: number): StarSize {
-    return STAR_SIZES[size - 1];
-  }
-  
-  public getPlanetTypeById(type: number): PlanetType {
-    return PLANET_TYPES[type - 1];
-  }
-  
-  public getPlanetSizeById(size: number): PlanetSize {
-    return PLANET_SIZES[size - 1];
-  }
-
   public clear(): void {
-    this.starSystemsSubject.next([]);
-    this.planetsSubject.next(new Set());
     this.fleetsSubject.next(new Set());
     this.coloniesSubject.next(new Set());
     this.civilizationSubject.next(undefined);

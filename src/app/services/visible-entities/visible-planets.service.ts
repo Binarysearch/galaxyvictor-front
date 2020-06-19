@@ -7,6 +7,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { PlanetRendererService } from '../render/planet-renderer.service';
 import { CameraChangeRecorder } from './camera-change-recorder';
 import { RenderContext } from '../render/renderer.interface';
+import { PlanetsService } from '../data/planets.service';
 
 export interface VisiblePlanet {
   x: number;
@@ -30,11 +31,11 @@ export class VisiblePlanetsService {
   private planetsChanged: boolean;
 
   constructor(
-    private store: Store,
+    private planetsService: PlanetsService,
     private planetRenderer: PlanetRendererService
   ) {
 
-    this.store.getPlanets().subscribe(planets => {
+    this.planetsService.getPlanets().subscribe(planets => {
       this.planets = planets;
       this.planetsChanged = true;
     });

@@ -1,26 +1,15 @@
-import { TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
 import { GvApiService } from './gv-api.service';
-import { ApiService, PirosApiServiceConfig, PIROS_API_SERVICE_CONFIG, PirosApiService, ConnectorManagerService, IdGeneratorService, AuthService, RequestService, ChannelService } from '@piros/api';
+import { ApiService, PIROS_API_SERVICE_CONFIG, PirosApiService, ConnectorManagerService, IdGeneratorService, AuthService, RequestService, ChannelService } from '@piros/api';
 import { HttpClientModule, HttpErrorResponse, HttpClient } from '@angular/common/http';
 import { LocalStorageService } from './local-storage.service';
+import { PlanetInfoDto } from '../dto/planet-info';
+import { StarSystemInfoDto } from '../dto/star-system-info';
+import { config } from './config';
+import { Status } from '../model/gv-api-service-status';
+import { loginWithCivilization } from './login-utils';
 
-const config: PirosApiServiceConfig = {
-  services: [
-    {
-      id: 'civilizations',
-      url: 'ws://localhost:3001/',
-      requestTypes: [
-        'get-civilization',
-        'create-civilization',
-        'get-stars'
-      ],
-      channels: [
-        'create-civilization'
-      ]
-    }
-  ]
-} 
 
 describe('GvApiService', () => {
 
@@ -46,7 +35,7 @@ describe('GvApiService', () => {
 
   it('should register user', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const password = '12345';
 
@@ -59,14 +48,14 @@ describe('GvApiService', () => {
 
   it('should not register with existing user', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const password = '12345';
 
     service.register(user, password).subscribe(() => {
-      
+
       service.register(user, password).subscribe(
-        () => {}, 
+        () => { },
         error => {
           expect((<HttpErrorResponse>error).status).toEqual(409);
           expect(error).toBeDefined();
@@ -79,19 +68,19 @@ describe('GvApiService', () => {
 
   it('should login with registered user', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const password = '12345';
-    
+
     service.getStatus().subscribe(status => {
-      if (status.sessionStarted) {
+      if (status.sessionStarted === Status.SESSION_STARTED) {
         expect(status.sessionStarted).toBeTruthy();
         done();
       }
     });
 
     service.register(user, password).subscribe(() => {
-      
+
       service.login(user, password).subscribe((session) => {
         expect(session.authToken).toBeDefined();
       });
@@ -102,12 +91,12 @@ describe('GvApiService', () => {
 
   it('should not login with unregistered user', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const password = '12345';
 
     service.login(user, password).subscribe(
-      () => {},
+      () => { },
       (err) => {
         expect(err).toEqual('INVALID_CREDENTIALS');
         done();
@@ -118,18 +107,18 @@ describe('GvApiService', () => {
 
   it('should auto login with previously generated token', (done) => {
     const service1: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const password = '12345';
-    
+
     service1.register(user, password).subscribe(() => {
       service1.login(user, password).subscribe((session) => {
-        
+
         const service2 = createGvApiServiceWithInitialToken();
 
         service2.getStatus().subscribe(
           status => {
-            if (status.sessionStarted) {
+            if (status.sessionStarted === Status.SESSION_STARTED) {
               expect(status.sessionStarted).toBeTruthy();
               done();
             }
@@ -143,13 +132,13 @@ describe('GvApiService', () => {
 
   it('should not auto login with previously generated token if session was closed', (done) => {
     const service1: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const password = '12345';
-    
+
     service1.register(user, password).subscribe(() => {
       service1.login(user, password).subscribe((session) => {
-        
+
         service1.closeSession();
 
         const service2 = createGvApiServiceWithInitialToken();
@@ -160,7 +149,7 @@ describe('GvApiService', () => {
 
         service2.getStatus().subscribe(
           status => {
-            expect(status.sessionStarted).toBeFalsy();
+            expect(status.sessionStarted).toEqual(Status.SESSION_CLOSED);
           }
         );
 
@@ -171,13 +160,13 @@ describe('GvApiService', () => {
 
   it('should save session state', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const password = '12345';
-    
+
     service.getStatus().subscribe(status => {
-      if (status.sessionStarted) {
-        
+      if (status.sessionStarted === Status.SESSION_STARTED) {
+
         service.setSessionstate({
           cameraX: 12,
           cameraY: 13,
@@ -189,7 +178,7 @@ describe('GvApiService', () => {
 
           service2.getStatus().subscribe(
             status => {
-              if (status.sessionStarted) {
+              if (status.sessionStarted === Status.SESSION_STARTED) {
                 service.getSessionState().subscribe((state) => {
 
                   expect(state).toEqual({
@@ -204,14 +193,14 @@ describe('GvApiService', () => {
               }
             }
           );
-          
+
         });
-        
+
       }
     });
 
     service.register(user, password).subscribe(() => {
-      
+
       service.login(user, password).subscribe((session) => {
         expect(session.authToken).toBeDefined();
       });
@@ -222,13 +211,13 @@ describe('GvApiService', () => {
 
   it('should delete session state when login', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const password = '12345';
-    
+
     service.getStatus().subscribe(status => {
-      if (status.sessionStarted) {
-        
+      if (status.sessionStarted === Status.SESSION_STARTED) {
+
         service.setSessionstate({
           cameraX: 12,
           cameraY: 13,
@@ -239,10 +228,10 @@ describe('GvApiService', () => {
           const service2 = createGvApiServiceWithInitialToken();
 
           service2.login(user, password).subscribe((session) => {
-            
+
             service2.getStatus().subscribe(
               status => {
-                if (status.sessionStarted) {
+                if (status.sessionStarted === Status.SESSION_STARTED) {
                   service.getSessionState().subscribe((state) => {
 
                     expect(state).toEqual(<any>{});
@@ -254,15 +243,15 @@ describe('GvApiService', () => {
             );
 
           });
-            
-          
+
+
         });
-        
+
       }
     });
 
     service.register(user, password).subscribe(() => {
-      
+
       service.login(user, password).subscribe((session) => {
         expect(session.authToken).toBeDefined();
       });
@@ -273,12 +262,12 @@ describe('GvApiService', () => {
 
   it('should get stars data when login', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const password = '12345';
-    
+
     service.getStatus().subscribe(status => {
-      if (status.sessionStarted) {
+      if (status.sessionStarted === Status.SESSION_STARTED) {
         expect(status.stars).toBeDefined();
         expect(status.stars[0]).toBeDefined();
         expect(status.stars[0].id).toBeDefined();
@@ -292,7 +281,7 @@ describe('GvApiService', () => {
     });
 
     service.register(user, password).subscribe(() => {
-      
+
       service.login(user, password).subscribe((session) => {
         expect(session.authToken).toBeDefined();
       });
@@ -303,19 +292,19 @@ describe('GvApiService', () => {
 
   it('should not get civilization when is new user', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const password = '12345';
-    
+
     service.getStatus().subscribe(status => {
-      if (status.sessionStarted) {
+      if (status.sessionStarted === Status.SESSION_STARTED) {
         expect(status.civilization).toBeNull();
         done();
       }
     });
 
     service.register(user, password).subscribe(() => {
-      
+
       service.login(user, password).subscribe((session) => {
         expect(session.authToken).toBeDefined();
       });
@@ -326,13 +315,13 @@ describe('GvApiService', () => {
 
   it('should create civilization', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const civilizationName = 'civilization-' + Math.random();
     const password = '12345';
-    
+
     service.getStatus().subscribe(status => {
-      if (status.sessionStarted) {
+      if (status.sessionStarted === Status.SESSION_STARTED) {
         expect(status.civilization).toBeNull();
         service.createCivilization(civilizationName).subscribe(id => {
           expect(id).toBeDefined();
@@ -342,7 +331,7 @@ describe('GvApiService', () => {
     });
 
     service.register(user, password).subscribe(() => {
-      
+
       service.login(user, password).subscribe((session) => {
         expect(session.authToken).toBeDefined();
       });
@@ -353,15 +342,15 @@ describe('GvApiService', () => {
 
   it('should get civilization when login with an user thas has civilization', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const civilizationName = 'civilization-' + Math.random();
     const password = '12345';
-    
+
     let civilizationId;
 
     service.getStatus().subscribe(status => {
-      if (status.sessionStarted) {
+      if (status.sessionStarted === Status.SESSION_STARTED) {
         if (!civilizationId) {
           expect(status.civilization).toBeNull();
           service.createCivilization(civilizationName).subscribe(id => {
@@ -380,7 +369,7 @@ describe('GvApiService', () => {
     });
 
     service.register(user, password).subscribe(() => {
-      
+
       service.login(user, password).subscribe((session) => {
         expect(session.authToken).toBeDefined();
       });
@@ -392,14 +381,14 @@ describe('GvApiService', () => {
   it('should not get notification when create civilization with other user', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
     const service2: GvApiService = createGvApiServiceWithInitialToken();
-    
+
     const user = 'user-' + Math.random();
     const user2 = 'user-' + Math.random();
     const civilizationName = 'civilization-' + Math.random();
     const password = '12345';
-    
+
     service.getStatus().subscribe(status => {
-      if (status.sessionStarted) {
+      if (status.sessionStarted === Status.SESSION_STARTED) {
         expect(status.civilization).toBeNull();
         service.createCivilization(civilizationName).subscribe();
       }
@@ -419,7 +408,7 @@ describe('GvApiService', () => {
     });
 
     service2.register(user2, password).subscribe(() => {
-      
+
       service2.login(user2, password).subscribe((session) => {
         setTimeout(() => {
           done();
@@ -429,9 +418,9 @@ describe('GvApiService', () => {
     });
 
     service.register(user, password).subscribe(() => {
-      
+
       service.login(user, password).subscribe((session) => {
-        
+
       });
 
     });
@@ -440,16 +429,16 @@ describe('GvApiService', () => {
 
   it('should get notification when create civilization', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const civilizationName = 'civilization-' + Math.random();
     const password = '12345';
-    
+
     service.getStatus().subscribe(status => {
-      if (status.sessionStarted) {
+      if (status.sessionStarted === Status.SESSION_STARTED) {
         expect(status.civilization).toBeNull();
         service.createCivilization(civilizationName).subscribe(id => {
-          
+
         });
       }
     });
@@ -465,7 +454,7 @@ describe('GvApiService', () => {
     );
 
     service.register(user, password).subscribe(() => {
-      
+
       service.login(user, password).subscribe((session) => {
         expect(session.authToken).toBeDefined();
       });
@@ -476,14 +465,14 @@ describe('GvApiService', () => {
 
   it('should get null civilization when logout', (done) => {
     const service: GvApiService = TestBed.get(GvApiService);
-    
+
     const user = 'user-' + Math.random();
     const civilizationName = 'civilization-' + Math.random();
     const password = '12345';
     let secondTime = false;
-    
+
     service.getStatus().subscribe(status => {
-      if (status.sessionStarted && !status.civilization) {
+      if (status.sessionStarted === Status.SESSION_STARTED && !status.civilization) {
         service.createCivilization(civilizationName).subscribe();
       }
     });
@@ -509,6 +498,37 @@ describe('GvApiService', () => {
 
   });
 
+  it('should get homeworld when start with civilization', (done) => {
+    const service: GvApiService = TestBed.get(GvApiService);
+
+    loginWithCivilization(service, () => {
+      service.getCivilization().subscribe(civilization => {
+        expect(civilization.homeworld).toBeDefined();
+        service.getPlanets().subscribe(planets => {
+          const homeworld: PlanetInfoDto = planets.find(p => p.id === civilization.homeworld);
+          expect(homeworld).toBeDefined();
+          expect(homeworld.orbit).toBeDefined();
+          expect(homeworld.size).toBeDefined();
+          expect(homeworld.starSystem).toBeDefined();
+          expect(homeworld.type).toBeDefined();
+
+          service.getStars().subscribe(stars => {
+            const homeworldStarSystem: StarSystemInfoDto = stars.find(s => s.id === homeworld.starSystem);
+            expect(homeworldStarSystem).toBeDefined();
+            expect(homeworldStarSystem.id).toBeDefined();
+            expect(homeworldStarSystem.name).toBeDefined();
+            expect(homeworldStarSystem.size).toBeDefined();
+            expect(homeworldStarSystem.type).toBeDefined();
+            expect(homeworldStarSystem.x).toBeDefined();
+            expect(homeworldStarSystem.y).toBeDefined();
+            done();
+          });
+        });
+      });
+    });
+
+  });
+
 
 });
 
@@ -521,3 +541,4 @@ function createApiService(): PirosApiService {
   const api = new PirosApiService(new AuthService(connectorManager), new RequestService(connectorManager, config, TestBed.get(HttpClient)), new ChannelService(connectorManager, config), config);
   return api;
 }
+

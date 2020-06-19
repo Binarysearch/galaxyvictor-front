@@ -9,7 +9,7 @@
     <app-hovered-info></app-hovered-info>
     <app-central-window></app-central-window>
     <app-modal-container></app-modal-container>
-    <div *ngIf="!sessionStarted || civilization"><router-outlet></router-outlet></div>
-    <div *ngIf="!(!sessionStarted || civilization)"><create-civilization></create-civilization></div>
+    <div *ngIf="true"><router-outlet></router-outlet></div>
+    <div *ngIf="showCreateCivilization"><create-civilization></create-civilization></div>
   </div>
 </ng-template>

@@ -10,6 +10,8 @@ import { Observable, Subject } from 'rxjs';
 import { Civilization } from '../model/civilization';
 import { MapActionResolverService, MapAction } from './map-action-resolver.service';
 import { GvApiService } from './gv-api.service';
+import { Status } from '../model/gv-api-service-status';
+import { MapEntitiesService } from './data/map-entities.service';
 
 @Injectable({
   providedIn: 'root'
@@ -40,6 +42,7 @@ export class GalaxyMapService {
 
   constructor(
     private renderer: MainRendererService,
+    private mapEntitiesService: MapEntitiesService,
     private hoverService: HoverService,
     private api: GvApiService,
     private store: Store,
@@ -50,8 +53,8 @@ export class GalaxyMapService {
   }
 
   private subscribeToStartingPosition() {
-    this.api.isReady().subscribe(ready => {
-      if (ready) {
+    this.api.getStatus().subscribe(status => {
+      if (status.sessionStarted === Status.SESSION_STARTED) {
         this.api.getSessionState().pipe(mergeMap(state => this.store.getCivilization().pipe(map(civ => ({ state: state, civilization: civ }))))).subscribe(result => {
           const sessionState: SessionState = result.state;
           const civilization: Civilization = result.civilization;
@@ -187,7 +190,7 @@ export class GalaxyMapService {
   }
 
   get selected(): Entity {
-    return this.store.getEntity(this.selectedId);
+    return this.mapEntitiesService.getEntity(this.selectedId);
   }
   
   select(id: string) {
@@ -213,8 +216,8 @@ export class GalaxyMapService {
 
   private startAutosaveState() {
     let interval;
-    this.api.isReady().subscribe(ready => {
-      if (ready) {
+    this.api.getStatus().subscribe(status => {
+      if (status.sessionStarted === Status.SESSION_STARTED) {
         let savedX: number;
         let savedY: number;
         let savedZ: number;
@@ -239,7 +242,7 @@ export class GalaxyMapService {
               savedSelected = newState.selectedId;
             });
           }
-        }, 2500);
+        }, 200);
       } else {
         if(interval){
           clearInterval(interval);

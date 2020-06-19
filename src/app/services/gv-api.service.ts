@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { PirosApiService, ApiServiceSession, ConnectionStatus } from '@piros/api';
-import { Observable, BehaviorSubject, pipe, EMPTY, of, forkJoin } from 'rxjs';
-import { Session } from '../dto/session';
+import { PirosApiService, ApiServiceSession, ConnectionStatus, ChannelConnection } from '@piros/api';
+import { Observable, BehaviorSubject, of, forkJoin, Subscription, Subject } from 'rxjs';
 import { FleetDetailDto } from '../dto/fleet-detail';
 import * as API from './api-constants';
 import { TransferShipsDto } from '../dto/transfer-ships-dto';
@@ -9,10 +8,11 @@ import { GalaxyDetailDto } from '../dto/galaxy-detail';
 import { UserListDto } from '../modules/admin/services/users.service';
 import { SessionState } from '../model/session.interface';
 import { LocalStorageService } from './local-storage.service';
-import { GvApiServiceStatus } from '../model/gv-api-service-status';
+import { GvApiServiceStatus, Status } from '../model/gv-api-service-status';
 import { tap } from 'rxjs/operators';
 import { StarSystemInfoDto } from '../dto/star-system-info';
 import { CivilizationDto } from '../dto/civilization/civilization-dto';
+import { PlanetInfoDto } from '../dto/planet-info';
 
 @Injectable({
   providedIn: 'root'
@@ -26,23 +26,29 @@ export class GvApiService {
     private api: PirosApiService,
     private localStorageService: LocalStorageService
   ) {
-    this.status = new BehaviorSubject({ sessionStarted: false });
+    
     this.civilizationSubject = new BehaviorSubject(null);
     
-
     this.api.getStatus().subscribe(status => {
       if (status.connectionStatus === ConnectionStatus.FULLY_CONNECTED) {
         this.fetchInitialData();
         this.connectToChannels();
       } else {
-        this.status.next({ sessionStarted: false });
+        if (this.status) {
+          this.status.next({ sessionStarted: Status.SESSION_CLOSED });
+        } else {
+          this.status = new BehaviorSubject({ sessionStarted: Status.SESSION_CLOSED });
+        }
         this.civilizationSubject.next(null);
       }
     });
 
     const savedToken = localStorageService.getSavedToken();
     if (savedToken) {
+      this.status = new BehaviorSubject({ sessionStarted: Status.SESSION_STARTING });
       this.api.connectWithToken(savedToken).subscribe();
+    } else {
+      this.status = new BehaviorSubject({ sessionStarted: Status.SESSION_CLOSED });
     }
   }
   
@@ -56,24 +62,24 @@ export class GvApiService {
 
   private fetchInitialData(): void {
     forkJoin(
-      this.api.request<StarSystemInfoDto[]>('civilizations.get-stars'),
+      this.getStars(),
       this.api.request<CivilizationDto>('civilizations.get-civilization')
     ).subscribe(
       results => {
         const stars = results[0];
         const civilization = results[1];
 
-        this.status.next({ sessionStarted: true, stars: stars, civilization: civilization });
+        this.civilizationSubject.next(civilization);
+        this.status.next({ sessionStarted: Status.SESSION_STARTED, stars: stars, civilization: civilization });
+      },
+      (err) => {
+        console.log(err);
       }
     );
   }
 
   public getStatus(): Observable<GvApiServiceStatus> {
     return this.status.asObservable();
-  }
-
-  public isReady(): Observable<boolean> {
-    return null;
   }
 
   public setSessionstate(newState: SessionState): Observable<SessionState> {
@@ -91,6 +97,14 @@ export class GvApiService {
   
   public transferShips(dto: TransferShipsDto): Observable<void> {
     return this.api.request(API.TRANSFER_SHIPS, dto);
+  }
+  
+  public getPlanets(): Observable<PlanetInfoDto[]> {
+    return this.api.request<PlanetInfoDto[]>('get-planets');
+  }
+  
+  public getStars(): Observable<StarSystemInfoDto[]> {
+    return this.api.request<StarSystemInfoDto[]>('get-stars');
   }
   
   public getGalaxy(): Observable<GalaxyDetailDto> {
@@ -139,4 +153,37 @@ export class GvApiService {
     return this.api.post<string>('civilizations.register', { username: username, password: password });
   }
 
+}
+
+
+function subscribeToNotifications<T>(api: PirosApiService, channelName: string, subject: Subject<T>) {
+
+  let channelConnection: ChannelConnection<T>;
+  let messagesSubscription: Subscription;
+  let connectToChannelSubscription: Subscription;
+
+
+  api.getStatus().subscribe(status => {
+    if (status.connectionStatus === ConnectionStatus.FULLY_CONNECTED) {
+
+      if (channelConnection) {
+        channelConnection.close();
+      }
+
+      if (messagesSubscription) {
+        messagesSubscription.unsubscribe();
+      }
+
+      if (connectToChannelSubscription) {
+        connectToChannelSubscription.unsubscribe();
+      }
+
+      connectToChannelSubscription = api.connectToChannel<T>(channelName).subscribe(connection => {
+        channelConnection = connection;
+        messagesSubscription = connection.messages.subscribe(message => {
+          subject.next(message);
+        });
+      });
+    }
+  });
 }

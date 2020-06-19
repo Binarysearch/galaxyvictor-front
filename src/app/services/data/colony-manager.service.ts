@@ -3,6 +3,7 @@ import { ColonyInfoDto } from 'src/app/dto/colony-info';
 import { Store } from './store';
 import { Colony } from 'src/app/model/colony';
 import { BuildingOrder } from 'src/app/model/building-order';
+import { PlanetsService } from './planets.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ import { BuildingOrder } from 'src/app/model/building-order';
 export class ColonyManagerService {
 
   constructor(
-    private store: Store
+    private store: Store,
+    private planetsService: PlanetsService
   ) { }
 
   public addColony(colony: ColonyInfoDto) {
@@ -19,7 +21,7 @@ export class ColonyManagerService {
 
   public addColonies(colonyDtos: ColonyInfoDto[]) {        
     const colonies: Colony[] = colonyDtos.map(c => {
-      const planet = this.store.getPlanetById(c.planet);
+      const planet = this.planetsService.getPlanetById(c.planet);
       const colony = new Colony(
         c.id,
         planet, 

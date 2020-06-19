@@ -17,7 +17,7 @@ import { PlanetsModule } from './modules/planets/planets.module';
 import { ResearchModule } from './modules/research/research.module';
 import { TradeModule } from './modules/trade/trade.module';
 import { UniverseModule } from './modules/universe/universe.module';
-import { ApiModule } from '@piros/api';
+import { ApiModule, PIROS_API_SERVICE_CONFIG } from '@piros/api';
 import { CreateCivilizationComponent } from './components/create-civilization/create-civilization.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TextRendererComponent } from './components/text-renderer/text-renderer.component';
@@ -33,6 +33,7 @@ import { ModalFrameComponent } from './components/modals/modal-frame/modal-frame
 import { ModalContainerComponent } from './components/modals/modal-container/modal-container.component';
 import { ModalService } from './services/modal.service-abstract';
 import { ModalServiceImpl } from './services/modal.service';
+import { config } from './services/config';
 
 
 @NgModule({
@@ -73,6 +74,7 @@ import { ModalServiceImpl } from './services/modal.service';
     { provide: 'Window', useValue: window },
     { provide: ModalService, useClass: ModalServiceImpl },
     { provide: WindowManagerService, useClass: WindowManagerServiceImpl },
+    { provide: PIROS_API_SERVICE_CONFIG, useValue: config }
   ],
   bootstrap: [AppComponent],
   entryComponents: [

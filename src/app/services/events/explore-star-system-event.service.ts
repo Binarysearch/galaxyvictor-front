@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ExploreStarSystemEvent } from '../../dto/explore-star-system-event';
 import { FleetManagerService } from '../data/fleet-manager.service';
-import { PlanetManagerService } from '../data/planet-manager.service';
 import { ColonyManagerService } from '../data/colony-manager.service';
 import { EventService } from '../event.service';
 
@@ -13,7 +12,6 @@ export class ExploreStarSystemEventService {
   constructor(
     private eventService: EventService,
     private fleetManagerService: FleetManagerService,
-    private planetManagerService: PlanetManagerService,
     private colonyManagerService: ColonyManagerService
   ) {
     this.eventService.getExploreStarSystemEvents().subscribe(event => {
@@ -22,9 +20,6 @@ export class ExploreStarSystemEventService {
   }
 
   private processEvent(event: ExploreStarSystemEvent) {
-    if (event.planets && event.planets.length > 0) {
-      this.planetManagerService.addPlanets(event.planets);
-    }
     if (event.colonies && event.colonies.length > 0) {
       this.colonyManagerService.addColonies(event.colonies);
     }

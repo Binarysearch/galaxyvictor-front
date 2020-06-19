@@ -23,7 +23,7 @@ export class EventService {
   constructor(
     private api: ApiService
   ) {
-    this.api.isReady().subscribe(
+    /*this.api.isReady().subscribe(
       ready => {
         if (ready) {
           [
@@ -41,7 +41,7 @@ export class EventService {
           ].forEach(channel => this.subscribeAndRedirectEvents(channel));
         }
       }
-    );
+    );*/
   }
 
   public getVisibilityLostEvents(): Observable<VisibilityLostEvent> {

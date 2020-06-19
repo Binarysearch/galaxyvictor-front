@@ -4,9 +4,9 @@ import { GalaxyMapService } from './services/galaxy-map.service';
 import { Store } from './services/data/store';
 import { Civilization } from './model/civilization';
 import { EventManagerService } from './services/events/event-manager.service';
-import { GalaxyManagerService } from './services/data/galaxy-manager.service';
 import { WindowManagerService } from './services/window-manager.service-abstract';
 import { GvApiService } from './services/gv-api.service';
+import { Status } from './model/gv-api-service-status';
 
 export interface AppRoute {
   path: string;
@@ -24,7 +24,8 @@ export class AppComponent implements AfterViewInit, OnInit {
   @ViewChildren('canvasRef') 
   private canvasRef: QueryList<ElementRef>;
   
-  public sessionStarted: boolean = false;
+  public sessionStarted: Status;
+  public showCreateCivilization: boolean;
 
   public civilization: Civilization;
 
@@ -42,8 +43,8 @@ export class AppComponent implements AfterViewInit, OnInit {
       { path: '/research', title: 'Research', faIcon: 'fas fa-flask', show: this.isSessionStarted.bind(this) },
       { path: '/battles', title: 'Battles', faIcon: 'fas fa-fighter-jet', show: this.isSessionStarted.bind(this)  },
       { onClick: this.logout.bind(this), title: 'Logout', faIcon: 'fas fa-sign-out-alt', topbarPosition: TopbarPosition.RIGHT, show: this.isSessionStarted.bind(this) },
-      { path: '/login', title: 'Login', faIcon: 'fas fa-sign-in-alt', topbarPosition: TopbarPosition.RIGHT, show: this.isNotSessionStarted.bind(this) },
-      { path: '/register', title: 'Register', faIcon: 'fas fa-user-plus', topbarPosition: TopbarPosition.RIGHT, show: this.isNotSessionStarted.bind(this) },
+      { path: '/login', title: 'Login', faIcon: 'fas fa-sign-in-alt', topbarPosition: TopbarPosition.RIGHT, show: this.isSessionClosed.bind(this) },
+      { path: '/register', title: 'Register', faIcon: 'fas fa-user-plus', topbarPosition: TopbarPosition.RIGHT, show: this.isSessionClosed.bind(this) },
     ]
   }
 
@@ -52,12 +53,14 @@ export class AppComponent implements AfterViewInit, OnInit {
     private galaxyMap: GalaxyMapService,
     private store: Store,
     private eventManagerService: EventManagerService,
-    private galaxyManagerService: GalaxyManagerService,
     private windowManagerService: WindowManagerService
   ) {
-    api.isReady().subscribe(ready => {
-      this.sessionStarted = ready;
-    });
+    api.getStatus().subscribe(
+      status => {
+        this.sessionStarted = status.sessionStarted
+        this.showCreateCivilization = status.sessionStarted === Status.SESSION_STARTED && status.civilization == null;
+      }
+    );
     store.getCivilization().subscribe(civilization => this.civilization = civilization);
     this.galaxyMap.getOnSelectEntity().subscribe(selected => {
       this.requestCloseWindows();
@@ -73,11 +76,11 @@ export class AppComponent implements AfterViewInit, OnInit {
   }
 
   private isSessionStarted(): boolean {
-    return this.sessionStarted;
+    return this.sessionStarted === Status.SESSION_STARTED;
   }
 
-  private isNotSessionStarted(): boolean {
-    return !this.sessionStarted;
+  private isSessionClosed(): boolean {
+    return this.sessionStarted === Status.SESSION_CLOSED;
   }
 
   private logout(): void {
