@@ -93,18 +93,6 @@ export class GvApiService {
   public transferShips(dto: TransferShipsDto): Observable<void> {
     return this.api.request(API.TRANSFER_SHIPS, dto);
   }
-  
-  public getPlanets(): Observable<PlanetInfoDto[]> {
-    return this.api.request<PlanetInfoDto[]>('get-planets');
-  }
-  
-  public getStars(): Observable<StarSystemInfoDto[]> {
-    return this.api.request<StarSystemInfoDto[]>('get-stars');
-  }
-  
-  public getGalaxy(): Observable<GalaxyDetailDto> {
-    return this.api.request<GalaxyDetailDto>('get-galaxy', 'test-galaxy');
-  }
 
   public startTravel(fleet: string, destination: string) {
     return this.api.request(API.START_TRAVEL, { fleet: fleet, destination: destination });

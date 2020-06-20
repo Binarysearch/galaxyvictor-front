@@ -4,7 +4,6 @@ import { GvApiService } from './gv-api.service';
 import { ApiService, PIROS_API_SERVICE_CONFIG, PirosApiService, ConnectorManagerService, IdGeneratorService, AuthService, RequestService, ChannelService } from '@piros/api';
 import { HttpClientModule, HttpErrorResponse, HttpClient } from '@angular/common/http';
 import { LocalStorageService } from './local-storage.service';
-import { PlanetInfoDto } from '../dto/planet-info';
 import { config } from './config';
 import { Status } from '../model/gv-api-service-status';
 import { loginWithCivilization } from './login-utils';
@@ -476,16 +475,7 @@ describe('GvApiService', () => {
     loginWithCivilization(service, () => {
       service.getCivilization().subscribe(civilization => {
         expect(civilization.homeworld).toBeDefined();
-        service.getPlanets().subscribe(planets => {
-          const homeworld: PlanetInfoDto = planets.find(p => p.id === civilization.homeworld);
-          expect(homeworld).toBeDefined();
-          expect(homeworld.orbit).toBeDefined();
-          expect(homeworld.size).toBeDefined();
-          expect(homeworld.starSystem).toBeDefined();
-          expect(homeworld.type).toBeDefined();
-
-          done();
-        });
+        done();
       });
     });
 
