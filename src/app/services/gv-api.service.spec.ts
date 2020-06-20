@@ -170,7 +170,8 @@ describe('GvApiService', () => {
           cameraX: 12,
           cameraY: 13,
           cameraZ: 14,
-          selectedId: '15'
+          selectedId: '15',
+          selectedType: 'star'
         }).subscribe(() => {
 
           const service2 = createGvApiServiceWithInitialToken();
@@ -184,7 +185,8 @@ describe('GvApiService', () => {
                     cameraX: 12,
                     cameraY: 13,
                     cameraZ: 14,
-                    selectedId: '15'
+                    selectedId: '15',
+                    selectedType: 'star'
                   });
 
                   done();
@@ -221,7 +223,8 @@ describe('GvApiService', () => {
           cameraX: 12,
           cameraY: 13,
           cameraZ: 14,
-          selectedId: '15'
+          selectedId: '15',
+          selectedType: 'star'
         }).subscribe(() => {
 
           const service2 = createGvApiServiceWithInitialToken();

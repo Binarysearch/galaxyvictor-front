@@ -11,7 +11,8 @@ import { Civilization } from '../model/civilization';
 import { MapActionResolverService, MapAction } from './map-action-resolver.service';
 import { GvApiService } from './gv-api.service';
 import { Status } from '../model/gv-api-service-status';
-import { MapEntitiesService } from './data/map-entities.service';
+import { StarsService } from './data/stars.service';
+import { PlanetsService } from './data/planets.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,17 +37,17 @@ export class GalaxyMapService {
 
   private mouseDownCameraX: number;
   private mouseDownCameraY: number;
-  private selectedId: string;
-  private galaxyId: string;
+  private selectedEntity: Entity;
 
 
   constructor(
     private renderer: MainRendererService,
-    private mapEntitiesService: MapEntitiesService,
     private hoverService: HoverService,
     private api: GvApiService,
     private store: Store,
-    private actionResolver: MapActionResolverService
+    private actionResolver: MapActionResolverService,
+    private starsService: StarsService,
+    private planetsService: PlanetsService
   ){
     this.subscribeToStartingPosition();
     this.startAutosaveState();
@@ -59,21 +60,40 @@ export class GalaxyMapService {
           const sessionState: SessionState = result.state;
           const civilization: Civilization = result.civilization;
           
-          let x = 0, y = 0, z = 0.00003, selected;
+          let x = 0, y = 0, z = 0.00003, selectedId, selectedType;
           if (sessionState.cameraX && sessionState.cameraY && sessionState.cameraZ) {
             x = sessionState.cameraX;
             y = sessionState.cameraY;
             z = sessionState.cameraZ;
-            selected = sessionState.selectedId;
-          }
-          else if (civilization) {
+            selectedId = sessionState.selectedId;
+            selectedType = sessionState.selectedType;
+          } else if (civilization) {
             x = civilization.homeworld.x;
             y = civilization.homeworld.y;
             z = 0.5;
-            selected = civilization.homeworld.id;
+            selectedId = civilization.homeworld.id;
           }
-          this.selectedId = selected;
-          this.renderer.setSelectedId(this.selectedId);
+
+          if (selectedType === 'star') {
+            const subscription = this.starsService.isLoaded().subscribe(
+              loaded => {
+                if (loaded) {
+                  subscription.unsubscribe();
+                  this.select(this.starsService.getStarById(selectedId));
+                }
+              }
+            );
+          } else if (selectedType === 'planet') {
+            const subscription = this.planetsService.isLoaded().subscribe(
+              loaded => {
+                if (loaded) {
+                  subscription.unsubscribe();
+                  this.select(this.planetsService.getPlanetById(selectedId));
+                }
+              }
+            );
+          }
+
           this.context.camera.setPosition(x, y, z);
         });
 
@@ -134,9 +154,8 @@ export class GalaxyMapService {
     if (delta > epsilon) {
       return;
     }
-    this.selectedId = (this.hovered) ? this.hovered.id: null;
-    this.renderer.setSelectedId(this.selectedId);
-    this.onSelectEntity.next(this.selected);
+    this.select(this.hovered);
+    this.onSelectEntity.next(this.hovered);
   }
 
   onMouseDown(event: MouseEvent) {
@@ -190,12 +209,12 @@ export class GalaxyMapService {
   }
 
   get selected(): Entity {
-    return this.mapEntitiesService.getEntity(this.selectedId);
+    return this.selectedEntity;
   }
   
   select(entity: Entity) {
-    this.selectedId = entity ? entity.id : null;
-    this.renderer.setSelectedId(this.selectedId);
+    this.selectedEntity = entity;
+    this.renderer.setSelectedEntity(this.selectedEntity);
     this.onSelectEntity.next(this.selected);
   }
   
@@ -223,17 +242,20 @@ export class GalaxyMapService {
         let savedZ: number;
         let savedSelected: string;
         interval = setInterval(()=>{
+          const selectedId: string = this.selected ? this.selected.id : null;
+          const selectedType: string = this.selected ? this.selected.entityType : null;
           if (
             savedX !== this.context.camera.x ||
             savedY !== this.context.camera.y ||
             savedZ !== this.context.camera.zoom ||
-            savedSelected !== this.selectedId
+            savedSelected !== selectedId
           ) {
             const newState = {
               cameraX: this.context.camera.x,
               cameraY: this.context.camera.y,
               cameraZ: this.context.camera.zoom,
-              selectedId: this.selectedId
+              selectedId: selectedId,
+              selectedType: selectedType,
             };
             this.api.setSessionstate(newState).subscribe(()=>{
               savedX = newState.cameraX;

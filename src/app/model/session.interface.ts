@@ -5,6 +5,7 @@ export interface SessionState{
     cameraY: number;
     cameraZ: number;
     selectedId: string;
+    selectedType: string;
 }
 
 export interface Session {

@@ -7,6 +7,7 @@ import { BuildingOrder } from './building-order';
 export class Colony implements Entity {
 
     private changes: Subject<void> = new Subject();
+    public entityType = 'colony';
     
     constructor(
         public id: string,

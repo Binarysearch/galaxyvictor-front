@@ -15,6 +15,7 @@ export class StarsService {
   private starsMap: Map<string, StarSystem> = new Map();
 
   private stars: BehaviorSubject<StarSystem[]> = new BehaviorSubject([]);
+  private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
     private api: PirosApiService,
@@ -33,13 +34,19 @@ export class StarsService {
             )
           );
           this.setStarSystems(starSystems);
+          this.loaded.next(true);
         }, (err) => {
           console.log(err);
         });
       } else {
         this.stars.next([]);
+        this.loaded.next(false);
       }
     });
+  }
+
+  public isLoaded(): Observable<boolean> {
+    return this.loaded.asObservable();
   }
 
   public getStars(): Observable<StarSystem[]> {

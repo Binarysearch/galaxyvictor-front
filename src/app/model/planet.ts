@@ -20,6 +20,7 @@ export interface PlanetType {
 export class Planet implements Entity {
     
     colony: Colony;
+    public entityType = 'planet';
 
     constructor(
         public id: string,

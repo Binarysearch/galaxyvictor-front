@@ -33,7 +33,7 @@ export class Store {
   }
   
   public addCivilization(civilization: Civilization) {
-    this.entityMap.set(civilization.id, civilization);
+    this.entityMap.set(civilization.id, <any>civilization);
   }
 
   public getFleetById(id: string): Fleet {
@@ -46,7 +46,7 @@ export class Store {
 
   public getCivilizationById(id: string): Civilization {
     if (this.entityMap.has(id)) {
-      return <Civilization>this.entityMap.get(id);
+      return <any>this.entityMap.get(id);
     } else {
       return this.unknownCivilization;
     }

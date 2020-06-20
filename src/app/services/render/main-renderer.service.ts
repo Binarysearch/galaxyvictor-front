@@ -15,14 +15,13 @@ import { LineRendererService } from './line-renderer.service';
 import { Colony } from 'src/app/model/colony';
 import { VisibleEntitiesService } from '../visible-entities/visible-entities.service';
 import { ConstraintService } from '../constraint.service';
-import { MapEntitiesService } from '../data/map-entities.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MainRendererService {
 
-  private selectedId: string;
+  private selectedEntity: Entity;
 
   private viewportSubject: ReplaySubject<{w: number, h: number}> = new ReplaySubject(1);
 
@@ -42,8 +41,7 @@ export class MainRendererService {
     private hoverService: HoverService,
     private store: Store,
     private visibleEntitiesService: VisibleEntitiesService,
-    private constraintService: ConstraintService,
-    private mapEntitiesService: MapEntitiesService
+    private constraintService: ConstraintService
   ) {
     this.visibleEntitiesService.getViewportStars().subscribe(ss => this.starSystems = ss);
     this.visibleEntitiesService.getViewportPlanets().subscribe(planets => this.planets = planets);
@@ -123,12 +121,12 @@ export class MainRendererService {
     return this.viewportSubject.asObservable();
   }
 
-  setSelectedId(id: string) {
-    this.selectedId = id;
+  setSelectedEntity(entity: Entity) {
+    this.selectedEntity = entity;
   }
 
   get selected(): Entity {
-    return this.mapEntitiesService.getEntity(this.selectedId);
+    return this.selectedEntity;
   }
 
 }

@@ -26,6 +26,7 @@ export class StarSystem implements Entity {
     public incomingFleets: Set<Fleet> = new Set();
     public orbitingFleets: Set<Fleet> = new Set();
     public planets: Set<Planet> = new Set();
+    public entityType = 'star';
 
     constructor(
         public id: string,

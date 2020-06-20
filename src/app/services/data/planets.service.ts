@@ -18,6 +18,7 @@ export class PlanetsService {
   private planets: BehaviorSubject<Set<Planet>> = new BehaviorSubject(new Set());
 
   private unknownPlanet: Planet = new Planet('', PLANET_TYPES[0], PLANET_SIZES[0], 0, StarsService.unknownStarSystem);
+  private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
     private eventService: EventService,
@@ -31,10 +32,14 @@ export class PlanetsService {
             this.api.getPlanets().subscribe(
               planets => {
                 this.addPlanets(planets.map(p => this.mapPlanetInfoToPlanet(p)));
+                this.loaded.next(true);
               }
             );
           }
         });
+      } else {
+        this.planets.next(new Set());
+        this.loaded.next(false);
       }
     });
 
@@ -45,6 +50,10 @@ export class PlanetsService {
         }
       }
     );
+  }
+
+  public isLoaded(): Observable<boolean> {
+    return this.loaded.asObservable();
   }
 
   public getPlanets(): Observable<Set<Planet>> {
