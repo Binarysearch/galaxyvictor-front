@@ -4,12 +4,12 @@ import { StarsService } from './stars.service';
 import { HttpClientModule } from '@angular/common/http';
 import { PIROS_API_SERVICE_CONFIG, ApiService } from '@piros/api';
 import { config } from '../config';
-import { loginWithCivilization } from '../login-utils';
-import { GvApiService } from '../gv-api.service';
+import { registerAndLogin } from '../login-utils';
 import { LocalStorageService } from '../local-storage.service';
+import { AuthService } from '../auth.service';
 
 describe('StarsService', () => {
-  
+
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -24,36 +24,48 @@ describe('StarsService', () => {
 
     const localStorageService: LocalStorageService = TestBed.get(LocalStorageService);
     localStorageService.deleteSavedToken();
-    
+
   });
 
   it('should get stars when login', (done) => {
-    const apiService = TestBed.get(GvApiService);
+    const authService = TestBed.get(AuthService);
     const service: StarsService = TestBed.get(StarsService);
 
-    loginWithCivilization(apiService, () => {
-      service.getStars().subscribe(
-        stars => {
-          expect(stars[0]).toBeDefined();
-          expect(stars[0].id).toBeDefined();
-          done();
+    registerAndLogin(authService, () => {
+      service.isLoaded().subscribe(
+        loaded => {
+          if (loaded) {
+            service.getStars().subscribe(
+              stars => {
+                expect(stars[0]).toBeDefined();
+                expect(stars[0].id).toBeDefined();
+                done();
+              }
+            );
+          }
         }
       );
     });
   });
 
   it('should get stars by id', (done) => {
-    const apiService = TestBed.get(GvApiService);
+    const authService = TestBed.get(AuthService);
     const service: StarsService = TestBed.get(StarsService);
-    
-    loginWithCivilization(apiService, () => {
-      service.getStars().subscribe(
-        stars => {
-          expect(stars[0]).toBeDefined();
-          expect(stars[0].id).toBeDefined();
-          const star = service.getStarById(stars[0].id);
-          expect(star).toEqual(stars[0]);
-          done();
+
+    registerAndLogin(authService, () => {
+      service.isLoaded().subscribe(
+        loaded => {
+          if (loaded) {
+            service.getStars().subscribe(
+              stars => {
+                expect(stars[0]).toBeDefined();
+                expect(stars[0].id).toBeDefined();
+                const star = service.getStarById(stars[0].id);
+                expect(star).toEqual(stars[0]);
+                done();
+              }
+            );
+          }
         }
       );
     });

@@ -3,6 +3,7 @@ import { Validators, FormBuilder, FormControl } from '@angular/forms';
 import { TranslateService } from '../../../../services/translate.service';
 import { Router } from '@angular/router';
 import { GvApiService } from 'src/app/services/gv-api.service';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +24,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private router: Router, 
     public api: GvApiService, 
+    public authService: AuthService, 
     public ts: TranslateService, 
     private fb: FormBuilder
   ) { }
@@ -32,7 +34,7 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    this.api.login(this.loginForm.value.email, this.loginForm.value.password)
+    this.authService.login(this.loginForm.value.email, this.loginForm.value.password)
     .subscribe(() => {
       this.router.navigateByUrl('/');
     });

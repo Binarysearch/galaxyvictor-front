@@ -4,6 +4,7 @@ import { StarSystem, StarType, StarSize } from 'src/app/model/star-system';
 import { STAR_TYPES, STAR_SIZES } from 'src/app/galaxy-constants';
 import { PirosApiService, ConnectionStatus } from '@piros/api';
 import { StarSystemInfoDto } from 'src/app/dto/star-system-info';
+import { AuthService, AuthStatus } from '../auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,9 +20,10 @@ export class StarsService {
 
   constructor(
     private api: PirosApiService,
+    private authService: AuthService,
   ) {
-    this.api.getStatus().subscribe((status) => {
-      if (status.connectionStatus === ConnectionStatus.FULLY_CONNECTED) {
+    this.authService.getStatus().subscribe((status) => {
+      if (status === AuthStatus.SESSION_STARTED) {
         this.api.request<StarSystemInfoDto[]>('get-stars').subscribe(stars => {
           const starSystems: StarSystem[] = stars.map(
             ss => new StarSystem(

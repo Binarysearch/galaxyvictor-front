@@ -9,6 +9,5 @@ export enum Status {
 export interface GvApiServiceStatus {
 
     sessionStarted: Status;
-    civilization?: CivilizationDto;
 
 }

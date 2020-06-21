@@ -1,33 +1,46 @@
-import { GvApiService } from './gv-api.service';
-import { Status } from '../model/gv-api-service-status';
+import { AuthService, AuthStatus } from './auth.service';
+import { CivilizationsService } from './data/civilizations.service';
 
+export function registerAndLogin(service: AuthService, callback: (user: string, password: string) => void) {
 
-export function loginWithCivilization(service: GvApiService, callback: () => void) {
-  
   const user = 'user-' + Math.random();
-  const civilizationName = 'civilization-' + Math.random();
   const password = '12345';
 
-  let civilizationId;
-
   const subscription = service.getStatus().subscribe(status => {
-    
-    if (status.sessionStarted === Status.SESSION_STARTED) {
-      if (!civilizationId) {
-        
-        service.createCivilization(civilizationName).subscribe(id => {
-          civilizationId = id;
-          service.closeSession();
-          service.login(user, password).subscribe();
-        });
-      } else {
-        subscription.unsubscribe();
-        callback();
-      }
+
+    if (status === AuthStatus.SESSION_STARTED) {
+      subscription.unsubscribe();
+      callback(user, password);
     }
   });
 
   service.register(user, password).subscribe(() => {
     service.login(user, password).subscribe();
+  });
+}
+
+
+export function registerLoginAndCreateCivilization(authService: AuthService, civilizationService: CivilizationsService, callback: (user: string, password: string) => void) {
+
+  const user = 'user-' + Math.random();
+  const civName = 'civilization-' + Math.random();
+  const password = '12345';
+
+  const subscription = authService.getStatus().subscribe(status => {
+    if (status === AuthStatus.SESSION_STARTED) {
+      subscription.unsubscribe();
+      civilizationService.createCivilization(civName).subscribe();
+    }
+  });
+
+  const civSubscription = civilizationService.getCivilization().subscribe(civ => {
+    if (civ) {
+      civSubscription.unsubscribe();
+      callback(user, password);
+    }
+  });
+
+  authService.register(user, password).subscribe(() => {
+    authService.login(user, password).subscribe();
   });
 }

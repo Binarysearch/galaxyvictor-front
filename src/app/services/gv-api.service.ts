@@ -20,26 +20,22 @@ import { PlanetInfoDto } from '../dto/planet-info';
 export class GvApiService {
 
   private status: BehaviorSubject<GvApiServiceStatus>;
-  private civilizationSubject: BehaviorSubject<CivilizationDto>;
 
   constructor(
     private api: PirosApiService,
     private localStorageService: LocalStorageService
   ) {
     
-    this.civilizationSubject = new BehaviorSubject(null);
     
     this.api.getStatus().subscribe(status => {
       if (status.connectionStatus === ConnectionStatus.FULLY_CONNECTED) {
-        this.fetchInitialData();
-        this.connectToChannels();
+        
       } else {
         if (this.status) {
           this.status.next({ sessionStarted: Status.SESSION_CLOSED });
         } else {
           this.status = new BehaviorSubject({ sessionStarted: Status.SESSION_CLOSED });
         }
-        this.civilizationSubject.next(null);
       }
     });
 
@@ -50,27 +46,6 @@ export class GvApiService {
     } else {
       this.status = new BehaviorSubject({ sessionStarted: Status.SESSION_CLOSED });
     }
-  }
-  
-  private connectToChannels() {
-    this.api.connectToChannel<CivilizationDto>('create-civilization').subscribe((channelConnection) => {
-      channelConnection.messages.subscribe(message => {
-        this.civilizationSubject.next(message);
-      });
-    });
-  }
-
-  private fetchInitialData(): void {
-    this.api.request<CivilizationDto>('civilizations.get-civilization').subscribe(
-      civilization => {
-
-        this.civilizationSubject.next(civilization);
-        this.status.next({ sessionStarted: Status.SESSION_STARTED, civilization: civilization });
-      },
-      (err) => {
-        console.log(err);
-      }
-    );
   }
 
   public getStatus(): Observable<GvApiServiceStatus> {
@@ -106,21 +81,12 @@ export class GvApiService {
     return this.api.request(API.BUILD_SHIP, { colony: colony });
   }
 
-  public createCivilization(name: string) {
-    return this.api.request('create-civilization', name);
-  }
-
-  public getCivilization(): Observable<CivilizationDto> {
-    return this.civilizationSubject.asObservable();
-  }
-
   public getUsers(): Observable<UserListDto> {
     return this.api.request<UserListDto>('get-users', '');
   }
   
   public closeSession() {
     this.localStorageService.deleteSavedToken();
-    this.civilizationSubject.next(null);
   }
   
   public login(username: string, password: string): Observable<ApiServiceSession> {

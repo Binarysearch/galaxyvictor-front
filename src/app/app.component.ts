@@ -7,6 +7,9 @@ import { EventManagerService } from './services/events/event-manager.service';
 import { WindowManagerService } from './services/window-manager.service-abstract';
 import { GvApiService } from './services/gv-api.service';
 import { Status } from './model/gv-api-service-status';
+import { CivilizationsService } from './services/data/civilizations.service';
+import { CivilizationDto } from './dto/civilization/civilization-dto';
+import { AuthService, AuthStatus } from './services/auth.service';
 
 export interface AppRoute {
   path: string;
@@ -24,10 +27,10 @@ export class AppComponent implements AfterViewInit, OnInit {
   @ViewChildren('canvasRef') 
   private canvasRef: QueryList<ElementRef>;
   
-  public sessionStarted: Status;
+  public sessionStarted: AuthStatus;
   public showCreateCivilization: boolean;
 
-  public civilization: Civilization;
+  public civilization: CivilizationDto;
 
   config: DsConfig = {
     routes: [
@@ -50,18 +53,34 @@ export class AppComponent implements AfterViewInit, OnInit {
 
   constructor(
     private api: GvApiService,
+    private authService: AuthService,
+    private civilizationsService: CivilizationsService,
     private galaxyMap: GalaxyMapService,
     private store: Store,
     private eventManagerService: EventManagerService,
     private windowManagerService: WindowManagerService
   ) {
-    api.getStatus().subscribe(
+    this.authService.getStatus().subscribe(
       status => {
-        this.sessionStarted = status.sessionStarted
-        this.showCreateCivilization = status.sessionStarted === Status.SESSION_STARTED && status.civilization == null;
+        this.sessionStarted = status;
       }
     );
-    store.getCivilization().subscribe(civilization => this.civilization = civilization);
+    civilizationsService.isLoaded().subscribe(
+      loaded => {
+        if (loaded) {
+          this.civilizationsService.getCivilization().subscribe(
+            civ => {
+              this.civilization = civ;
+              if (civ) {
+                this.showCreateCivilization = false;
+              } else {
+                this.showCreateCivilization = true;
+              }
+            }
+          );
+        }
+      }
+    );
     this.galaxyMap.getOnSelectEntity().subscribe(selected => {
       this.requestCloseWindows();
     });
@@ -76,11 +95,11 @@ export class AppComponent implements AfterViewInit, OnInit {
   }
 
   private isSessionStarted(): boolean {
-    return this.sessionStarted === Status.SESSION_STARTED;
+    return this.sessionStarted === AuthStatus.SESSION_STARTED;
   }
 
   private isSessionClosed(): boolean {
-    return this.sessionStarted === Status.SESSION_CLOSED;
+    return this.sessionStarted === AuthStatus.SESSION_CLOSED;
   }
 
   private logout(): void {

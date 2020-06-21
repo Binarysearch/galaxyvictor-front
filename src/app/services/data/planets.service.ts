@@ -8,6 +8,8 @@ import { PlanetInfoDto } from 'src/app/dto/planet-info';
 import { PLANET_TYPES, PLANET_SIZES } from 'src/app/galaxy-constants';
 import { StarsService } from './stars.service';
 import { PirosApiService } from '@piros/api';
+import { AuthService, AuthStatus } from '../auth.service';
+import { CivilizationsService } from './civilizations.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,11 +27,12 @@ export class PlanetsService {
     private eventService: EventService,
     private starsService: StarsService,
     private api: PirosApiService,
-    private gvApi: GvApiService
+    private authService: AuthService,
+    private civilizationsService: CivilizationsService
   ) {
-    this.gvApi.getStatus().subscribe(status => {
-      if (status.sessionStarted === Status.SESSION_STARTED) {
-        this.gvApi.getCivilization().subscribe(civilization => {
+    this.authService.getStatus().subscribe(status => {
+      if (status === AuthStatus.SESSION_STARTED) {
+        this.civilizationsService.getCivilization().subscribe(civilization => {
           if (civilization) {
             this.api.request<PlanetInfoDto[]>('get-planets').subscribe(
               planets => {

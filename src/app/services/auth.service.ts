@@ -61,6 +61,7 @@ export class AuthService {
   
   public closeSession() {
     this.localStorageService.deleteSavedToken();
+    this.status.next(AuthStatus.SESSION_CLOSED);
   }
 
 }

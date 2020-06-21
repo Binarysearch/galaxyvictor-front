@@ -5,8 +5,9 @@ import { config } from '../config';
 import { PIROS_API_SERVICE_CONFIG, ApiService } from '@piros/api';
 import { HttpClientModule } from '@angular/common/http';
 import { LocalStorageService } from '../local-storage.service';
-import { GvApiService } from '../gv-api.service';
-import { loginWithCivilization } from '../login-utils';
+import { registerLoginAndCreateCivilization } from '../login-utils';
+import { CivilizationsService } from './civilizations.service';
+import { AuthService } from '../auth.service';
 
 describe('PlanetsService', () => {
 
@@ -23,41 +24,56 @@ describe('PlanetsService', () => {
 
     const localStorageService: LocalStorageService = TestBed.get(LocalStorageService);
     localStorageService.deleteSavedToken();
-    
+
   });
 
   it('should get planets when login', (done) => {
-    const apiService = TestBed.get(GvApiService);
+    const authService = TestBed.get(AuthService);
+    const civilizationsService = TestBed.get(CivilizationsService);
     const service: PlanetsService = TestBed.get(PlanetsService);
 
-    loginWithCivilization(apiService, () => {
-      service.getPlanets().subscribe(
-        planets => {
-          expect(Array.from(planets)[0]).toBeDefined();
-          expect(Array.from(planets)[0].id).toBeDefined();
-          done();
+    registerLoginAndCreateCivilization(authService, civilizationsService, () => {
+      service.isLoaded().subscribe(
+        loaded => {
+          if (loaded) {
+            service.getPlanets().subscribe(
+              planets => {
+                expect(planets.size).toBeGreaterThan(0);
+                expect(Array.from(planets)[0].id).toBeDefined();
+                done();
+              }
+            );
+          }
         }
       );
     });
   });
 
   it('should get planets by id', (done) => {
-    const apiService = TestBed.get(GvApiService);
+    const authService = TestBed.get(AuthService);
+    const civilizationsService = TestBed.get(CivilizationsService);
     const service: PlanetsService = TestBed.get(PlanetsService);
-    
-    loginWithCivilization(apiService, () => {
-      service.getPlanets().subscribe(
-        planets => {
-          const pArray = Array.from(planets);
-          expect(pArray[0]).toBeDefined();
-          expect(pArray[0].id).toBeDefined();
-          const planet = service.getPlanetById(pArray[0].id);
-          expect(planet.id).toEqual(pArray[0].id);
-          expect(planet.size).toEqual(pArray[0].size);
-          expect(planet.type).toEqual(pArray[0].type);
-          done();
+
+    registerLoginAndCreateCivilization(authService, civilizationsService, () => {
+      service.isLoaded().subscribe(
+        loaded => {
+          if (loaded) {
+            service.getPlanets().subscribe(
+              planets => {
+                const pArray = Array.from(planets);
+                expect(planets.size).toBeGreaterThan(0);
+                expect(pArray[0].id).toBeDefined();
+                const planet = service.getPlanetById(pArray[0].id);
+                expect(planet.id).toEqual(pArray[0].id);
+                expect(planet.size).toEqual(pArray[0].size);
+                expect(planet.type).toEqual(pArray[0].type);
+                done();
+              }
+            );
+          }
         }
       );
     });
   });
+
 });
