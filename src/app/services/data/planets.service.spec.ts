@@ -87,7 +87,7 @@ describe('PlanetsService', () => {
     const apiService2 = createApiService();
     const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
     const civilizationsService2 = new CivilizationsService(apiService2, authService2);
-    const service2: PlanetsService = new PlanetsService(TestBed.get(EventService), TestBed.get(StarsService), apiService2, authService2, civilizationsService2);
+    const service2: PlanetsService = new PlanetsService(TestBed.get(StarsService), apiService2, authService2, civilizationsService2);
 
     registerLoginAndCreateCivilization(authService, civilizationsService, () => {
       service.isLoaded().subscribe(

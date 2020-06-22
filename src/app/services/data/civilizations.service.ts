@@ -3,14 +3,17 @@ import { CivilizationDto } from '../../dto/civilization/civilization-dto';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { PirosApiService } from '@piros/api';
 import { AuthService, AuthStatus } from '../auth.service';
+import { Civilization } from '../../model/civilization';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CivilizationsService {
 
+  private civilizationMap: Map<string, Civilization> = new Map();
   private civilization: BehaviorSubject<CivilizationDto> = new BehaviorSubject(null);
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private unknownCivilization: Civilization = new Civilization('', 'Desconocida', false);
 
   constructor(
     private api: PirosApiService,
@@ -48,5 +51,13 @@ export class CivilizationsService {
 
   public createCivilization(name: string): Observable<string> {
     return this.api.request<string>('create-civilization', name);
+  }
+
+  public getCivilizationById(id: string): Civilization {
+    if (this.civilizationMap.has(id)) {
+      return this.civilizationMap.get(id);
+    } else {
+      return this.unknownCivilization;
+    }
   }
 }

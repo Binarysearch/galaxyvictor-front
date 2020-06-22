@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Planet, PlanetType, PlanetSize } from 'src/app/model/planet';
-import { GvApiService } from '../gv-api.service';
-import { Status } from 'src/app/model/gv-api-service-status';
-import { EventService } from '../event.service';
 import { PlanetInfoDto } from 'src/app/dto/planet-info';
 import { PLANET_TYPES, PLANET_SIZES } from 'src/app/galaxy-constants';
 import { StarsService } from './stars.service';
@@ -24,7 +21,6 @@ export class PlanetsService {
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
-    private eventService: EventService,
     private starsService: StarsService,
     private api: PirosApiService,
     private authService: AuthService,
@@ -47,14 +43,6 @@ export class PlanetsService {
         this.loaded.next(false);
       }
     });
-
-    this.eventService.getExploreStarSystemEvents().subscribe(
-      event => {
-        if (event.planets && event.planets.length > 0) {
-          this.addPlanets(event.planets.map(p => this.mapPlanetInfoToPlanet(p)));
-        }
-      }
-    );
   }
 
   public isLoaded(): Observable<boolean> {

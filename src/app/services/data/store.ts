@@ -84,10 +84,6 @@ export class Store {
     return this.coloniesSubject.asObservable();
   }
 
-  public getFleets(): Observable<Set<Fleet>> {
-    return this.fleetsSubject.asObservable();
-  }
-
   public getStarSystems(): Observable<StarSystem[]> {
     return this.starsService.getStars();
   }

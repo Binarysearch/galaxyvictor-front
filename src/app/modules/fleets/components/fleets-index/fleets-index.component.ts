@@ -8,6 +8,7 @@ import { StarSystemRenderComponent } from './renders/star-system-render/star-sys
 import { CivilizationRenderComponent } from './renders/civilization-render/civilization-render.component';
 import { StatusRenderComponent } from './renders/status-render/status-render.component';
 import { NameRenderComponent } from './renders/name-render/name-render.component';
+import { FleetsService } from 'src/app/services/data/fleets.service';
 
 @Component({
   selector: 'app-fleets-index',
@@ -19,7 +20,7 @@ export class FleetsIndexComponent implements OnInit {
   config: TableConfig<Fleet>;
   
   constructor(
-    private store: Store
+    private fleetsService: FleetsService
   ) { }
 
   ngOnInit() {
@@ -30,7 +31,7 @@ export class FleetsIndexComponent implements OnInit {
         { id: 'status', cellRenderer: StatusRenderComponent, name: 'Estado', sortable: true },
         { id: 'destination', cellRenderer: StarSystemRenderComponent, name: 'Destino', sortable: true }
       ],
-      dataSource: new FleetDataSource(this.store),
+      dataSource: new FleetDataSource(this.fleetsService),
       pagination: false,
       tableClasses: ['gv-table']
     };
@@ -46,14 +47,14 @@ class FleetDataSource implements DataSource<Fleet> {
     'destination': (a, b) => a.destination.name.localeCompare(b.destination.name)
   }
 
-  constructor(private store: Store) {
+  constructor(private fleetsService: FleetsService) {
     
   }
 
   connect(paramsChange: Observable<QueryParams>): Observable<QueryResult<Fleet>> {
     return paramsChange.pipe(
       switchMap(params => {
-        return this.store.getFleets().pipe(map(FleetSet => {
+        return this.fleetsService.getFleets().pipe(map(FleetSet => {
           let fleets = Array.from(FleetSet);
           if (params && params.sortStatus) {
             const reverseSortStatus = Array.from(params.sortStatus);

@@ -9,6 +9,7 @@ import { MIN_ZOOM_TO_VIEW_PLANETS } from '../galaxy-constants';
 import { Fleet } from '../model/fleet';
 import { FleetRendererService } from './render/fleet-renderer.service';
 import { PlanetsService } from './data/planets.service';
+import { FleetsService } from './data/fleets.service';
 
 interface IntersectingElement {
   x: number;
@@ -31,11 +32,12 @@ export class HoverService {
     private planetRenderer: PlanetRendererService,
     private fleetRenderer: FleetRendererService,
     private store: Store,
+    private fleetsService: FleetsService,
     private planetsService: PlanetsService
   ) {
     this.store.getStarSystems().subscribe(ss => this.starSystems = ss);
     this.planetsService.getPlanets().subscribe(planets => this.planets = planets);
-    this.store.getFleets().subscribe(fleets => this.fleets = fleets);
+    this.fleetsService.getFleets().subscribe(fleets => this.fleets = fleets);
   }
 
   public get hovered(): Entity {

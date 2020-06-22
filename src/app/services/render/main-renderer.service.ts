@@ -15,6 +15,7 @@ import { LineRendererService } from './line-renderer.service';
 import { Colony } from 'src/app/model/colony';
 import { VisibleEntitiesService } from '../visible-entities/visible-entities.service';
 import { ConstraintService } from '../constraint.service';
+import { FleetsService } from '../data/fleets.service';
 
 @Injectable({
   providedIn: 'root'
@@ -40,12 +41,13 @@ export class MainRendererService {
     private travelLineRenderer: LineRendererService,
     private hoverService: HoverService,
     private store: Store,
+    private fleetsService: FleetsService,
     private visibleEntitiesService: VisibleEntitiesService,
     private constraintService: ConstraintService
   ) {
     this.visibleEntitiesService.getViewportStars().subscribe(ss => this.starSystems = ss);
     this.visibleEntitiesService.getViewportPlanets().subscribe(planets => this.planets = planets);
-    this.store.getFleets().subscribe(fleets => this.fleets = fleets);
+    this.fleetsService.getFleets().subscribe(fleets => this.fleets = fleets);
     this.store.getColonies().subscribe(colonies => this.colonies = colonies);
   }
 

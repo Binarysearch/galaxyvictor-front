@@ -13,6 +13,7 @@ import { StarsService } from './data/stars.service';
 import { PlanetsService } from './data/planets.service';
 import { MapStateService } from './map-state.service';
 import { AuthService, AuthStatus } from './auth.service';
+import { FleetsService } from './data/fleets.service';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +48,7 @@ export class GalaxyMapService {
     private actionResolver: MapActionResolverService,
     private starsService: StarsService,
     private planetsService: PlanetsService,
+    private fleetsService: FleetsService,
     private mapStateService: MapStateService,
     private authService: AuthService
   ){
@@ -90,6 +92,15 @@ export class GalaxyMapService {
                 if (loaded) {
                   subscription.unsubscribe();
                   this.select(this.planetsService.getPlanetById(selectedId));
+                }
+              }
+            );
+          } else if (selectedType === 'fleet') {
+            const subscription = this.fleetsService.isLoaded().subscribe(
+              loaded => {
+                if (loaded) {
+                  subscription.unsubscribe();
+                  this.select(this.fleetsService.getFleetById(selectedId));
                 }
               }
             );

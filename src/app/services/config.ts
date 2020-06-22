@@ -9,7 +9,8 @@ export const config: PirosApiServiceConfig = {
           'get-civilization',
           'create-civilization',
           'get-stars',
-          'get-planets'
+          'get-planets',
+          'get-fleets',
         ],
         channels: [
           'create-civilization'
