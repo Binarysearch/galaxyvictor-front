@@ -1,5 +1,9 @@
 import { AuthService, AuthStatus } from './auth.service';
 import { CivilizationsService } from './data/civilizations.service';
+import { PirosApiService, ConnectorManagerService, IdGeneratorService, RequestService, AuthService as PirosAuthService, ChannelService } from '@piros/api';
+import { config } from './config';
+import { HttpClient } from '@angular/common/http';
+import { TestBed } from '@angular/core/testing';
 
 export function registerAndLogin(service: AuthService, callback: (user: string, password: string) => void) {
 
@@ -43,4 +47,10 @@ export function registerLoginAndCreateCivilization(authService: AuthService, civ
   authService.register(user, password).subscribe(() => {
     authService.login(user, password).subscribe();
   });
+}
+
+export function createApiService(): PirosApiService {
+  const connectorManager = new ConnectorManagerService(new IdGeneratorService(), config);
+  const api = new PirosApiService(new PirosAuthService(connectorManager), new RequestService(connectorManager, config, TestBed.get(HttpClient)), new ChannelService(connectorManager, config), config);
+  return api;
 }
