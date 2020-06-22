@@ -2,14 +2,13 @@ import { Component, ElementRef, AfterViewInit, ViewChildren, QueryList, HostList
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { GalaxyMapService } from './services/galaxy-map.service';
 import { Store } from './services/data/store';
-import { Civilization } from './model/civilization';
 import { EventManagerService } from './services/events/event-manager.service';
 import { WindowManagerService } from './services/window-manager.service-abstract';
 import { GvApiService } from './services/gv-api.service';
-import { Status } from './model/gv-api-service-status';
 import { CivilizationsService } from './services/data/civilizations.service';
 import { CivilizationDto } from './dto/civilization/civilization-dto';
 import { AuthService, AuthStatus } from './services/auth.service';
+import { PlanetsService } from './services/data/planets.service';
 
 export interface AppRoute {
   path: string;
@@ -55,6 +54,7 @@ export class AppComponent implements AfterViewInit, OnInit {
     private api: GvApiService,
     private authService: AuthService,
     private civilizationsService: CivilizationsService,
+    private planetsService: PlanetsService,
     private galaxyMap: GalaxyMapService,
     private store: Store,
     private eventManagerService: EventManagerService,
@@ -72,6 +72,14 @@ export class AppComponent implements AfterViewInit, OnInit {
             civ => {
               this.civilization = civ;
               if (civ) {
+                if (this.showCreateCivilization) {
+                  this.planetsService.isLoaded().subscribe(loaded=>{
+                    if (loaded) {
+                      this.galaxyMap.selectAndGo(this.planetsService.getPlanetById(civ.homeworld));
+                    }
+                  });
+                  
+                }
                 this.showCreateCivilization = false;
               } else {
                 this.showCreateCivilization = true;
