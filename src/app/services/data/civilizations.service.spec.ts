@@ -8,6 +8,7 @@ import { LocalStorageService } from '../local-storage.service';
 import { AuthService } from '../auth.service';
 import { AuthService as PirosAuthService } from '@piros/api';
 import { CivilizationsService } from './civilizations.service';
+import { MapStateService } from '../map-state.service';
 
 describe('CivilizationsService', () => {
 
@@ -167,7 +168,7 @@ describe('CivilizationsService', () => {
     const service: CivilizationsService = TestBed.get(CivilizationsService);
 
     const apiService2 = createApiService();
-    const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService));
+    const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
     const service2: CivilizationsService = new CivilizationsService(apiService2, authService2);
 
     const civilizationName = 'civilization-' + Math.random();

@@ -3,6 +3,7 @@ import { PirosApiService, ApiServiceSession, ConnectionStatus } from '@piros/api
 import { LocalStorageService } from './local-storage.service';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
+import { MapStateService } from './map-state.service';
 
 export enum AuthStatus {
   SESSION_STARTING = 'SESSION_STARTING',
@@ -19,7 +20,8 @@ export class AuthService {
 
   constructor(
     private api: PirosApiService,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private mapStateService: MapStateService
   ) {
     this.api.getStatus().subscribe(status => {
       if (status.connectionStatus === ConnectionStatus.FULLY_CONNECTED) {
@@ -55,6 +57,7 @@ export class AuthService {
       map(session => session.authToken),
       tap(authToken => {
         this.localStorageService.setSavedToken(authToken);
+        this.mapStateService.setSessionstate(<any>{});
       })
     );
   }

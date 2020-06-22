@@ -9,10 +9,10 @@ import { SessionState } from '../model/session.interface';
 import { Observable, Subject } from 'rxjs';
 import { Civilization } from '../model/civilization';
 import { MapActionResolverService, MapAction } from './map-action-resolver.service';
-import { GvApiService } from './gv-api.service';
-import { Status } from '../model/gv-api-service-status';
 import { StarsService } from './data/stars.service';
 import { PlanetsService } from './data/planets.service';
+import { MapStateService } from './map-state.service';
+import { AuthService, AuthStatus } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,20 +43,21 @@ export class GalaxyMapService {
   constructor(
     private renderer: MainRendererService,
     private hoverService: HoverService,
-    private api: GvApiService,
     private store: Store,
     private actionResolver: MapActionResolverService,
     private starsService: StarsService,
-    private planetsService: PlanetsService
+    private planetsService: PlanetsService,
+    private mapStateService: MapStateService,
+    private authService: AuthService
   ){
     this.subscribeToStartingPosition();
     this.startAutosaveState();
   }
 
   private subscribeToStartingPosition() {
-    this.api.getStatus().subscribe(status => {
-      if (status.sessionStarted === Status.SESSION_STARTED) {
-        this.api.getSessionState().pipe(mergeMap(state => this.store.getCivilization().pipe(map(civ => ({ state: state, civilization: civ }))))).subscribe(result => {
+    this.authService.getStatus().subscribe(status => {
+      if (status === AuthStatus.SESSION_STARTED) {
+        this.mapStateService.getSessionState().pipe(mergeMap(state => this.store.getCivilization().pipe(map(civ => ({ state: state, civilization: civ }))))).subscribe(result => {
           const sessionState: SessionState = result.state;
           const civilization: Civilization = result.civilization;
           
@@ -235,8 +236,8 @@ export class GalaxyMapService {
 
   private startAutosaveState() {
     let interval;
-    this.api.getStatus().subscribe(status => {
-      if (status.sessionStarted === Status.SESSION_STARTED) {
+    this.authService.getStatus().subscribe(status => {
+      if (status === AuthStatus.SESSION_STARTED) {
         let savedX: number;
         let savedY: number;
         let savedZ: number;
@@ -257,7 +258,7 @@ export class GalaxyMapService {
               selectedId: selectedId,
               selectedType: selectedType,
             };
-            this.api.setSessionstate(newState).subscribe(()=>{
+            this.mapStateService.setSessionstate(newState).subscribe(()=>{
               savedX = newState.cameraX;
               savedY = newState.cameraY;
               savedZ = newState.cameraZ;

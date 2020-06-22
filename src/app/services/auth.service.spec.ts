@@ -6,6 +6,7 @@ import { HttpClientModule, HttpErrorResponse, HttpClient } from '@angular/common
 import { config } from './config';
 import { PIROS_API_SERVICE_CONFIG, PirosApiService, ConnectorManagerService, IdGeneratorService, RequestService, ChannelService } from '@piros/api';
 import { AuthService as PirosAuthService } from '@piros/api';
+import { MapStateService } from './map-state.service';
 
 describe('AuthService', () => {
 
@@ -151,7 +152,7 @@ describe('AuthService', () => {
 });
 
 function createGvApiServiceWithInitialToken(): AuthService {
-  return new AuthService(createApiService(), TestBed.get(LocalStorageService));
+  return new AuthService(createApiService(), TestBed.get(LocalStorageService), TestBed.get(MapStateService));
 }
 
 function createApiService(): PirosApiService {

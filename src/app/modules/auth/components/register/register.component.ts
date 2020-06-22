@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
 import { TranslateService } from 'src/app/services/translate.service';
 import { Router } from '@angular/router';
-import { GvApiService } from '../../../../services/gv-api.service';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -21,7 +21,7 @@ export class RegisterComponent implements OnInit {
   
   constructor(
     private router: Router,
-    private api: GvApiService, 
+    private authService: AuthService, 
     public ts: TranslateService, 
     private fb: FormBuilder
   ) { }
@@ -44,7 +44,7 @@ export class RegisterComponent implements OnInit {
   register() {
     const email = this.registerForm.value.email;
     const password = this.registerForm.value.password;
-    this.api.register(email, password).subscribe(() => {
+    this.authService.register(email, password).subscribe(() => {
       this.router.navigateByUrl('/');
     });
   }

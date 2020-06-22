@@ -103,7 +103,7 @@ export class AppComponent implements AfterViewInit, OnInit {
   }
 
   private logout(): void {
-    this.api.closeSession();
+    this.authService.closeSession();
     this.store.clear();
   }
 

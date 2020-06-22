@@ -52,15 +52,6 @@ export class GvApiService {
     return this.status.asObservable();
   }
 
-  public setSessionstate(newState: SessionState): Observable<SessionState> {
-    this.localStorageService.saveSessionState(newState);
-    return of(newState);
-  }
-
-  public getSessionState(): Observable<SessionState> {
-    return of(this.localStorageService.getSessionState());
-  }
-
   public getFleetDetail(fleetId: string): Observable<FleetDetailDto> {
     return this.api.request(API.GET_FLEET_DETAIL, fleetId);
   }
@@ -83,23 +74,6 @@ export class GvApiService {
 
   public getUsers(): Observable<UserListDto> {
     return this.api.request<UserListDto>('get-users', '');
-  }
-  
-  public closeSession() {
-    this.localStorageService.deleteSavedToken();
-  }
-  
-  public login(username: string, password: string): Observable<ApiServiceSession> {
-    return this.api.login(username, password).pipe(
-      tap(session => {
-        this.localStorageService.setSavedToken(session.authToken);
-        this.setSessionstate(<any>{});
-      })
-    );
-  }
-  
-  public register(username: string, password: string): Observable<string> {
-    return this.api.post<string>('civilizations.register', { username: username, password: password });
   }
 
 }
