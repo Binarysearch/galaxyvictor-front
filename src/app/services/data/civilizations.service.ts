@@ -11,9 +11,9 @@ import { Civilization } from '../../model/civilization';
 export class CivilizationsService {
 
   private civilizationMap: Map<string, Civilization> = new Map();
-  private civilization: BehaviorSubject<CivilizationDto> = new BehaviorSubject(null);
+  private civilization: BehaviorSubject<Civilization> = new BehaviorSubject(null);
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  private unknownCivilization: Civilization = new Civilization('', 'Desconocida', false);
+  private unknownCivilization: Civilization = new Civilization('', 'Desconocida', false, null);
 
   constructor(
     private api: PirosApiService,
@@ -21,22 +21,32 @@ export class CivilizationsService {
   ) {
     this.authService.getStatus().subscribe((status) => {
       if (status === AuthStatus.SESSION_STARTED) {
-        this.api.request<CivilizationDto>('civilizations.get-civilization').subscribe(civilization => {
-          this.civilization.next(civilization);
+        this.api.request<CivilizationDto>('civilizations.get-civilization').subscribe(civ => {
+          if (civ) {
+            const civilization = new Civilization(civ.id, civ.name, true, civ.homeworld);
+            this.civilizationMap.set(civilization.id, civilization);
+            this.civilization.next(civilization);
+          } else {
+            this.civilization.next(null);
+          }
+          
           this.loaded.next(true);
         }, (err) => {
           console.log(err);
         });
 
         this.api.connectToChannel<CivilizationDto>('create-civilization').subscribe((channelConnection) => {
-          channelConnection.messages.subscribe(message => {
-            this.civilization.next(message);
+          channelConnection.messages.subscribe(civ => {
+            const civilization = new Civilization(civ.id, civ.name, true, civ.homeworld);
+            this.civilizationMap.set(civilization.id, civilization);
+            this.civilization.next(civilization);
           });
         });
 
       } else {
         this.civilization.next(null);
         this.loaded.next(false);
+        this.civilizationMap.clear();
       }
     });
   }
@@ -45,7 +55,7 @@ export class CivilizationsService {
     return this.loaded.asObservable();
   }
 
-  public getCivilization(): Observable<CivilizationDto> {
+  public getCivilization(): Observable<Civilization> {
     return this.civilization.asObservable();
   }
 

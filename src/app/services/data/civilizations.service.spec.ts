@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { PIROS_API_SERVICE_CONFIG, ApiService, PirosApiService, ConnectorManagerService, IdGeneratorService, RequestService, ChannelService } from '@piros/api';
 import { config } from '../config';
-import { registerAndLogin } from '../login-utils';
+import { registerAndLogin, registerLoginAndCreateCivilization } from '../login-utils';
 import { LocalStorageService } from '../local-storage.service';
 import { AuthService } from '../auth.service';
 import { AuthService as PirosAuthService } from '@piros/api';
@@ -148,7 +148,7 @@ describe('CivilizationsService', () => {
                     if (civ) {
                       expect(civ.id).toBeDefined();
                       expect(civ.name).toEqual(civilizationName);
-                      expect(civ.homeworld).toBeDefined();
+                      expect(civ.homeworldId).toBeDefined();
                       done();
                     }
                   }
@@ -213,6 +213,28 @@ describe('CivilizationsService', () => {
 
   });
 
+  it('should get player civilizations by id', (done) => {
+    const authService = TestBed.get(AuthService);
+    const civilizationsService: CivilizationsService = TestBed.get(CivilizationsService);
+    
+    registerLoginAndCreateCivilization(authService, civilizationsService, () => {
+      civilizationsService.isLoaded().subscribe(
+        loaded => {
+          if (loaded) {
+            civilizationsService.getCivilization().subscribe(
+              civilization => {
+                if (civilization) {
+                  expect(civilizationsService.getCivilizationById(civilization.id)).toEqual(civilization);
+                  done();
+                }
+              }
+            );
+          }
+        }
+      );
+    });
+    
+  });
 });
 
 
