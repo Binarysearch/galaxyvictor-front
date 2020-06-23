@@ -20,8 +20,6 @@ export class Store {
 
   private civilizationSubject: BehaviorSubject<Civilization> = new BehaviorSubject(undefined);
   
-  private unknownCivilization: Civilization = new Civilization('', 'Desconocida', false);
-
   constructor(
     private starsService: StarsService
   ) {
@@ -42,14 +40,6 @@ export class Store {
 
   public getColonyById(id: string): Colony {
     return <Colony>this.entityMap.get(id);
-  }
-
-  public getCivilizationById(id: string): Civilization {
-    if (this.entityMap.has(id)) {
-      return <any>this.entityMap.get(id);
-    } else {
-      return this.unknownCivilization;
-    }
   }
 
   public addColonies(colonies: Colony[]) {

@@ -9,6 +9,7 @@ import { CivilizationsService } from './services/data/civilizations.service';
 import { CivilizationDto } from './dto/civilization/civilization-dto';
 import { AuthService, AuthStatus } from './services/auth.service';
 import { PlanetsService } from './services/data/planets.service';
+import { Civilization } from './model/civilization';
 
 export interface AppRoute {
   path: string;
@@ -29,7 +30,7 @@ export class AppComponent implements AfterViewInit, OnInit {
   public sessionStarted: AuthStatus;
   public showCreateCivilization: boolean;
 
-  public civilization: CivilizationDto;
+  public civilization: Civilization;
 
   config: DsConfig = {
     routes: [
@@ -75,7 +76,7 @@ export class AppComponent implements AfterViewInit, OnInit {
                 if (this.showCreateCivilization) {
                   this.planetsService.isLoaded().subscribe(loaded=>{
                     if (loaded) {
-                      this.galaxyMap.selectAndGo(this.planetsService.getPlanetById(civ.homeworld));
+                      this.galaxyMap.selectAndGo(this.planetsService.getPlanetById(civ.homeworldId));
                     }
                   });
                   

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Store } from './data/store';
+import { CivilizationsService } from './data/civilizations.service';
 
 export interface Color {
   r: number;
@@ -15,9 +15,9 @@ export class ColorService {
   private civilizationId: string;
 
   constructor(
-    private store: Store
+    private civilizationsService: CivilizationsService
   ) {
-    this.store.getCivilization().subscribe(
+    this.civilizationsService.getCivilization().subscribe(
       civilization => {
         
         if (civilization) {
