@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GvApiService } from './gv-api.service';
+import { FleetsService } from './data/fleets.service';
 
 @Injectable({
   providedIn: 'root'
@@ -7,11 +8,12 @@ import { GvApiService } from './gv-api.service';
 export class CommandService {
 
   constructor(
-    private api: GvApiService
+    private api: GvApiService,
+    private fleetsService: FleetsService,
   ) { }
 
-  public startTravel(fleet: string, destination: string) {
-    this.api.startTravel(fleet, destination).subscribe();
+  public startTravel(fleet: string, origin: string, destination: string) {
+    this.fleetsService.startTravel(fleet, origin, destination).subscribe();
   }
 
   public colonizePlanet(planet: string) {

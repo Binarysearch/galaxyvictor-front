@@ -1,6 +1,6 @@
 import { FleetInfoDto } from './fleet-info';
 
-export interface StartTravelEvent {
+export interface StartTravelNotificationDto {
 
     fleet: FleetInfoDto;
 

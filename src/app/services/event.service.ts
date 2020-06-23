@@ -4,7 +4,7 @@ import { VisibilityLostEvent } from '../dto/visibility-lost-event';
 import { Subject, Observable } from 'rxjs';
 import { VisibilityGainedEvent } from '../dto/visibility-gained-event';
 import { UpdateFleetEvent } from '../dto/update-fleet-event';
-import { StartTravelEvent } from '../dto/start-travel-event';
+import { StartTravelNotificationDto } from '../dto/start-travel-notification';
 import { FinishBuildingShipEvent } from '../dto/finish-building-ship-event';
 import { ExploreStarSystemEvent } from '../dto/explore-star-system-event';
 import { EndTravelEvent } from '../dto/end-travel-event';
@@ -56,7 +56,7 @@ export class EventService {
     return this.getSubject('update-fleet-events').asObservable();
   }
 
-  public getStartTravelEvents(): Observable<StartTravelEvent> {
+  public getStartTravelEvents(): Observable<StartTravelNotificationDto> {
     return this.getSubject('start-travel-events').asObservable();
   }
 

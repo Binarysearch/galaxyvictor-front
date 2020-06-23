@@ -11,9 +11,11 @@ export const config: PirosApiServiceConfig = {
           'get-stars',
           'get-planets',
           'get-fleets',
+          'start-travel',
         ],
         channels: [
-          'create-civilization'
+          'create-civilization',
+          'start-travel-notifications',
         ]
       }
     ]

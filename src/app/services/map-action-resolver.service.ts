@@ -45,14 +45,14 @@ export class MapActionResolverService {
         return {
           description: `Dividir la flota y enviar naves a ${hovered.name}`,
           execute: () => {
-            this.command.startTravel(selected.id, hovered.id);
+            this.command.startTravel(selected.id, selected.destination.id, hovered.id);
           }
         }
       } else {
         return {
           description: `Viajar al sistema ${hovered.name}`,
           execute: () => {
-            this.command.startTravel(selected.id, hovered.id);
+            this.command.startTravel(selected.id, selected.destination.id, hovered.id);
           }
         }
       }

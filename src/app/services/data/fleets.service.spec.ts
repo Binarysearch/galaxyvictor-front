@@ -8,6 +8,11 @@ import { config } from '../config';
 import { PIROS_API_SERVICE_CONFIG, ApiService } from '@piros/api';
 import { HttpClientModule } from '@angular/common/http';
 import { registerLoginAndCreateCivilization } from '../login-utils';
+import { Fleet } from '../../model/fleet';
+import { StarsService } from './stars.service';
+import { forkJoin } from 'rxjs';
+import { first } from 'rxjs/operators';
+import { StarSystem } from '../../model/star-system';
 
 describe('FleetsService', () => {
 
@@ -68,7 +73,54 @@ describe('FleetsService', () => {
                 expect(fleet.destination).toEqual(fArray[0].destination);
                 expect(fleet.origin).toEqual(fArray[0].origin);
                 expect(fleet.civilization).toEqual(fArray[0].civilization);
+
+                expect(fleet.destination.hasAlliedFleets).toBeTruthy();
+                expect(fleet.origin.hasAlliedFleets).toBeTruthy();
+                expect(fleet.origin.orbitingFleets.size).toEqual(1);
+                expect(fleet.origin).toEqual(fleet.destination);
+                expect(fleet.civilization.fleets.size).toEqual(1);
+                expect(fleet.isTravelling).toEqual(false);
+
                 done();
+              }
+            );
+          }
+        }
+      );
+    });
+  });
+
+  fit('should start travel', (done) => {
+    const authService = TestBed.get(AuthService);
+    const civilizationsService = TestBed.get(CivilizationsService);
+    const fleetsService: FleetsService = TestBed.get(FleetsService);
+    const starsService: StarsService = TestBed.get(StarsService);
+
+    let travelStartSent = false;
+
+    registerLoginAndCreateCivilization(authService, civilizationsService, () => {
+      forkJoin(
+        fleetsService.isLoaded().pipe(first(l => l)),
+        starsService.isLoaded().pipe(first(l => l))
+      ).subscribe(
+        results => {
+          if (!travelStartSent) {
+            fleetsService.getFleets().subscribe(
+              fleets => {
+                const fleet: Fleet = fleets.values().next().value;
+                starsService.getStars().subscribe(stars => {
+                  const star: StarSystem = stars[Math.floor(Math.random() * stars.length)];
+                  
+                  fleetsService.startTravel(fleet.id, fleet.destination.id, star.id).subscribe(result => {
+                    expect(result).toBeTruthy();
+                    
+                  });
+                  travelStartSent = true;
+
+                  fleet.getChanges().subscribe(() => {
+                    done();
+                  });
+                });
               }
             );
           }

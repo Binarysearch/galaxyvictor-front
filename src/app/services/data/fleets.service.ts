@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, Subject } from 'rxjs';
 import { Fleet } from 'src/app/model/fleet';
 import { StarsService } from './stars.service';
 import { PirosApiService } from '@piros/api';
@@ -7,6 +7,8 @@ import { AuthService, AuthStatus } from '../auth.service';
 import { CivilizationsService } from './civilizations.service';
 import { FleetInfoDto } from '../../dto/fleet-info';
 import { TimeService } from '../time.service';
+import { subscribeToNotifications } from '../channel-utils';
+import { StartTravelNotificationDto } from 'src/app/dto/start-travel-notification';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +19,8 @@ export class FleetsService {
   private fleets: BehaviorSubject<Set<Fleet>> = new BehaviorSubject(new Set());
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
+  private startTravelNotificationSubject: Subject<StartTravelNotificationDto> = new Subject();
+  
   constructor(
     private starsService: StarsService,
     private api: PirosApiService,
@@ -42,6 +46,12 @@ export class FleetsService {
         this.loaded.next(false);
       }
     });
+
+    subscribeToNotifications(this.api, 'start-travel-notifications', this.startTravelNotificationSubject);
+
+    this.startTravelNotificationSubject.subscribe(notification => {
+      this.updateFleet(notification.fleet);
+    });
   }
 
   public isLoaded(): Observable<boolean> {
@@ -56,10 +66,54 @@ export class FleetsService {
     return this.fleetMap.get(id);
   }
 
+  public startTravel(fleetId: string, originStarId: string, destinationStarId: string): Observable<boolean> {
+    return this.api.request('start-travel', { fleetId: fleetId, originStarId: originStarId, destinationStarId: destinationStarId });
+  }
+
+  private updateFleet(fleetDto: FleetInfoDto): void {
+    const existing = this.getFleetById(fleetDto.id);
+    if (!existing) {
+      this.addFleets([this.mapFleetInfoToFleet(fleetDto)]);
+    } else {
+      this.updateExistingFleet(existing, fleetDto);
+    }
+  }
+
+  private updateExistingFleet(existing: Fleet, fleetDto: FleetInfoDto) {
+    existing.origin.removeIncomingFleet(existing);
+    existing.origin.removeOrbitingFleet(existing);
+    existing.destination.removeIncomingFleet(existing);
+    existing.destination.removeOrbitingFleet(existing);
+    existing.civilization.removeFleet(existing);
+
+    existing.origin = this.starsService.getStarById(fleetDto.originId);
+    existing.destination = this.starsService.getStarById(fleetDto.destinationId);
+    existing.civilization = this.civilizationsService.getCivilizationById(fleetDto.civilizationId);
+    existing.startTravelTime = fleetDto.startTravelTime;
+    existing.speed = fleetDto.speed;
+    existing.seed = fleetDto.seed;
+
+    if (fleetDto.destinationId === fleetDto.originId) {
+      existing.origin.addOrbitingFleet(existing);
+    } else {
+      existing.destination.addIncomingFleet(existing);
+    }
+    existing.civilization.addFleet(existing);
+    existing.sendChanges();
+  }
+
   private addFleets(fleets: Fleet[]): void {
-    fleets.forEach(p => {
-      this.fleetMap.set(p.id, p);
-      this.fleets.value.add(p);
+    fleets.forEach(fleet => {
+
+      if (fleet.destination.id === fleet.origin.id) {
+        fleet.origin.addOrbitingFleet(fleet);
+      } else {
+        fleet.destination.addIncomingFleet(fleet);
+      }
+      fleet.civilization.addFleet(fleet);
+
+      this.fleetMap.set(fleet.id, fleet);
+      this.fleets.value.add(fleet);
     });
     this.fleets.next(this.fleets.value);
   }

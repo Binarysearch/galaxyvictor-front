@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Entity } from './render/renderer.interface';
 import { Fleet } from '../model/fleet';
 import { StarSystem } from '../model/star-system';
-import { Store } from './data/store';
 import { Civilization } from '../model/civilization';
+import { CivilizationsService } from './data/civilizations.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +13,9 @@ export class ConstraintService {
   private civilization: Civilization;
 
   constructor(
-    private store: Store
+    private civilizationsService: CivilizationsService
   ) {
-    this.store.getCivilization().subscribe(civilization => this.civilization = civilization);
+    this.civilizationsService.getCivilization().subscribe(civilization => this.civilization = civilization);
   }
 
   public canStartTravelTo(traveller: Entity, destination: Entity): boolean {
