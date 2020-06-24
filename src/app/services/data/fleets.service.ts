@@ -61,6 +61,14 @@ export class FleetsService {
 
   }
 
+  public getStartTravelEvents(): Observable<StartTravelNotificationDto> {
+    return this.startTravelNotificationSubject.asObservable();
+  }
+
+  public getEndTravelEvents(): Observable<EndTravelNotificationDto> {
+    return this.endTravelNotificationSubject.asObservable();
+  }
+
   public isLoaded(): Observable<boolean> {
     return this.loaded.asObservable();
   }

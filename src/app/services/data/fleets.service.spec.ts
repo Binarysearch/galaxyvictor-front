@@ -7,12 +7,15 @@ import { LocalStorageService } from '../local-storage.service';
 import { config } from '../config';
 import { PIROS_API_SERVICE_CONFIG, ApiService } from '@piros/api';
 import { HttpClientModule } from '@angular/common/http';
-import { registerLoginAndCreateCivilization } from '../login-utils';
+import { registerLoginAndCreateCivilization, createApiService } from '../login-utils';
 import { Fleet } from '../../model/fleet';
 import { StarsService } from './stars.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { StarSystem } from '../../model/star-system';
+import { MapStateService } from '../map-state.service';
+import { TimeService } from '../time.service';
+import { PlanetsService } from './planets.service';
 
 describe('FleetsService', () => {
 
@@ -145,6 +148,204 @@ describe('FleetsService', () => {
         }
       );
     });
+  });
+
+  it('should not receive start travel or end travel notification if player cannot view the stars', (done) => {
+    const authService = TestBed.get(AuthService);
+    const civilizationsService = TestBed.get(CivilizationsService);
+    const fleetsService: FleetsService = TestBed.get(FleetsService);
+    const starsService: StarsService = TestBed.get(StarsService);
+
+    const apiService2 = createApiService();
+    const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
+    const civilizationsService2 = new CivilizationsService(apiService2, authService2);
+    const starsService2: StarsService = new StarsService(apiService2, authService2);
+    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService));
+    const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2);
+
+    let travelStartSent = false;
+    let travelStartReceived = false;
+    let fleetId;
+
+    const secondHomeStar: Subject<StarSystem> = new Subject();
+    const travelReceivedInFirstUser: Subject<void> = new Subject();
+
+
+    registerLoginAndCreateCivilization(authService, civilizationsService, () => {
+      forkJoin(
+        fleetsService.isLoaded().pipe(first(l => l)),
+        starsService.isLoaded().pipe(first(l => l))
+      ).subscribe(
+        results => {
+          if (!travelStartSent) {
+            fleetsService.getFleets().subscribe(
+              fleets => {
+                const fleet: Fleet = fleets.values().next().value;
+                fleetId = fleet.id;
+                starsService.getStars().subscribe(stars => {
+                  
+                  secondHomeStar.subscribe(otherPlayerHomeStar => {
+
+                    let star: StarSystem = stars[Math.floor(Math.random() * stars.length)];
+                    while (star.id === otherPlayerHomeStar.id) {
+                      star = stars[Math.floor(Math.random() * stars.length)];
+                    }
+                    
+                    fleetsService.startTravel(fleet.id, fleet.destination.id, star.id).subscribe(result => {
+                      expect(result).toBeTruthy();
+                      travelStartSent = true;
+                    });
+
+                    fleet.getChanges().subscribe(()=>{
+                      travelStartReceived = true;
+                      if (travelStartSent) {
+                        travelReceivedInFirstUser.next();
+                        travelReceivedInFirstUser.complete();
+                      }
+                    });
+                  });
+
+                });
+              }
+            );
+          }
+        }
+      );
+    });
+
+    registerLoginAndCreateCivilization(authService2, civilizationsService2, () => {
+      forkJoin(
+        civilizationsService2.isLoaded().pipe(first(l => l)),
+        planetsService2.isLoaded().pipe(first(l => l))
+      ).subscribe(
+        results => {
+          civilizationsService2.getCivilization().subscribe(
+            civ => {
+              const homeStar = planetsService2.getPlanetById(civ.homeworldId).starSystem;
+              secondHomeStar.next(homeStar);
+              secondHomeStar.complete();
+
+              fleetsService2.getStartTravelEvents().subscribe(()=>{
+                fail('No deberia recibir el evento de inicio de viaje en el segundo usuario');
+              });
+
+              fleetsService2.getEndTravelEvents().subscribe(()=>{
+                fail('No deberia recibir el evento de fin de viaje en el segundo usuario');
+              });
+
+              travelReceivedInFirstUser.subscribe(()=>{
+                setTimeout(() => {
+                  fleetsService2.getFleets().subscribe(fleets => {
+                    fleets.forEach(f => {
+                      if (f.id === fleetId) {
+                        fail('La flota no deberia estar en el listado de flotas en el segundo usuario');
+                      }
+                    });
+                    homeStar.incomingFleets.forEach(f=>{
+                      if (f.id === fleetId) {
+                        fail('La flota no deberia estar en el listado de flotas en el segundo usuario');
+                      }
+                    });
+                    homeStar.orbitingFleets.forEach(f => {
+                      if (f.id === fleetId) {
+                        fail('La flota no deberia estar en el listado de flotas en el segundo usuario');
+                      }
+                    });
+  
+                    done();
+                  });
+                  expect(fleetsService2.getFleetById(fleetId)).toBeUndefined();
+                }, 200);
+              });
+            }
+          );
+
+        }
+      );
+    });
+
+  });
+
+  it('should receive start travel and end travel notification if player can view the stars', (done) => {
+    const authService = TestBed.get(AuthService);
+    const civilizationsService = TestBed.get(CivilizationsService);
+    const fleetsService: FleetsService = TestBed.get(FleetsService);
+    const starsService: StarsService = TestBed.get(StarsService);
+
+    const apiService2 = createApiService();
+    const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
+    const civilizationsService2 = new CivilizationsService(apiService2, authService2);
+    const starsService2: StarsService = new StarsService(apiService2, authService2);
+    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService));
+    const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2);
+
+    let travelStartSent = false;
+    let travelStartReceived = false;
+    let fleetId;
+
+    const secondHomeStar: Subject<StarSystem> = new Subject();
+
+    registerLoginAndCreateCivilization(authService, civilizationsService, () => {
+      forkJoin(
+        fleetsService.isLoaded().pipe(first(l => l)),
+        starsService.isLoaded().pipe(first(l => l))
+      ).subscribe(
+        results => {
+          if (!travelStartSent) {
+            fleetsService.getFleets().subscribe(
+              fleets => {
+                const fleet: Fleet = fleets.values().next().value;
+                fleetId = fleet.id;
+                starsService.getStars().subscribe(stars => {
+                  
+                  secondHomeStar.subscribe(otherPlayerHomeStar => {
+
+                    fleetsService.startTravel(fleet.id, fleet.destination.id, otherPlayerHomeStar.id).subscribe(result => {
+                      expect(result).toBeTruthy();
+                      travelStartSent = true;
+                    });
+                  });
+
+                });
+              }
+            );
+          }
+        }
+      );
+    });
+
+    registerLoginAndCreateCivilization(authService2, civilizationsService2, () => {
+      forkJoin(
+        civilizationsService2.isLoaded().pipe(first(l => l)),
+        planetsService2.isLoaded().pipe(first(l => l))
+      ).subscribe(
+        results => {
+          civilizationsService2.getCivilization().subscribe(
+            civ => {
+              const homeStar = planetsService2.getPlanetById(civ.homeworldId).starSystem;
+              
+
+              let startTravelEventReceived = false;
+              fleetsService2.getStartTravelEvents().subscribe(()=>{
+                startTravelEventReceived = true;
+              });
+
+              fleetsService2.getEndTravelEvents().subscribe(()=>{
+                if (!startTravelEventReceived) {
+                  fail('No se ha recibido el evento de inicio de viaje');
+                }
+                done();
+              });
+
+              secondHomeStar.next(homeStar);
+              secondHomeStar.complete();
+            }
+          );
+
+        }
+      );
+    });
+
   });
 
 });
