@@ -90,13 +90,14 @@ describe('FleetsService', () => {
     });
   });
 
-  fit('should start travel', (done) => {
+  it('should start travel', (done) => {
     const authService = TestBed.get(AuthService);
     const civilizationsService = TestBed.get(CivilizationsService);
     const fleetsService: FleetsService = TestBed.get(FleetsService);
     const starsService: StarsService = TestBed.get(StarsService);
 
     let travelStartSent = false;
+    let travelStartReceived = false;
 
     registerLoginAndCreateCivilization(authService, civilizationsService, () => {
       forkJoin(
@@ -108,17 +109,34 @@ describe('FleetsService', () => {
             fleetsService.getFleets().subscribe(
               fleets => {
                 const fleet: Fleet = fleets.values().next().value;
+                const origin: StarSystem = fleet.origin;
                 starsService.getStars().subscribe(stars => {
                   const star: StarSystem = stars[Math.floor(Math.random() * stars.length)];
                   
                   fleetsService.startTravel(fleet.id, fleet.destination.id, star.id).subscribe(result => {
                     expect(result).toBeTruthy();
-                    
                   });
+
                   travelStartSent = true;
 
                   fleet.getChanges().subscribe(() => {
-                    done();
+                    if (!travelStartReceived) {
+                      travelStartReceived = true;
+                      expect(fleet.destination.id).toEqual(star.id);
+                      expect(fleet.origin.incomingFleets.has(fleet)).toBeFalsy();
+                      expect(fleet.origin.orbitingFleets.has(fleet)).toBeFalsy();
+                      expect(fleet.destination.incomingFleets.has(fleet)).toBeTruthy();
+                      expect(fleet.isTravelling).toBeTruthy();
+                    } else {
+                      expect(fleet.destination.id).toEqual(star.id);
+                      expect(fleet.origin.id).toEqual(star.id);
+                      expect(fleet.destination.incomingFleets.has(fleet)).toBeFalsy();
+                      expect(fleet.destination.orbitingFleets.has(fleet)).toBeTruthy();
+                      expect(origin.orbitingFleets.has(fleet)).toBeFalsy();
+                      expect(origin.incomingFleets.has(fleet)).toBeFalsy();
+                      expect(fleet.isTravelling).toBeFalsy();
+                      done();
+                    }
                   });
                 });
               }

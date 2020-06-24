@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, Subject } from 'rxjs';
-import { Fleet } from 'src/app/model/fleet';
+import { Fleet } from '../../model/fleet';
 import { StarsService } from './stars.service';
 import { PirosApiService } from '@piros/api';
 import { AuthService, AuthStatus } from '../auth.service';
@@ -8,7 +8,8 @@ import { CivilizationsService } from './civilizations.service';
 import { FleetInfoDto } from '../../dto/fleet-info';
 import { TimeService } from '../time.service';
 import { subscribeToNotifications } from '../channel-utils';
-import { StartTravelNotificationDto } from 'src/app/dto/start-travel-notification';
+import { StartTravelNotificationDto } from '../../dto/start-travel-notification';
+import { EndTravelNotificationDto } from '../../dto/end-travel-notification';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class FleetsService {
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   private startTravelNotificationSubject: Subject<StartTravelNotificationDto> = new Subject();
+  private endTravelNotificationSubject: Subject<EndTravelNotificationDto> = new Subject();
   
   constructor(
     private starsService: StarsService,
@@ -48,10 +50,15 @@ export class FleetsService {
     });
 
     subscribeToNotifications(this.api, 'start-travel-notifications', this.startTravelNotificationSubject);
+    subscribeToNotifications(this.api, 'end-travel-notifications', this.endTravelNotificationSubject);
 
     this.startTravelNotificationSubject.subscribe(notification => {
       this.updateFleet(notification.fleet);
     });
+    this.endTravelNotificationSubject.subscribe(notification => {
+      this.updateFleet(notification.fleet);
+    });
+
   }
 
   public isLoaded(): Observable<boolean> {

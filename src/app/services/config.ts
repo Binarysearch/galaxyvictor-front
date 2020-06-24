@@ -16,6 +16,7 @@ export const config: PirosApiServiceConfig = {
         channels: [
           'create-civilization',
           'start-travel-notifications',
+          'end-travel-notifications',
         ]
       }
     ]
