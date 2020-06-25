@@ -17,6 +17,7 @@ export const config: PirosApiServiceConfig = {
           'create-civilization',
           'start-travel-notifications',
           'end-travel-notifications',
+          'delete-fleet-notifications',
         ]
       }
     ]

@@ -8,7 +8,7 @@ import { StartTravelNotificationDto } from '../dto/start-travel-notification';
 import { FinishBuildingShipEvent } from '../dto/finish-building-ship-event';
 import { ExploreStarSystemEvent } from '../dto/explore-star-system-event';
 import { EndTravelNotificationDto } from '../dto/end-travel-notification';
-import { DeleteFleetEvent } from '../dto/delete-fleet-event';
+import { DeleteFleetNotificationDto } from '../dto/delete-fleet-notification';
 import { CreateBuildingOrderEvent } from '../dto/create-building-order-event';
 import { ColonizePlanetEvent } from '../dto/colonize-planet-event';
 import { CivilizationDetailDto } from '../dto/civilization-detail';
@@ -72,7 +72,7 @@ export class EventService {
     return this.getSubject('end-travel-events').asObservable();
   }
 
-  public getDeleteFleetEvents(): Observable<DeleteFleetEvent> {
+  public getDeleteFleetEvents(): Observable<DeleteFleetNotificationDto> {
     return this.getSubject('delete-fleet-events').asObservable();
   }
 

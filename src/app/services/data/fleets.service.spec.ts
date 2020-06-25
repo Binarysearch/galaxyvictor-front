@@ -348,4 +348,106 @@ describe('FleetsService', () => {
 
   });
 
+  it('should receive delete fleet when enemy fleet starts travel to a not visible star', (done) => {
+    const authService = TestBed.get(AuthService);
+    const civilizationsService = TestBed.get(CivilizationsService);
+    const fleetsService: FleetsService = TestBed.get(FleetsService);
+    const starsService: StarsService = TestBed.get(StarsService);
+
+    const apiService2 = createApiService();
+    const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
+    const civilizationsService2 = new CivilizationsService(apiService2, authService2);
+    const starsService2: StarsService = new StarsService(apiService2, authService2);
+    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService));
+    const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2);
+
+    let travelStartSent = false;
+    let fleetId;
+
+    const secondHomeStar: Subject<StarSystem> = new Subject();
+
+    registerLoginAndCreateCivilization(authService, civilizationsService, () => {
+      forkJoin(
+        fleetsService.isLoaded().pipe(first(l => l)),
+        starsService.isLoaded().pipe(first(l => l))
+      ).subscribe(
+        results => {
+          if (!travelStartSent) {
+            fleetsService.getFleets().subscribe(
+              fleets => {
+                const fleet: Fleet = fleets.values().next().value;
+                fleetId = fleet.id;
+                secondHomeStar.subscribe(otherPlayerHomeStar => {
+
+                  fleetsService.getEndTravelEvents().subscribe((ev) => {
+                    if (ev.fleet.originId) {
+                      starsService.getStars().subscribe(stars => {
+                  
+                        let star: StarSystem = stars[Math.floor(Math.random() * stars.length)];
+                        while (star.id === otherPlayerHomeStar.id) {
+                          star = stars[Math.floor(Math.random() * stars.length)];
+                        }
+                        
+                        fleetsService.startTravel(fleet.id, ev.fleet.originId, star.id).subscribe(result => {
+                          expect(result).toBeTruthy();
+                          travelStartSent = true;
+                        });
+      
+                      });
+                    }
+                  });
+
+                  fleetsService.startTravel(fleet.id, fleet.destination.id, otherPlayerHomeStar.id).subscribe();
+
+                });
+              }
+            );
+          }
+        }
+      );
+    });
+
+    registerLoginAndCreateCivilization(authService2, civilizationsService2, () => {
+      forkJoin(
+        civilizationsService2.isLoaded().pipe(first(l => l)),
+        planetsService2.isLoaded().pipe(first(l => l))
+      ).subscribe(
+        results => {
+          civilizationsService2.getCivilization().subscribe(
+            civ => {
+              const homeStar = planetsService2.getPlanetById(civ.homeworldId).starSystem;
+              
+              let enemyFleet: Fleet;
+              fleetsService2.getEndTravelEvents().subscribe(() => {
+                enemyFleet = fleetsService2.getFleetById(fleetId);
+                expect(enemyFleet).toBeDefined();
+              });
+
+              fleetsService2.getDeleteFleetEvents().subscribe((event) => {
+                expect(event.fleetId).toEqual(fleetId);
+
+                setTimeout(() => {
+                  const fleet = fleetsService2.getFleetById(fleetId);
+                  expect(fleet).toBeUndefined();
+
+                  expect(enemyFleet.origin.orbitingFleets.has(enemyFleet)).toBeFalsy();
+                  expect(enemyFleet.origin.incomingFleets.has(enemyFleet)).toBeFalsy();
+                  expect(enemyFleet.destination.orbitingFleets.has(enemyFleet)).toBeFalsy();
+                  expect(enemyFleet.destination.incomingFleets.has(enemyFleet)).toBeFalsy();
+                  expect(enemyFleet.civilization.fleets.has(enemyFleet)).toBeFalsy();
+
+                  done();
+                }, 200);
+              });
+
+              secondHomeStar.next(homeStar);
+              secondHomeStar.complete();
+            }
+          );
+        }
+      );
+    });
+
+  });
+
 });

@@ -12,7 +12,7 @@ export class DeleteFleetEventService {
     private fleetManagerService: FleetManagerService
   ) {
     this.eventService.getDeleteFleetEvents().subscribe(event => {
-      this.deleteFleet(event.fleet);
+      this.deleteFleet(event.fleetId);
     });
   }
   
