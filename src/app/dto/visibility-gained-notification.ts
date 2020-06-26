@@ -3,7 +3,7 @@ import { ColonyInfoDto } from './colony-info';
 
 export interface VisibilityGainedNotificationDto {
 
-	starSystem: string;
+	starId: string;
     orbitingFleets: FleetInfoDto[];
     incomingFleets: FleetInfoDto[];
     colonies: ColonyInfoDto[];

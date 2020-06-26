@@ -480,15 +480,123 @@ describe('FleetsService', () => {
                 starsService.getStars().subscribe(stars => {
                   const star: StarSystem = stars[Math.floor(Math.random() * stars.length)];
                   
-                  fleetsService.startTravel(fleet.id, fleet.destination.id, star.id).subscribe(result => {
-                    expect(result).toBeTruthy();
-                  });
+                  if (!travelStartSent) {
+                    fleetsService.startTravel(fleet.id, fleet.destination.id, star.id).subscribe(result => {
+                      expect(result).toBeTruthy();
+                    });
 
-                  travelStartSent = true;
+                    travelStartSent = true;
+                  }
 
                   visibilityEventsService.getVisibilityGainNotification().subscribe((event) => {
-                    expect(event.starSystem).toEqual(star.id);
+                    expect(event.starId).toEqual(star.id);
                     done();
+                  });
+                });
+              }
+            );
+          }
+        }
+      );
+    });
+  });
+
+  it('should receive visibility lost notification when travel ends', (done) => {
+    const authService = TestBed.get(AuthService);
+    const civilizationsService = TestBed.get(CivilizationsService);
+    const fleetsService: FleetsService = TestBed.get(FleetsService);
+    const starsService: StarsService = TestBed.get(StarsService);
+    const visibilityEventsService: VisibilityEventsService = TestBed.get(VisibilityEventsService);
+
+    let firstTravelStartSent = false;
+    let secondTravelStartSent = false;
+
+    registerLoginAndCreateCivilization(authService, civilizationsService, () => {
+      forkJoin(
+        fleetsService.isLoaded().pipe(first(l => l)),
+        starsService.isLoaded().pipe(first(l => l))
+      ).subscribe(
+        results => {
+          if (!firstTravelStartSent) {
+            fleetsService.getFleets().subscribe(
+              fleets => {
+                const fleet: Fleet = fleets.values().next().value;
+                const origin: StarSystem = fleet.origin;
+                starsService.getStars().subscribe(stars => {
+                  const star1: StarSystem = stars[Math.floor(Math.random() * stars.length)];
+                  
+                  if (!firstTravelStartSent) {
+                    fleetsService.startTravel(fleet.id, fleet.destination.id, star1.id).subscribe(result => {
+                      expect(result).toBeTruthy();
+                    });
+                    firstTravelStartSent = true;
+                  }
+
+                  fleetsService.getEndTravelEvents().subscribe((ev) => {
+                    const star2: StarSystem = stars[Math.floor(Math.random() * stars.length)];
+                  
+                    if (!secondTravelStartSent) {
+                      fleetsService.startTravel(fleet.id, star1.id, star2.id).subscribe(result => {
+                        expect(result).toBeTruthy();
+                      });
+                      secondTravelStartSent = true;
+                    }
+                  });
+
+                  visibilityEventsService.getVisibilityLostNotification().subscribe((event) => {
+                    if (secondTravelStartSent) {
+                      expect(event.starId).toEqual(star1.id);
+                      done();
+                    }
+                  });
+
+                });
+              }
+            );
+          }
+        }
+      );
+    });
+  });
+
+  it('should not receive visibility lost notification when travel ends  if user is still present in star', (done) => {
+    const authService = TestBed.get(AuthService);
+    const civilizationsService = TestBed.get(CivilizationsService);
+    const fleetsService: FleetsService = TestBed.get(FleetsService);
+    const starsService: StarsService = TestBed.get(StarsService);
+    const visibilityEventsService: VisibilityEventsService = TestBed.get(VisibilityEventsService);
+
+    let firstTravelStartSent = false;
+
+    registerLoginAndCreateCivilization(authService, civilizationsService, () => {
+      forkJoin(
+        fleetsService.isLoaded().pipe(first(l => l)),
+        starsService.isLoaded().pipe(first(l => l))
+      ).subscribe(
+        results => {
+          if (!firstTravelStartSent) {
+            fleetsService.getFleets().subscribe(
+              fleets => {
+                const fleet: Fleet = fleets.values().next().value;
+                const origin: StarSystem = fleet.origin;
+                starsService.getStars().subscribe(stars => {
+                  const star1: StarSystem = stars[Math.floor(Math.random() * stars.length)];
+                  
+                  if (!firstTravelStartSent) {
+                    fleetsService.startTravel(fleet.id, fleet.destination.id, star1.id).subscribe(result => {
+                      expect(result).toBeTruthy();
+                    });
+                    firstTravelStartSent = true;
+                  }
+
+                  visibilityEventsService.getVisibilityLostNotification().subscribe((event) => {
+                    fail('El usuario no deberia perder la visibilidad en el sistema');
+                  });
+
+                  fleetsService.getEndTravelEvents().subscribe(() => {
+                    setTimeout(() => {
+                      done();
+                    }, 200);
                   });
                 });
               }

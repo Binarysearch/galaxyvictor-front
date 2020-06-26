@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { VisibilityLostEvent } from '../../dto/visibility-lost-event';
+import { VisibilityLostNotificationDto } from '../../dto/visibility-lost-notidication';
 import { Store } from '../data/store';
 import { FleetManagerService } from '../data/fleet-manager.service';
 import { ColonyManagerService } from '../data/colony-manager.service';
@@ -24,8 +24,8 @@ export class VisibilityLostEventService {
     });
   }
 
-  private processEvent(event: VisibilityLostEvent) {
-    const starSystem = this.starsService.getStarById(event.starSystem);
+  private processEvent(event: VisibilityLostNotificationDto) {
+    const starSystem = this.starsService.getStarById(event.starId);
     this.removeFleets(starSystem.incomingFleets);
     this.removeFleets(starSystem.orbitingFleets);
     starSystem.planets.forEach(p => {

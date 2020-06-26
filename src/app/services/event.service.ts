@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '@piros/api';
-import { VisibilityLostEvent } from '../dto/visibility-lost-event';
+import { VisibilityLostNotificationDto } from '../dto/visibility-lost-notidication';
 import { Subject, Observable } from 'rxjs';
 import { VisibilityGainedNotificationDto } from '../dto/visibility-gained-notification';
 import { UpdateFleetEvent } from '../dto/update-fleet-event';
@@ -44,7 +44,7 @@ export class EventService {
     );*/
   }
 
-  public getVisibilityLostEvents(): Observable<VisibilityLostEvent> {
+  public getVisibilityLostEvents(): Observable<VisibilityLostNotificationDto> {
     return this.getSubject('visibility-lost-events').asObservable();
   }
 
