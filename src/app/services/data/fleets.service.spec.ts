@@ -16,6 +16,7 @@ import { StarSystem } from '../../model/star-system';
 import { MapStateService } from '../map-state.service';
 import { TimeService } from '../time.service';
 import { PlanetsService } from './planets.service';
+import { VisibilityEventsService } from '../events/visibility-events.service';
 
 describe('FleetsService', () => {
 
@@ -116,9 +117,11 @@ describe('FleetsService', () => {
                 starsService.getStars().subscribe(stars => {
                   const star: StarSystem = stars[Math.floor(Math.random() * stars.length)];
                   
-                  fleetsService.startTravel(fleet.id, fleet.destination.id, star.id).subscribe(result => {
-                    expect(result).toBeTruthy();
-                  });
+                  if (!travelStartSent) {
+                    fleetsService.startTravel(fleet.id, fleet.destination.id, star.id).subscribe(result => {
+                      expect(result).toBeTruthy();
+                    });
+                  }
 
                   travelStartSent = true;
 
@@ -190,11 +193,13 @@ describe('FleetsService', () => {
                     while (star.id === otherPlayerHomeStar.id) {
                       star = stars[Math.floor(Math.random() * stars.length)];
                     }
-                    
-                    fleetsService.startTravel(fleet.id, fleet.destination.id, star.id).subscribe(result => {
-                      expect(result).toBeTruthy();
+
+                    if (!travelStartSent) {
+                      fleetsService.startTravel(fleet.id, fleet.destination.id, star.id).subscribe(result => {
+                        expect(result).toBeTruthy();
+                      });
                       travelStartSent = true;
-                    });
+                    }
 
                     fleet.getChanges().subscribe(()=>{
                       travelStartReceived = true;
@@ -299,11 +304,12 @@ describe('FleetsService', () => {
                 starsService.getStars().subscribe(stars => {
                   
                   secondHomeStar.subscribe(otherPlayerHomeStar => {
-
-                    fleetsService.startTravel(fleet.id, fleet.destination.id, otherPlayerHomeStar.id).subscribe(result => {
-                      expect(result).toBeTruthy();
+                    if (!travelStartSent) {
+                      fleetsService.startTravel(fleet.id, fleet.destination.id, otherPlayerHomeStar.id).subscribe(result => {
+                        expect(result).toBeTruthy();
+                      });
                       travelStartSent = true;
-                    });
+                    }
                   });
 
                 });
@@ -387,11 +393,12 @@ describe('FleetsService', () => {
                         while (star.id === otherPlayerHomeStar.id) {
                           star = stars[Math.floor(Math.random() * stars.length)];
                         }
-                        
-                        fleetsService.startTravel(fleet.id, ev.fleet.originId, star.id).subscribe(result => {
-                          expect(result).toBeTruthy();
+                        if (!travelStartSent) {
+                          fleetsService.startTravel(fleet.id, ev.fleet.originId, star.id).subscribe(result => {
+                            expect(result).toBeTruthy();
+                          });
                           travelStartSent = true;
-                        });
+                        }
       
                       });
                     }
@@ -448,6 +455,48 @@ describe('FleetsService', () => {
       );
     });
 
+  });
+
+  it('should receive visibility gain notification when travel ends', (done) => {
+    const authService = TestBed.get(AuthService);
+    const civilizationsService = TestBed.get(CivilizationsService);
+    const fleetsService: FleetsService = TestBed.get(FleetsService);
+    const starsService: StarsService = TestBed.get(StarsService);
+    const visibilityEventsService: VisibilityEventsService = TestBed.get(VisibilityEventsService);
+
+    let travelStartSent = false;
+
+    registerLoginAndCreateCivilization(authService, civilizationsService, () => {
+      forkJoin(
+        fleetsService.isLoaded().pipe(first(l => l)),
+        starsService.isLoaded().pipe(first(l => l))
+      ).subscribe(
+        results => {
+          if (!travelStartSent) {
+            fleetsService.getFleets().subscribe(
+              fleets => {
+                const fleet: Fleet = fleets.values().next().value;
+                const origin: StarSystem = fleet.origin;
+                starsService.getStars().subscribe(stars => {
+                  const star: StarSystem = stars[Math.floor(Math.random() * stars.length)];
+                  
+                  fleetsService.startTravel(fleet.id, fleet.destination.id, star.id).subscribe(result => {
+                    expect(result).toBeTruthy();
+                  });
+
+                  travelStartSent = true;
+
+                  visibilityEventsService.getVisibilityGainNotification().subscribe((event) => {
+                    expect(event.starSystem).toEqual(star.id);
+                    done();
+                  });
+                });
+              }
+            );
+          }
+        }
+      );
+    });
   });
 
 });

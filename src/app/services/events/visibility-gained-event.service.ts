@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { VisibilityGainedEvent } from '../../dto/visibility-gained-event';
+import { VisibilityGainedNotificationDto } from '../../dto/visibility-gained-notification';
 import { FleetManagerService } from '../data/fleet-manager.service';
 import { ColonyManagerService } from '../data/colony-manager.service';
 import { EventService } from '../event.service';
@@ -19,7 +19,7 @@ export class VisibilityGainedEventService {
     });
   }
 
-  private processEvent(event: VisibilityGainedEvent) {
+  private processEvent(event: VisibilityGainedNotificationDto) {
     if (event.colonies && event.colonies.length > 0) {
       this.colonyManagerService.addColonies(event.colonies);
     }
