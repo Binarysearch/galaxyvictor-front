@@ -5,18 +5,19 @@ import { CivilizationsService } from './civilizations.service';
 import { AuthService } from '../auth.service';
 import { LocalStorageService } from '../local-storage.service';
 import { config } from '../config';
-import { PIROS_API_SERVICE_CONFIG, ApiService } from '@piros/api';
+import { PIROS_API_SERVICE_CONFIG, ApiService, PirosApiService } from '@piros/api';
 import { HttpClientModule } from '@angular/common/http';
 import { registerLoginAndCreateCivilization, createApiService } from '../login-utils';
 import { Fleet } from '../../model/fleet';
 import { StarsService } from './stars.service';
-import { forkJoin, Subject } from 'rxjs';
+import { forkJoin, Subject, ReplaySubject } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { StarSystem } from '../../model/star-system';
 import { MapStateService } from '../map-state.service';
 import { TimeService } from '../time.service';
 import { PlanetsService } from './planets.service';
 import { VisibilityEventsService } from '../events/visibility-events.service';
+import { FleetInfoDto } from '../../dto/fleet-info';
 
 describe('FleetsService', () => {
 
@@ -502,14 +503,24 @@ describe('FleetsService', () => {
   });
 
   it('should receive visibility lost notification when travel ends', (done) => {
+    const apiService: PirosApiService = TestBed.get(PirosApiService);
     const authService = TestBed.get(AuthService);
     const civilizationsService = TestBed.get(CivilizationsService);
     const fleetsService: FleetsService = TestBed.get(FleetsService);
     const starsService: StarsService = TestBed.get(StarsService);
     const visibilityEventsService: VisibilityEventsService = TestBed.get(VisibilityEventsService);
 
+    const apiService2 = createApiService();
+    const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
+    const civilizationsService2 = new CivilizationsService(apiService2, authService2);
+    const starsService2: StarsService = new StarsService(apiService2, authService2);
+    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService));
+
     let firstTravelStartSent = false;
     let secondTravelStartSent = false;
+    let enemyTravelStartSent = false;
+
+    const starIdSubject: Subject<string> = new ReplaySubject(1);
 
     registerLoginAndCreateCivilization(authService, civilizationsService, () => {
       forkJoin(
@@ -524,29 +535,37 @@ describe('FleetsService', () => {
                 const origin: StarSystem = fleet.origin;
                 starsService.getStars().subscribe(stars => {
                   const star1: StarSystem = stars[Math.floor(Math.random() * stars.length)];
-                  
+
+                  starIdSubject.next(star1.id);
+
                   if (!firstTravelStartSent) {
-                    fleetsService.startTravel(fleet.id, fleet.destination.id, star1.id).subscribe(result => {
-                      expect(result).toBeTruthy();
-                    });
+                    fleetsService.startTravel(fleet.id, fleet.destination.id, star1.id).subscribe();
                     firstTravelStartSent = true;
                   }
 
                   fleetsService.getEndTravelEvents().subscribe((ev) => {
-                    const star2: StarSystem = stars[Math.floor(Math.random() * stars.length)];
+                    
+                    if (ev.fleet.id !== fleet.id) {
+                      const star2: StarSystem = stars[Math.floor(Math.random() * stars.length)];
                   
-                    if (!secondTravelStartSent) {
-                      fleetsService.startTravel(fleet.id, star1.id, star2.id).subscribe(result => {
-                        expect(result).toBeTruthy();
-                      });
-                      secondTravelStartSent = true;
+                      if (!secondTravelStartSent) {
+                        fleetsService.startTravel(fleet.id, star1.id, star2.id).subscribe();
+                        secondTravelStartSent = true;
+                      }
                     }
+                    
                   });
 
                   visibilityEventsService.getVisibilityLostNotification().subscribe((event) => {
-                    if (secondTravelStartSent) {
-                      expect(event.starId).toEqual(star1.id);
-                      done();
+                    if (enemyTravelStartSent) {
+                      if (event.starId === star1.id) {
+                        apiService.request<FleetInfoDto[]>('get-fleets').subscribe(
+                          fleets => {
+                            expect(fleets.find(f => f.originId === event.starId ||  f.originId === event.starId)).toBeUndefined();
+                            done();
+                          }
+                        );
+                      }
                     }
                   });
 
@@ -556,6 +575,25 @@ describe('FleetsService', () => {
           }
         }
       );
+    });
+
+    registerLoginAndCreateCivilization(authService2, civilizationsService2, () => {
+        fleetsService2.isLoaded().pipe(first(l => l)).subscribe(
+          () => {
+            fleetsService2.getFleets().subscribe((fleets)=>{
+              const fleet: Fleet = fleets.values().next().value;
+              starIdSubject.subscribe(starId => {
+                if (!enemyTravelStartSent) {
+                  setTimeout(() => {
+                    fleetsService2.startTravel(fleet.id, fleet.origin.id, starId).subscribe();
+                  }, 200);
+                  
+                  enemyTravelStartSent = true;
+                }
+              });
+            });
+          }
+        );
     });
   });
 

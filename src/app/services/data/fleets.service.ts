@@ -97,7 +97,9 @@ export class FleetsService {
 
   private removeFleetById(fleetId: string) {
     const fleet = this.getFleetById(fleetId);
-    this.removeFleet(fleet);
+    if (fleet) {
+      this.removeFleet(fleet);
+    };
   }
 
   private removeFleet(fleet: Fleet) {
