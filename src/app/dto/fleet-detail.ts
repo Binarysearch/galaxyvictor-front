@@ -1,8 +1,8 @@
 import { FleetInfoDto } from './fleet-info';
-import { ShipInfoDto } from './ship-info';
+import { ShipDto } from './ship-dto';
 
 export interface FleetDetailDto extends FleetInfoDto {
 
-    ships: ShipInfoDto[];
+    ships: ShipDto[];
 
 }

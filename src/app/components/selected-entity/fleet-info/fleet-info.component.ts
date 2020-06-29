@@ -1,9 +1,9 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Fleet } from 'src/app/model/fleet';
-import { ShipsService } from 'src/app/services/data/getters/ships.service';
 import { Ship } from 'src/app/model/ship';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { ShipsService } from '../../../services/data/ships.service';
 
 @Component({
   selector: 'app-fleet-info',
@@ -43,8 +43,8 @@ export class FleetInfoComponent implements OnInit, OnDestroy {
   }
 
   private getShips() {
-    this.shipsService.getFleetDetail(this.fleet.id).subscribe(detail => {
-      this.ships = detail.ships;
+    this.shipsService.getFleetShips(this.fleet.id).subscribe(ships => {
+      this.ships = ships;
       const newShips = new Set(this.ships.map(s => s.id));
       if (this._fleet.unSelectedShips) {
         this._fleet.unSelectedShips.forEach(s => {
