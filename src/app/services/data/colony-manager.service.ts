@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ColonyInfoDto } from 'src/app/dto/colony-info';
+import { ColonyDto } from 'src/app/dto/colony-dto';
 import { Store } from './store';
 import { Colony } from 'src/app/model/colony';
 import { BuildingOrder } from 'src/app/model/building-order';
@@ -17,18 +17,19 @@ export class ColonyManagerService {
     private civilizationsService: CivilizationsService
   ) { }
 
-  public addColony(colony: ColonyInfoDto) {
+  public addColony(colony: ColonyDto) {
     this.addColonies([colony]);
   }
 
-  public addColonies(colonyDtos: ColonyInfoDto[]) {        
+  public addColonies(colonyDtos: ColonyDto[]) {        
     const colonies: Colony[] = colonyDtos.map(c => {
       const planet = this.planetsService.getPlanetById(c.planet);
       const colony = new Colony(
         c.id,
         planet, 
-        this.civilizationsService.getCivilizationById(c.civilizationId),
-        c.buildingOrder ? new BuildingOrder(c.buildingOrder.id) : null
+        this.civilizationsService.getCivilizationById(c.civilization),
+        null
+        //c.buildingOrder ? new BuildingOrder(c.buildingOrder.id) : null
       );
       planet.colony = colony;
       return colony;
@@ -41,7 +42,7 @@ export class ColonyManagerService {
     colony.planet.colony = undefined;
   }
 
-  public updateColony(colonyDto: ColonyInfoDto): void {
+  public updateColony(colonyDto: ColonyDto): void {
     const existing = this.store.getColonyById(colonyDto.id);
     if (!existing) {
       this.addColony(colonyDto);
@@ -51,10 +52,10 @@ export class ColonyManagerService {
   }
 
   
-  private updateExistingColony(existing: Colony, colonyDto: ColonyInfoDto) {
-    existing.civilization = this.civilizationsService.getCivilizationById(colonyDto.civilizationId);
+  private updateExistingColony(existing: Colony, colonyDto: ColonyDto) {
+    existing.civilization = this.civilizationsService.getCivilizationById(colonyDto.civilization);
 
-    existing.buildingOrder = (colonyDto.buildingOrder) ? new BuildingOrder(colonyDto.buildingOrder.id) : null;
+    //existing.buildingOrder = (colonyDto.buildingOrder) ? new BuildingOrder(colonyDto.buildingOrder.id) : null;
     
     existing.sendChanges();
   }

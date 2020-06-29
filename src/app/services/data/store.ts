@@ -70,10 +70,6 @@ export class Store {
     this.fleetsSubject.next(this.fleetsSubject.value);
   }
 
-  public getColonies(): Observable<Set<Colony>> {
-    return this.coloniesSubject.asObservable();
-  }
-
   public getStarSystems(): Observable<StarSystem[]> {
     return this.starsService.getStars();
   }

@@ -1,10 +1,10 @@
 import { FleetInfoDto } from './fleet-info';
 import { BuildingOrderDto } from './building-order';
-import { ColonyInfoDto } from './colony-info';
+import { ColonyDto } from './colony-dto';
 
 export interface FinishBuildingShipEvent {
 
     fleet: FleetInfoDto;
-    colony: ColonyInfoDto;
+    colony: ColonyDto;
     
 }

@@ -29,7 +29,7 @@ describe('ShipsService', () => {
 
   });
 
-  fit('should get fleet ships', (done) => {
+  it('should get fleet ships', (done) => {
     const authService = TestBed.get(AuthService);
     const civilizationsService = TestBed.get(CivilizationsService);
     const fleetsService: FleetsService = TestBed.get(FleetsService);

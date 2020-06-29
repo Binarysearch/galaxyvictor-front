@@ -1,6 +1,6 @@
 import { PlanetInfoDto } from "./planet-info";
 import { FleetInfoDto } from './fleet-info';
-import { ColonyInfoDto } from './colony-info';
+import { ColonyDto } from './colony-dto';
 
 export interface ExploreStarSystemEvent {
 
@@ -8,6 +8,6 @@ export interface ExploreStarSystemEvent {
     planets: PlanetInfoDto[];
     orbitingFleets: FleetInfoDto[];
     incomingFleets: FleetInfoDto[];
-    colonies: ColonyInfoDto[];
+    colonies: ColonyDto[];
 
 }

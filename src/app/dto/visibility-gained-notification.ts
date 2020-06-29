@@ -1,11 +1,11 @@
 import { FleetInfoDto } from './fleet-info';
-import { ColonyInfoDto } from './colony-info';
+import { ColonyDto } from './colony-dto';
 
 export interface VisibilityGainedNotificationDto {
 
 	starId: string;
     orbitingFleets: FleetInfoDto[];
     incomingFleets: FleetInfoDto[];
-    colonies: ColonyInfoDto[];
+    colonies: ColonyDto[];
 
 }

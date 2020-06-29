@@ -1,7 +1,7 @@
-import { ColonyInfoDto } from './colony-info';
+import { ColonyDto } from './colony-dto';
 
 export interface CreateBuildingOrderEvent {
     
-    colony: ColonyInfoDto;
+    colony: ColonyDto;
 
 }
