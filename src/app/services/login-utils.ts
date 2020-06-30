@@ -15,6 +15,7 @@ import { StarSystem } from '../model/star-system';
 import { first } from 'rxjs/operators';
 import { PlanetsService } from './data/planets.service';
 import { NotificationService } from './notification.service';
+import { ColoniesService } from './data/colonies.service';
 
 export function registerAndLogin(service: AuthService, callback: (user: string, password: string) => void) {
 
@@ -60,7 +61,7 @@ export function registerLoginAndCreateCivilization(authService: AuthService, civ
   });
 }
 
-export function quickStart(callback: (servicesAndData: {
+export interface ServicesAndData {
   credentials: { user: string; password: string; };
   civilization: Civilization;
   startingFleet: Fleet;
@@ -73,17 +74,24 @@ export function quickStart(callback: (servicesAndData: {
     fleetsService: FleetsService;
     planetsService: PlanetsService;
     notificationService: NotificationService;
+    coloniesService: ColoniesService;
   },
   getRandomStar: () => StarSystem
-}) => void) {
+}
+
+export function quickStart(callback: (servicesAndData: ServicesAndData) => void) {
   const apiService = createApiService();
   const notificationService: NotificationService = new NotificationService(apiService);
+  TestBed.get(LocalStorageService).deleteSavedToken();
   const authService = new AuthService(apiService, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
   const civilizationsService = new CivilizationsService(apiService, authService);
   const starsService: StarsService = new StarsService(apiService, authService);
   const fleetsService = new FleetsService(starsService, apiService, authService, civilizationsService, TestBed.get(TimeService), notificationService);
   const planetsService: PlanetsService = new PlanetsService(starsService, apiService, authService, civilizationsService);
+  const coloniesService: ColoniesService = new ColoniesService(apiService, authService, civilizationsService, planetsService, notificationService);
 
+  let done = false;
+  
   registerLoginAndCreateCivilization(authService, civilizationsService, (user, password, civilization) => {
 
     fleetsService.isLoaded().pipe(first(l => l)).subscribe(()=>{
@@ -99,25 +107,30 @@ export function quickStart(callback: (servicesAndData: {
             return star;
           }
 
-          callback({
-            credentials: {
-              user: user,
-              password: password
-            },
-            civilization: civilization,
-            startingFleet: fleet,
-            homeStar: fleet.destination,
-            services: {
-              apiService: apiService,
-              authService: authService,
-              civilizationsService: civilizationsService,
-              starsService: starsService,
-              fleetsService: fleetsService,
-              planetsService: planetsService,
-              notificationService: notificationService,
-            },
-            getRandomStar: getRandomStar
-          });
+          if (!done) {
+            done = true;
+            callback({
+              credentials: {
+                user: user,
+                password: password
+              },
+              civilization: civilization,
+              startingFleet: fleet,
+              homeStar: fleet.destination,
+              services: {
+                apiService: apiService,
+                authService: authService,
+                civilizationsService: civilizationsService,
+                starsService: starsService,
+                fleetsService: fleetsService,
+                planetsService: planetsService,
+                notificationService: notificationService,
+                coloniesService: coloniesService,
+              },
+              getRandomStar: getRandomStar
+            });
+          }
+          
         });
       });
     });

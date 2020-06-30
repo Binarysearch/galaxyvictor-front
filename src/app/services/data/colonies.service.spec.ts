@@ -6,9 +6,13 @@ import { LocalStorageService } from '../local-storage.service';
 import { config } from '../config';
 import { PIROS_API_SERVICE_CONFIG, ApiService } from '@piros/api';
 import { HttpClientModule } from '@angular/common/http';
-import { registerLoginAndCreateCivilization } from '../login-utils';
+import { registerLoginAndCreateCivilization, quickStart, ServicesAndData } from '../login-utils';
 
 import { ColoniesService } from './colonies.service';
+import { Observable } from 'rxjs';
+import { Fleet } from 'src/app/model/fleet';
+import { StarSystem } from 'src/app/model/star-system';
+import { first } from 'rxjs/operators';
 
 describe('ColoniesService', () => {
 
@@ -76,6 +80,36 @@ describe('ColoniesService', () => {
         }
       );
     });
+  });
+  
+  it('should get colonies from visible stars', (done) => {
+    
+    let travelSent = false;
+
+    quickStart((sd1) => {
+      
+        quickStart((sd2) => {
+  
+          const homeStar1 = sd1.homeStar;
+          const fleet2 = sd2.startingFleet;
+  
+          sd2.services.coloniesService.isLoaded().pipe(first(l => l)).subscribe(() => {
+            sd2.services.coloniesService.getColonies().subscribe(colonies => {
+              if (!travelSent) {
+                  travelSent = true;
+                  sd2.services.fleetsService.startTravel(fleet2.id, fleet2.origin.id, homeStar1.id).subscribe();
+                expect(colonies.size).toEqual(1);
+              } else {
+                expect(colonies.size).toEqual(2);
+                done();
+              }
+            });
+          });
+          
+        });
+        
+    });
+
   });
 
 });
