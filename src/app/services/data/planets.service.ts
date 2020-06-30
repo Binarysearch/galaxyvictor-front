@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, Subject } from 'rxjs';
 import { Planet, PlanetType, PlanetSize } from 'src/app/model/planet';
 import { PlanetInfoDto } from 'src/app/dto/planet-info';
 import { PLANET_TYPES, PLANET_SIZES } from 'src/app/galaxy-constants';
@@ -7,6 +7,8 @@ import { StarsService } from './stars.service';
 import { PirosApiService } from '@piros/api';
 import { AuthService, AuthStatus } from '../auth.service';
 import { CivilizationsService } from './civilizations.service';
+import { subscribeToNotifications } from '../channel-utils';
+import { ExploreStarNotificationDto } from 'src/app/dto/explore-star-notification';
 
 @Injectable({
   providedIn: 'root'
@@ -14,11 +16,12 @@ import { CivilizationsService } from './civilizations.service';
 export class PlanetsService {
 
   private planetMap: Map<string, Planet> = new Map();
-
   private planets: BehaviorSubject<Set<Planet>> = new BehaviorSubject(new Set());
 
   private unknownPlanet: Planet = new Planet('', PLANET_TYPES[0], PLANET_SIZES[0], 0, StarsService.unknownStarSystem);
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
+
+  private exploreStarNotificationSubject: Subject<ExploreStarNotificationDto> = new Subject();
 
   constructor(
     private starsService: StarsService,
@@ -42,6 +45,12 @@ export class PlanetsService {
         this.planets.next(new Set());
         this.loaded.next(false);
       }
+    });
+
+    subscribeToNotifications(this.api, 'explore-star-notifications', this.exploreStarNotificationSubject);
+
+    this.exploreStarNotificationSubject.subscribe((notification) => {
+      this.addPlanets(notification.planets.map(p => this.mapPlanetInfoToPlanet(p)));
     });
   }
 

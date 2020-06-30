@@ -23,7 +23,8 @@ export const config: PirosApiServiceConfig = {
           'end-travel-notifications',
           'delete-fleet-notifications',
           'visibility-gain-notifications',
-          'visibility-lost-notifications'
+          'visibility-lost-notifications',
+          'explore-star-notifications',
         ]
       }
     ]

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ExploreStarSystemEvent } from '../../dto/explore-star-system-event';
+import { ExploreStarNotificationDto } from '../../dto/explore-star-notification';
 import { FleetManagerService } from '../data/fleet-manager.service';
 import { ColonyManagerService } from '../data/colony-manager.service';
 import { EventService } from '../event.service';
@@ -19,8 +19,8 @@ export class ExploreStarSystemEventService {
     });
   }
 
-  private processEvent(event: ExploreStarSystemEvent) {
-    if (event.colonies && event.colonies.length > 0) {
+  private processEvent(event: ExploreStarNotificationDto) {
+    /*if (event.colonies && event.colonies.length > 0) {
       this.colonyManagerService.addColonies(event.colonies);
     }
     if (event.incomingFleets && event.incomingFleets.length > 0) {
@@ -28,7 +28,7 @@ export class ExploreStarSystemEventService {
     }
     if (event.orbitingFleets && event.orbitingFleets.length > 0) {
       this.fleetManagerService.updateFleets(event.orbitingFleets);
-    }
+    }*/
   }
 
 }

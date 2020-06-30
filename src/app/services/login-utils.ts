@@ -4,6 +4,16 @@ import { PirosApiService, ConnectorManagerService, IdGeneratorService, RequestSe
 import { config } from './config';
 import { HttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
+import { Civilization } from '../model/civilization';
+import { MapStateService } from './map-state.service';
+import { LocalStorageService } from './local-storage.service';
+import { StarsService } from './data/stars.service';
+import { TimeService } from './time.service';
+import { FleetsService } from './data/fleets.service';
+import { Fleet } from '../model/fleet';
+import { StarSystem } from '../model/star-system';
+import { first } from 'rxjs/operators';
+import { PlanetsService } from './data/planets.service';
 
 export function registerAndLogin(service: AuthService, callback: (user: string, password: string) => void) {
 
@@ -24,7 +34,7 @@ export function registerAndLogin(service: AuthService, callback: (user: string, 
 }
 
 
-export function registerLoginAndCreateCivilization(authService: AuthService, civilizationService: CivilizationsService, callback: (user: string, password: string) => void) {
+export function registerLoginAndCreateCivilization(authService: AuthService, civilizationService: CivilizationsService, callback: (user: string, password: string, civilization: Civilization) => void) {
 
   const user = 'user-' + Math.random();
   const civName = 'civilization-' + Math.random();
@@ -40,12 +50,73 @@ export function registerLoginAndCreateCivilization(authService: AuthService, civ
   const civSubscription = civilizationService.getCivilization().subscribe(civ => {
     if (civ) {
       civSubscription.unsubscribe();
-      callback(user, password);
+      callback(user, password, civ);
     }
   });
 
   authService.register(user, password).subscribe(() => {
     authService.login(user, password).subscribe();
+  });
+}
+
+export function quickStart(callback: (servicesAndData: {
+  credentials: { user: string; password: string; };
+  civilization: Civilization;
+  startingFleet: Fleet;
+  homeStar: StarSystem;
+  services: {
+    apiService: PirosApiService;
+    authService: AuthService;
+    civilizationsService: CivilizationsService;
+    starsService: StarsService;
+    fleetsService: FleetsService;
+    planetsService: PlanetsService;
+  },
+  getRandomStar: () => StarSystem
+}) => void) {
+  const apiService = createApiService();
+  const authService = new AuthService(apiService, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
+  const civilizationsService = new CivilizationsService(apiService, authService);
+  const starsService: StarsService = new StarsService(apiService, authService);
+  const fleetsService = new FleetsService(starsService, apiService, authService, civilizationsService, TestBed.get(TimeService));
+  const planetsService: PlanetsService = new PlanetsService(starsService, apiService, authService, civilizationsService);
+
+  registerLoginAndCreateCivilization(authService, civilizationsService, (user, password, civilization) => {
+
+    fleetsService.isLoaded().pipe(first(l => l)).subscribe(()=>{
+      fleetsService.getFleets().subscribe(fleetSet => {
+        const fleet: Fleet = fleetSet.values().next().value;
+
+        starsService.getStars().subscribe(stars => {
+          const getRandomStar = () => {
+            let star: StarSystem = stars[Math.floor(Math.random() * stars.length)];
+            while (star.id === fleet.destination.id) {
+              star = stars[Math.floor(Math.random() * stars.length)];
+            }
+            return star;
+          }
+
+          callback({
+            credentials: {
+              user: user,
+              password: password
+            },
+            civilization: civilization,
+            startingFleet: fleet,
+            homeStar: fleet.destination,
+            services: {
+              apiService: apiService,
+              authService: authService,
+              civilizationsService: civilizationsService,
+              starsService: starsService,
+              fleetsService: fleetsService,
+              planetsService: planetsService
+            },
+            getRandomStar: getRandomStar
+          });
+        });
+      });
+    });
   });
 }
 

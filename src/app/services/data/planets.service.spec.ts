@@ -5,7 +5,7 @@ import { config } from '../config';
 import { PIROS_API_SERVICE_CONFIG, ApiService } from '@piros/api';
 import { HttpClientModule } from '@angular/common/http';
 import { LocalStorageService } from '../local-storage.service';
-import { registerLoginAndCreateCivilization, createApiService } from '../login-utils';
+import { registerLoginAndCreateCivilization, createApiService, quickStart } from '../login-utils';
 import { CivilizationsService } from './civilizations.service';
 import { AuthService } from '../auth.service';
 import { MapStateService } from '../map-state.service';
@@ -123,6 +123,35 @@ describe('PlanetsService', () => {
 
     
 
+  });
+
+  it('should get planets from other stars when explore them', (done) => {
+    let traveled = false;
+
+    quickStart((sd) => {
+      sd.services.planetsService.getPlanets().subscribe(planets => {
+        if (traveled) {
+
+          planets.forEach(p => {
+            if (p.starSystem.id !== sd.homeStar.id) {
+              done();
+            }
+          });
+          
+        } else {
+
+          planets.forEach(p => {
+            expect(p.starSystem).toEqual(sd.homeStar);
+          });
+
+          sd.services.fleetsService.startTravel(sd.startingFleet.id, sd.homeStar.id, sd.getRandomStar().id).subscribe(
+            () => {
+              traveled = true;
+            }
+          );
+        }
+      });
+    });
   });
 });
 
