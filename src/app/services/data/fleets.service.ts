@@ -11,6 +11,7 @@ import { subscribeToNotifications } from '../channel-utils';
 import { StartTravelNotificationDto } from '../../dto/start-travel-notification';
 import { EndTravelNotificationDto } from '../../dto/end-travel-notification';
 import { DeleteFleetNotificationDto } from 'src/app/dto/delete-fleet-notification';
+import { NotificationService } from '../notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,17 +21,14 @@ export class FleetsService {
   private fleetMap: Map<string, Fleet> = new Map();
   private fleets: BehaviorSubject<Set<Fleet>> = new BehaviorSubject(new Set());
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
-
-  private startTravelNotificationSubject: Subject<StartTravelNotificationDto> = new Subject();
-  private endTravelNotificationSubject: Subject<EndTravelNotificationDto> = new Subject();
-  private deleteFleetNotificationSubject: Subject<DeleteFleetNotificationDto> = new Subject();
   
   constructor(
     private starsService: StarsService,
     private api: PirosApiService,
     private authService: AuthService,
     private civilizationsService: CivilizationsService,
-    private timeService: TimeService
+    private timeService: TimeService,
+    private notificationService: NotificationService
   ) {
     
     this.authService.getStatus().subscribe(status => {
@@ -51,32 +49,16 @@ export class FleetsService {
       }
     });
 
-    subscribeToNotifications(this.api, 'start-travel-notifications', this.startTravelNotificationSubject);
-    subscribeToNotifications(this.api, 'end-travel-notifications', this.endTravelNotificationSubject);
-    subscribeToNotifications(this.api, 'delete-fleet-notifications', this.deleteFleetNotificationSubject);
-
-    this.startTravelNotificationSubject.subscribe(notification => {
+    this.notificationService.getStartTravelEvents().subscribe(notification => {
       this.updateFleet(notification.fleet);
     });
-    this.endTravelNotificationSubject.subscribe(notification => {
+    this.notificationService.getEndTravelEvents().subscribe(notification => {
       this.updateFleet(notification.fleet);
     });
-    this.deleteFleetNotificationSubject.subscribe(notification => {
+    this.notificationService.getDeleteFleetEvents().subscribe(notification => {
       this.removeFleetById(notification.fleetId);
     });
 
-  }
-
-  public getStartTravelEvents(): Observable<StartTravelNotificationDto> {
-    return this.startTravelNotificationSubject.asObservable();
-  }
-
-  public getEndTravelEvents(): Observable<EndTravelNotificationDto> {
-    return this.endTravelNotificationSubject.asObservable();
-  }
-
-  public getDeleteFleetEvents(): Observable<DeleteFleetNotificationDto> {
-    return this.deleteFleetNotificationSubject.asObservable();
   }
 
   public isLoaded(): Observable<boolean> {

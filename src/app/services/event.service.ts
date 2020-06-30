@@ -6,7 +6,6 @@ import { VisibilityGainedNotificationDto } from '../dto/visibility-gained-notifi
 import { UpdateFleetEvent } from '../dto/update-fleet-event';
 import { StartTravelNotificationDto } from '../dto/start-travel-notification';
 import { FinishBuildingShipEvent } from '../dto/finish-building-ship-event';
-import { ExploreStarNotificationDto } from '../dto/explore-star-notification';
 import { EndTravelNotificationDto } from '../dto/end-travel-notification';
 import { DeleteFleetNotificationDto } from '../dto/delete-fleet-notification';
 import { CreateBuildingOrderEvent } from '../dto/create-building-order-event';
@@ -64,10 +63,6 @@ export class EventService {
     return this.getSubject('finish-building-ship-events').asObservable();
   }
 
-  public getExploreStarSystemEvents(): Observable<ExploreStarNotificationDto> {
-    return this.getSubject('explore-star-system-events').asObservable();
-  }
-
   public getEndTravelEvents(): Observable<EndTravelNotificationDto> {
     return this.getSubject('end-travel-events').asObservable();
   }
@@ -89,7 +84,7 @@ export class EventService {
   }
 
   private subscribeAndRedirectEvents(channel: string) {
-    this.api.connectToChannel<ExploreStarNotificationDto>(channel)
+    this.api.connectToChannel<any>(channel)
     .observable.subscribe(event => {
       this.getSubject(channel).next(event);
     });

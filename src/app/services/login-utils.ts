@@ -14,6 +14,7 @@ import { Fleet } from '../model/fleet';
 import { StarSystem } from '../model/star-system';
 import { first } from 'rxjs/operators';
 import { PlanetsService } from './data/planets.service';
+import { NotificationService } from './notification.service';
 
 export function registerAndLogin(service: AuthService, callback: (user: string, password: string) => void) {
 
@@ -71,14 +72,16 @@ export function quickStart(callback: (servicesAndData: {
     starsService: StarsService;
     fleetsService: FleetsService;
     planetsService: PlanetsService;
+    notificationService: NotificationService;
   },
   getRandomStar: () => StarSystem
 }) => void) {
   const apiService = createApiService();
+  const notificationService: NotificationService = new NotificationService(apiService);
   const authService = new AuthService(apiService, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
   const civilizationsService = new CivilizationsService(apiService, authService);
   const starsService: StarsService = new StarsService(apiService, authService);
-  const fleetsService = new FleetsService(starsService, apiService, authService, civilizationsService, TestBed.get(TimeService));
+  const fleetsService = new FleetsService(starsService, apiService, authService, civilizationsService, TestBed.get(TimeService), notificationService);
   const planetsService: PlanetsService = new PlanetsService(starsService, apiService, authService, civilizationsService);
 
   registerLoginAndCreateCivilization(authService, civilizationsService, (user, password, civilization) => {
@@ -110,7 +113,8 @@ export function quickStart(callback: (servicesAndData: {
               civilizationsService: civilizationsService,
               starsService: starsService,
               fleetsService: fleetsService,
-              planetsService: planetsService
+              planetsService: planetsService,
+              notificationService: notificationService,
             },
             getRandomStar: getRandomStar
           });

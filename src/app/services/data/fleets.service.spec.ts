@@ -16,8 +16,8 @@ import { StarSystem } from '../../model/star-system';
 import { MapStateService } from '../map-state.service';
 import { TimeService } from '../time.service';
 import { PlanetsService } from './planets.service';
-import { VisibilityEventsService } from '../events/visibility-events.service';
 import { FleetInfoDto } from '../../dto/fleet-info';
+import { NotificationService } from '../notification.service';
 
 describe('FleetsService', () => {
 
@@ -161,10 +161,11 @@ describe('FleetsService', () => {
     const starsService: StarsService = TestBed.get(StarsService);
 
     const apiService2 = createApiService();
+    const notificationService: NotificationService = new NotificationService(apiService2);
     const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
     const civilizationsService2 = new CivilizationsService(apiService2, authService2);
     const starsService2: StarsService = new StarsService(apiService2, authService2);
-    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService));
+    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService), notificationService);
     const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2);
 
     let travelStartSent = false;
@@ -231,11 +232,11 @@ describe('FleetsService', () => {
               secondHomeStar.next(homeStar);
               secondHomeStar.complete();
 
-              fleetsService2.getStartTravelEvents().subscribe(()=>{
+              notificationService.getStartTravelEvents().subscribe(()=>{
                 fail('No deberia recibir el evento de inicio de viaje en el segundo usuario');
               });
 
-              fleetsService2.getEndTravelEvents().subscribe(()=>{
+              notificationService.getEndTravelEvents().subscribe(()=>{
                 fail('No deberia recibir el evento de fin de viaje en el segundo usuario');
               });
 
@@ -279,10 +280,11 @@ describe('FleetsService', () => {
     const starsService: StarsService = TestBed.get(StarsService);
 
     const apiService2 = createApiService();
+    const notificationService2: NotificationService = new NotificationService(apiService2);
     const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
     const civilizationsService2 = new CivilizationsService(apiService2, authService2);
     const starsService2: StarsService = new StarsService(apiService2, authService2);
-    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService));
+    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService), notificationService2);
     const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2);
 
     let travelStartSent = false;
@@ -333,11 +335,11 @@ describe('FleetsService', () => {
               
 
               let startTravelEventReceived = false;
-              fleetsService2.getStartTravelEvents().subscribe(()=>{
+              notificationService2.getStartTravelEvents().subscribe(()=>{
                 startTravelEventReceived = true;
               });
 
-              fleetsService2.getEndTravelEvents().subscribe(()=>{
+              notificationService2.getEndTravelEvents().subscribe(()=>{
                 if (!startTravelEventReceived) {
                   fail('No se ha recibido el evento de inicio de viaje');
                 }
@@ -360,12 +362,14 @@ describe('FleetsService', () => {
     const civilizationsService = TestBed.get(CivilizationsService);
     const fleetsService: FleetsService = TestBed.get(FleetsService);
     const starsService: StarsService = TestBed.get(StarsService);
+    const notificationService: NotificationService = TestBed.get(NotificationService);
 
     const apiService2 = createApiService();
+    const notificationService2: NotificationService = new NotificationService(apiService2);
     const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
     const civilizationsService2 = new CivilizationsService(apiService2, authService2);
     const starsService2: StarsService = new StarsService(apiService2, authService2);
-    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService));
+    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService), notificationService2);
     const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2);
 
     let travelStartSent = false;
@@ -386,7 +390,7 @@ describe('FleetsService', () => {
                 fleetId = fleet.id;
                 secondHomeStar.subscribe(otherPlayerHomeStar => {
 
-                  fleetsService.getEndTravelEvents().subscribe((ev) => {
+                  notificationService.getEndTravelEvents().subscribe((ev) => {
                     if (ev.fleet.originId) {
                       starsService.getStars().subscribe(stars => {
                   
@@ -426,12 +430,12 @@ describe('FleetsService', () => {
               const homeStar = planetsService2.getPlanetById(civ.homeworldId).starSystem;
               
               let enemyFleet: Fleet;
-              fleetsService2.getEndTravelEvents().subscribe(() => {
+              notificationService2.getEndTravelEvents().subscribe(() => {
                 enemyFleet = fleetsService2.getFleetById(fleetId);
                 expect(enemyFleet).toBeDefined();
               });
 
-              fleetsService2.getDeleteFleetEvents().subscribe((event) => {
+              notificationService2.getDeleteFleetEvents().subscribe((event) => {
                 expect(event.fleetId).toEqual(fleetId);
 
                 setTimeout(() => {
@@ -463,7 +467,7 @@ describe('FleetsService', () => {
     const civilizationsService = TestBed.get(CivilizationsService);
     const fleetsService: FleetsService = TestBed.get(FleetsService);
     const starsService: StarsService = TestBed.get(StarsService);
-    const visibilityEventsService: VisibilityEventsService = TestBed.get(VisibilityEventsService);
+    const notificationService: NotificationService = TestBed.get(NotificationService);
 
     let travelStartSent = false;
 
@@ -489,7 +493,7 @@ describe('FleetsService', () => {
                     travelStartSent = true;
                   }
 
-                  visibilityEventsService.getVisibilityGainNotification().subscribe((event) => {
+                  notificationService.getVisibilityGainNotification().subscribe((event) => {
                     expect(event.starId).toEqual(star.id);
                     done();
                   });
@@ -508,13 +512,14 @@ describe('FleetsService', () => {
     const civilizationsService = TestBed.get(CivilizationsService);
     const fleetsService: FleetsService = TestBed.get(FleetsService);
     const starsService: StarsService = TestBed.get(StarsService);
-    const visibilityEventsService: VisibilityEventsService = TestBed.get(VisibilityEventsService);
+    const notificationService: NotificationService = TestBed.get(NotificationService);
 
     const apiService2 = createApiService();
+    const notificationService2: NotificationService = new NotificationService(apiService2);
     const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
     const civilizationsService2 = new CivilizationsService(apiService2, authService2);
     const starsService2: StarsService = new StarsService(apiService2, authService2);
-    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService));
+    const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService), notificationService2);
 
     let firstTravelStartSent = false;
     let secondTravelStartSent = false;
@@ -543,7 +548,7 @@ describe('FleetsService', () => {
                     firstTravelStartSent = true;
                   }
 
-                  fleetsService.getEndTravelEvents().subscribe((ev) => {
+                  notificationService.getEndTravelEvents().subscribe((ev) => {
                     
                     if (ev.fleet.id !== fleet.id) {
                       const star2: StarSystem = stars[Math.floor(Math.random() * stars.length)];
@@ -556,7 +561,7 @@ describe('FleetsService', () => {
                     
                   });
 
-                  visibilityEventsService.getVisibilityLostNotification().subscribe((event) => {
+                  notificationService.getVisibilityLostNotification().subscribe((event) => {
                     if (enemyTravelStartSent) {
                       if (event.starId === star1.id) {
                         apiService.request<FleetInfoDto[]>('get-fleets').subscribe(
@@ -602,7 +607,7 @@ describe('FleetsService', () => {
     const civilizationsService = TestBed.get(CivilizationsService);
     const fleetsService: FleetsService = TestBed.get(FleetsService);
     const starsService: StarsService = TestBed.get(StarsService);
-    const visibilityEventsService: VisibilityEventsService = TestBed.get(VisibilityEventsService);
+    const notificationService: NotificationService = TestBed.get(NotificationService);
 
     let firstTravelStartSent = false;
 
@@ -627,11 +632,11 @@ describe('FleetsService', () => {
                     firstTravelStartSent = true;
                   }
 
-                  visibilityEventsService.getVisibilityLostNotification().subscribe((event) => {
+                  notificationService.getVisibilityLostNotification().subscribe((event) => {
                     fail('El usuario no deberia perder la visibilidad en el sistema');
                   });
 
-                  fleetsService.getEndTravelEvents().subscribe(() => {
+                  notificationService.getEndTravelEvents().subscribe(() => {
                     setTimeout(() => {
                       done();
                     }, 200);
