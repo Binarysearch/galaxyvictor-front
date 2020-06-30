@@ -15,6 +15,7 @@ export const config: PirosApiServiceConfig = {
           'get-fleet-ships',
           'get-visible-colonies',
           'get-stars-with-presence',
+          'get-explored-stars',
         ],
         channels: [
           'create-civilization',

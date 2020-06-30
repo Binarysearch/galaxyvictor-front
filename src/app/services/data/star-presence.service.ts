@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, forkJoin } from 'rxjs';
 import { AuthStatus, AuthService } from '../auth.service';
 import { PirosApiService } from '@piros/api';
 import { CivilizationsService } from './civilizations.service';
@@ -10,6 +10,7 @@ import { CivilizationsService } from './civilizations.service';
 export class StarPresenceService {
 
   private starsWithPresenceIds: BehaviorSubject<Set<string>> = new BehaviorSubject(new Set());
+  private exploredStars: BehaviorSubject<Set<string>> = new BehaviorSubject(new Set());
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
@@ -22,11 +23,21 @@ export class StarPresenceService {
       if (status === AuthStatus.SESSION_STARTED) {
         this.civilizationsService.getCivilization().subscribe(civilization => {
           if (civilization) {
-            this.api.request<string[]>('get-stars-with-presence').subscribe(
-              starIds => {
-                const idSet: Set<string> = new Set();
-                starIds.forEach(id => idSet.add(id));
-                this.starsWithPresenceIds.next(idSet);
+            forkJoin(
+              this.api.request<string[]>('get-stars-with-presence'),
+              this.api.request<string[]>('get-explored-stars')
+            ).subscribe(
+              results => {
+                const starIds = results[0];
+                const starIdSet: Set<string> = new Set();
+                starIds.forEach(id => starIdSet.add(id));
+                this.starsWithPresenceIds.next(starIdSet);
+
+                const exploredStars = results[1];
+                const exploredStarIdSet: Set<string> = new Set();
+                exploredStars.forEach(id => exploredStarIdSet.add(id));
+                this.exploredStars.next(exploredStarIdSet);
+
                 this.loaded.next(true);
               }
             );
@@ -42,6 +53,14 @@ export class StarPresenceService {
   public isLoaded(): Observable<boolean> {
     return this.loaded.asObservable();
   }
+
+  public getExploredStars(): Observable<Set<string>> {
+    return this.exploredStars.asObservable();
+  }
+
+  public isStarExplored(id: string): boolean {
+    return this.exploredStars.value.has(id);
+  } 
 
   public getStarsWithPresence(): Observable<Set<string>> {
     return this.starsWithPresenceIds.asObservable();

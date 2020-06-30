@@ -57,7 +57,7 @@ describe('StarPresenceService', () => {
     });
   });
 
-  fit('should get explored stars when login', (done) => {
+  it('should get explored stars when login', (done) => {
     const authService = TestBed.get(AuthService);
     const civilizationsService = TestBed.get(CivilizationsService);
     const starsService: StarsService = TestBed.get(StarsService);
