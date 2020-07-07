@@ -16,6 +16,7 @@ export const config: PirosApiServiceConfig = {
           'get-visible-colonies',
           'get-stars-with-presence',
           'get-explored-stars',
+          'create-colony',
         ],
         channels: [
           'create-civilization',
@@ -25,6 +26,7 @@ export const config: PirosApiServiceConfig = {
           'visibility-gain-notifications',
           'visibility-lost-notifications',
           'explore-star-notifications',
+          'create-colony-notifications',
         ]
       }
     ]

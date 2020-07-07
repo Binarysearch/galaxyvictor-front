@@ -53,7 +53,7 @@ describe('ColoniesService', () => {
       );
     });
   });
-  
+
   it('should get colonies by id', (done) => {
     const authService = TestBed.get(AuthService);
     const civilizationsService: CivilizationsService = TestBed.get(CivilizationsService);
@@ -81,33 +81,84 @@ describe('ColoniesService', () => {
       );
     });
   });
-  
+
   it('should get colonies from visible stars', (done) => {
-    
+
     let travelSent = false;
 
     quickStart((sd1) => {
-      
-        quickStart((sd2) => {
-  
-          const homeStar1 = sd1.homeStar;
-          const fleet2 = sd2.startingFleet;
-  
-          sd2.services.coloniesService.isLoaded().pipe(first(l => l)).subscribe(() => {
-            sd2.services.coloniesService.getColonies().subscribe(colonies => {
-              if (!travelSent) {
-                  travelSent = true;
-                  sd2.services.fleetsService.startTravel(fleet2.id, fleet2.origin.id, homeStar1.id).subscribe();
-                expect(colonies.size).toEqual(1);
-              } else {
-                expect(colonies.size).toEqual(2);
-                done();
-              }
-            });
+
+      quickStart((sd2) => {
+
+        const homeStar1 = sd1.homeStar;
+        const fleet2 = sd2.startingFleet;
+
+        sd2.services.coloniesService.isLoaded().pipe(first(l => l)).subscribe(() => {
+          sd2.services.coloniesService.getColonies().subscribe(colonies => {
+            if (!travelSent) {
+              travelSent = true;
+              sd2.services.fleetsService.startTravel(fleet2.id, fleet2.origin.id, homeStar1.id).subscribe();
+              expect(colonies.size).toEqual(1);
+            } else {
+              expect(colonies.size).toEqual(2);
+              done();
+            }
           });
-          
         });
-        
+
+      });
+
+    });
+
+  });
+
+  fit('should create colony', (done) => {
+
+    let travelSent = false;
+    let colonyCreated = false;
+
+    quickStart((sd) => {
+      const starToCreateColony = sd.getRandomStar();
+      const fleet = sd.startingFleet;
+
+      //viajar estrella aleatoria
+      if (!travelSent) {
+        sd.services.fleetsService.startTravel(fleet.id, fleet.origin.id, starToCreateColony.id).subscribe();
+        travelSent = true;
+      }
+
+      //crear colonia en planeta nuevo
+      sd.services.planetsService.getPlanets().subscribe(planets => {
+        if (travelSent && !colonyCreated) {
+          const planetToCreateColony = Array.from(planets).find(p => p.starSystem.id === starToCreateColony.id);
+          if (planetToCreateColony) {
+
+            sd.services.coloniesService.createColony(planetToCreateColony.id).subscribe(result => {
+              expect(result).toBeTruthy();
+            });
+            colonyCreated = true;
+
+            sd.services.notificationService.getCreateColonyNotification().subscribe(notification => {
+              expect(notification.planet).toEqual(planetToCreateColony.id);
+            });
+          }
+        }
+      });
+
+      //comprobar que se  ha creado la colonia
+      sd.services.coloniesService.isLoaded().subscribe(loaded => {
+        if (loaded) {
+          sd.services.coloniesService.getColonies().subscribe(colonies => {
+            if (!colonyCreated) {
+              expect(colonies.size).toEqual(1);
+            } else {
+              expect(colonies.size).toEqual(2);
+              done();
+            }
+          });
+        }
+      });
+
     });
 
   });

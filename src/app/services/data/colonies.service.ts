@@ -48,7 +48,13 @@ export class ColoniesService {
     });
 
     this.notificationService.getVisibilityGainNotification().subscribe(notificaton => {
-      this.addColonies(notificaton.colonies.map(c => this.mapColonyDtoToColony(c)));
+      if (notificaton.colonies.length > 0) {
+        this.addColonies(notificaton.colonies.map(c => this.mapColonyDtoToColony(c)));
+      }
+    });
+
+    this.notificationService.getCreateColonyNotification().subscribe(notification => {
+      this.addColonies([this.mapColonyDtoToColony(notification)]);
     });
 
   }
@@ -63,6 +69,10 @@ export class ColoniesService {
 
   public getColonyById(id: string): Colony {
     return this.coloniesMap.get(id);
+  }
+
+  public createColony(planetId: string): Observable<boolean> {
+    return this.api.request<boolean>('create-colony', planetId);
   }
 
   private addColonies(colonies: Colony[]): void {
