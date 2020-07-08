@@ -112,7 +112,7 @@ describe('ColoniesService', () => {
 
   });
 
-  fit('should create colony', (done) => {
+  it('should create colony', (done) => {
 
     let travelSent = false;
     let colonyCreated = false;
@@ -159,6 +159,69 @@ describe('ColoniesService', () => {
         }
       });
 
+    });
+
+  });
+
+  it('should see colonies when visibility gain', (done) => {
+
+    let travelSent = false;
+    let travelFinished = false;
+    let travel2Sent = false;
+    let travel2Finished = false;
+    let colonyCreated = false;
+
+    quickStart((sd) => {
+      quickStart((sd2) => {
+        const starToCreateColony = sd.getRandomStar();
+        const fleet = sd.startingFleet;
+        const fleet2 = sd2.startingFleet;
+
+        sd.services.notificationService.getEndTravelEvents().subscribe(() => {
+          travelFinished = true;
+        });
+
+        //viajar estrella aleatoria
+        if (!travelSent) {
+          sd.services.fleetsService.startTravel(fleet.id, fleet.origin.id, starToCreateColony.id).subscribe();
+          travelSent = true;
+        }
+
+        //crear colonia en planeta nuevo
+        sd.services.planetsService.getPlanets().subscribe(planets => {
+          if (travelFinished && !colonyCreated) {
+            const planetToCreateColony = Array.from(planets).find(p => p.starSystem.id === starToCreateColony.id);
+            if (travelFinished) {
+              sd.services.coloniesService.createColony(planetToCreateColony.id).subscribe();
+              colonyCreated = true;
+            }
+          }
+        });
+
+
+        //comprobar la visibilidad la colonia en la civilizacion 2
+        sd2.services.coloniesService.isLoaded().subscribe(loaded => {
+          if (loaded) {
+            sd2.services.coloniesService.getColonies().subscribe(colonies => {
+              if (!travel2Finished) {
+                expect(colonies.size).toEqual(1);
+              } else {
+                expect(colonies.size).toEqual(2);
+                done();
+              }
+            });
+          }
+        });
+        
+        sd2.services.notificationService.getEndTravelEvents().subscribe(() => {
+          travel2Finished = true;
+        });
+        if (!travel2Sent) {
+          sd2.services.fleetsService.startTravel(fleet2.id, fleet2.origin.id, starToCreateColony.id).subscribe();
+          travel2Sent = true;
+        }
+
+      });
     });
 
   });
