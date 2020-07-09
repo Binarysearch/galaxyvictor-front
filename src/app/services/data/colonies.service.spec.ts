@@ -198,6 +198,69 @@ describe('ColoniesService', () => {
           }
         });
 
+        sd.services.notificationService.getCreateColonyNotification().subscribe(()=>{
+          //comprobar la visibilidad la colonia en la civilizacion 2
+          sd2.services.coloniesService.getColonies().subscribe(colonies => {
+            if (!travel2Finished) {
+              expect(colonies.size).toEqual(1);
+
+              if (!travel2Sent) {
+                sd2.services.fleetsService.startTravel(fleet2.id, fleet2.origin.id, starToCreateColony.id).subscribe();
+                travel2Sent = true;
+              }
+            } else {
+              expect(colonies.size).toEqual(2);
+              done();
+            }
+          });
+
+          sd2.services.notificationService.getEndTravelEvents().subscribe((ev) => {
+            travel2Finished = true;
+          });
+        });
+
+      });
+    });
+
+  });
+
+  it('should stop seeing colonies when visibility lost', (done) => {
+
+    let travelSent = false;
+    let travelFinished = false;
+    let travel2Sent = false;
+    let travel2Finished = false;
+    let travel3Sent = false;
+    let colonyCreated = false;
+
+    quickStart((sd) => {
+      quickStart((sd2) => {
+        const starToCreateColony = sd.getRandomStar();
+        const randomStar = sd2.getRandomStar();
+        const fleet = sd.startingFleet;
+        const fleet2 = sd2.startingFleet;
+
+        sd.services.notificationService.getEndTravelEvents().subscribe(() => {
+          travelFinished = true;
+        });
+
+        //viajar estrella aleatoria
+        if (!travelSent) {
+          sd.services.fleetsService.startTravel(fleet.id, fleet.origin.id, starToCreateColony.id).subscribe();
+          travelSent = true;
+        }
+
+        //crear colonia en planeta nuevo
+        sd.services.planetsService.getPlanets().subscribe(planets => {
+          if (travelFinished && !colonyCreated) {
+            const planetToCreateColony = Array.from(planets).find(p => p.starSystem.id === starToCreateColony.id);
+            if (travelFinished) {
+              sd.services.coloniesService.createColony(planetToCreateColony.id).subscribe();
+              colonyCreated = true;
+            }
+          }
+        });
+
 
         //comprobar la visibilidad la colonia en la civilizacion 2
         sd2.services.coloniesService.isLoaded().subscribe(loaded => {
@@ -205,17 +268,24 @@ describe('ColoniesService', () => {
             sd2.services.coloniesService.getColonies().subscribe(colonies => {
               if (!travel2Finished) {
                 expect(colonies.size).toEqual(1);
-              } else {
+              } else if (!travel3Sent) {
                 expect(colonies.size).toEqual(2);
+                sd2.services.fleetsService.startTravel(fleet2.id, starToCreateColony.id, randomStar.id).subscribe();
+                travel3Sent = true;
+              } else {
+                expect(colonies.size).toEqual(1);
                 done();
               }
             });
           }
         });
         
-        sd2.services.notificationService.getEndTravelEvents().subscribe(() => {
-          travel2Finished = true;
+        sd2.services.notificationService.getEndTravelEvents().subscribe((ev) => {
+          if (ev.fleet.destinationId === starToCreateColony.id) {
+            travel2Finished = true;
+          }
         });
+
         if (!travel2Sent) {
           sd2.services.fleetsService.startTravel(fleet2.id, fleet2.origin.id, starToCreateColony.id).subscribe();
           travel2Sent = true;

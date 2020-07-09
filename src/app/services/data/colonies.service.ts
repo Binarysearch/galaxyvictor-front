@@ -53,6 +53,20 @@ export class ColoniesService {
       }
     });
 
+    this.notificationService.getVisibilityLostNotification().subscribe(notificaton => {
+      const colonies: Set<Colony> = new Set();
+
+      this.colonies.value.forEach(c => {
+        if (c.planet.starSystem.id !== notificaton.starId) {
+          colonies.add(c);
+        } else {
+          this.coloniesMap.delete(c.id);
+        }
+      });
+
+      this.colonies.next(colonies);
+    });
+
     this.notificationService.getCreateColonyNotification().subscribe(notification => {
       this.addColonies([this.mapColonyDtoToColony(notification)]);
     });
@@ -77,6 +91,13 @@ export class ColoniesService {
 
   private addColonies(colonies: Colony[]): void {
     colonies.forEach(c => {
+
+      const existingColony = this.coloniesMap.get(c.id);
+      if (existingColony) {
+        this.coloniesMap.delete(c.id);
+        this.colonies.value.delete(existingColony);
+      }
+
       this.coloniesMap.set(c.id, c);
       this.colonies.value.add(c);
 
