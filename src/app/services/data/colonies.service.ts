@@ -60,7 +60,7 @@ export class ColoniesService {
         if (c.planet.starSystem.id !== notificaton.starId) {
           colonies.add(c);
         } else {
-          this.coloniesMap.delete(c.id);
+          this.deleteColony(c);
         }
       });
 
@@ -94,8 +94,7 @@ export class ColoniesService {
 
       const existingColony = this.coloniesMap.get(c.id);
       if (existingColony) {
-        this.coloniesMap.delete(c.id);
-        this.colonies.value.delete(existingColony);
+        this.deleteColony(existingColony);
       }
 
       this.coloniesMap.set(c.id, c);
@@ -104,6 +103,12 @@ export class ColoniesService {
       c.planet.colony = c;
     });
     this.colonies.next(this.colonies.value);
+  }
+
+  private deleteColony(c: Colony) {
+    c.planet.colony = null;
+    this.coloniesMap.delete(c.id);
+    this.colonies.value.delete(c);
   }
 
   private mapColonyDtoToColony(dto: ColonyDto): Colony {

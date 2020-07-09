@@ -13,6 +13,7 @@ import { Observable } from 'rxjs';
 import { Fleet } from 'src/app/model/fleet';
 import { StarSystem } from 'src/app/model/star-system';
 import { first } from 'rxjs/operators';
+import { Colony } from 'src/app/model/colony';
 
 describe('ColoniesService', () => {
 
@@ -261,6 +262,7 @@ describe('ColoniesService', () => {
           }
         });
 
+        let colony: Colony;
 
         //comprobar la visibilidad la colonia en la civilizacion 2
         sd2.services.coloniesService.isLoaded().subscribe(loaded => {
@@ -270,10 +272,12 @@ describe('ColoniesService', () => {
                 expect(colonies.size).toEqual(1);
               } else if (!travel3Sent) {
                 expect(colonies.size).toEqual(2);
+                colony = Array.from(colonies).find(c => c.planet.starSystem.id !== sd2.homeStar.id);
                 sd2.services.fleetsService.startTravel(fleet2.id, starToCreateColony.id, randomStar.id).subscribe();
                 travel3Sent = true;
               } else {
                 expect(colonies.size).toEqual(1);
+                expect(colony.planet.colony).toBeNull();
                 done();
               }
             });
