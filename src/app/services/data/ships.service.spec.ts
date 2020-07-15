@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { ShipsService } from './ships.service';
 import { HttpClientModule } from '@angular/common/http';
-import { ApiService, PIROS_API_SERVICE_CONFIG } from '@piros/api';
+import { ApiService, PIROS_API_SERVICE_CONFIG, PirosApiService } from '@piros/api';
 import { config } from '../config';
 import { LocalStorageService } from '../local-storage.service';
 import { AuthService } from '../auth.service';
@@ -13,7 +13,7 @@ import { registerLoginAndCreateCivilization } from '../login-utils';
 
 describe('ShipsService', () => {
   
-  beforeEach(() => {
+  beforeEach((done) => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientModule
@@ -23,6 +23,7 @@ describe('ShipsService', () => {
         { provide: PIROS_API_SERVICE_CONFIG, useValue: config }
       ]
     });
+    TestBed.get(PirosApiService).post('civilizations.restore-state', '').subscribe(() => done());
 
     const localStorageService: LocalStorageService = TestBed.get(LocalStorageService);
     localStorageService.deleteSavedToken();

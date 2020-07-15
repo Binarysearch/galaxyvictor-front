@@ -21,7 +21,7 @@ import { NotificationService } from '../notification.service';
 
 describe('FleetsService', () => {
 
-  beforeEach(() => {
+  beforeEach((done) => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientModule
@@ -31,6 +31,8 @@ describe('FleetsService', () => {
         { provide: PIROS_API_SERVICE_CONFIG, useValue: config }
       ]
     });
+
+    TestBed.get(PirosApiService).post('civilizations.restore-state', '').subscribe(() => done());
 
     const localStorageService: LocalStorageService = TestBed.get(LocalStorageService);
     localStorageService.deleteSavedToken();

@@ -4,7 +4,7 @@ import { CivilizationsService } from './civilizations.service';
 import { AuthService } from '../auth.service';
 import { LocalStorageService } from '../local-storage.service';
 import { config } from '../config';
-import { PIROS_API_SERVICE_CONFIG, ApiService } from '@piros/api';
+import { PIROS_API_SERVICE_CONFIG, ApiService, PirosApiService } from '@piros/api';
 import { HttpClientModule } from '@angular/common/http';
 import { registerLoginAndCreateCivilization, quickStart, ServicesAndData } from '../login-utils';
 
@@ -17,7 +17,7 @@ import { Colony } from 'src/app/model/colony';
 
 describe('ColoniesService', () => {
 
-  beforeEach(() => {
+  beforeEach((done) => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientModule
@@ -27,6 +27,7 @@ describe('ColoniesService', () => {
         { provide: PIROS_API_SERVICE_CONFIG, useValue: config }
       ]
     });
+    TestBed.get(PirosApiService).post('civilizations.restore-state', '').subscribe(() => done());
 
     const localStorageService: LocalStorageService = TestBed.get(LocalStorageService);
     localStorageService.deleteSavedToken();

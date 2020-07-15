@@ -12,7 +12,7 @@ import { MapStateService } from '../map-state.service';
 
 describe('CivilizationsService', () => {
 
-  beforeEach(() => {
+  beforeEach((done) => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientModule
@@ -22,6 +22,8 @@ describe('CivilizationsService', () => {
         { provide: PIROS_API_SERVICE_CONFIG, useValue: config }
       ]
     });
+    
+    TestBed.get(PirosApiService).post('civilizations.restore-state', '').subscribe(() => done());
 
     const localStorageService: LocalStorageService = TestBed.get(LocalStorageService);
     localStorageService.deleteSavedToken();
@@ -213,7 +215,7 @@ describe('CivilizationsService', () => {
 
   });
 
-  it('should get player civilizations by id', (done) => {
+  it('should get player civiliz ations by id', (done) => {
     const authService = TestBed.get(AuthService);
     const civilizationsService: CivilizationsService = TestBed.get(CivilizationsService);
     
