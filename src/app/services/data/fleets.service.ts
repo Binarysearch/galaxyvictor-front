@@ -7,11 +7,8 @@ import { AuthService, AuthStatus } from '../auth.service';
 import { CivilizationsService } from './civilizations.service';
 import { FleetInfoDto } from '../../dto/fleet-info';
 import { TimeService } from '../time.service';
-import { subscribeToNotifications } from '../channel-utils';
-import { StartTravelNotificationDto } from '../../dto/start-travel-notification';
-import { EndTravelNotificationDto } from '../../dto/end-travel-notification';
-import { DeleteFleetNotificationDto } from 'src/app/dto/delete-fleet-notification';
 import { NotificationService } from '../notification.service';
+import { Civilization } from '../../model/civilization';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +18,7 @@ export class FleetsService {
   private fleetMap: Map<string, Fleet> = new Map();
   private fleets: BehaviorSubject<Set<Fleet>> = new BehaviorSubject(new Set());
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  civilization: Civilization;
   
   constructor(
     private starsService: StarsService,
@@ -35,6 +33,7 @@ export class FleetsService {
       if (status === AuthStatus.SESSION_STARTED) {
         this.civilizationsService.getCivilization().subscribe(civilization => {
           if (civilization) {
+            this.civilization = civilization;
             this.api.request<FleetInfoDto[]>('get-fleets').subscribe(
               fleets => {
                 this.addFleets(fleets.map(f => this.mapFleetInfoToFleet(f)));
@@ -52,11 +51,25 @@ export class FleetsService {
     this.notificationService.getStartTravelEvents().subscribe(notification => {
       this.updateFleet(notification.fleet);
     });
+    
     this.notificationService.getEndTravelEvents().subscribe(notification => {
       this.updateFleet(notification.fleet);
     });
+
     this.notificationService.getDeleteFleetEvents().subscribe(notification => {
       this.removeFleetById(notification.fleetId);
+    });
+
+    this.notificationService.getVisibilityGainNotification().subscribe(notification => {
+      notification.orbitingFleets.forEach(fleet => this.updateFleet(fleet))
+    });
+
+    this.notificationService.getVisibilityLostNotification().subscribe(notification => {
+      this.fleets.value.forEach(f => {
+        if (f.destination.id === notification.starId && f.civilization.id !== this.civilization.id) {
+          this.removeFleet(f);
+        }
+      });
     });
 
   }

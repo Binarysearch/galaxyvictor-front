@@ -7,7 +7,7 @@ import { LocalStorageService } from '../local-storage.service';
 import { config } from '../config';
 import { PIROS_API_SERVICE_CONFIG, ApiService, PirosApiService } from '@piros/api';
 import { HttpClientModule } from '@angular/common/http';
-import { registerLoginAndCreateCivilization, createApiService } from '../login-utils';
+import { registerLoginAndCreateCivilization, createApiService, quickStart } from '../login-utils';
 import { Fleet } from '../../model/fleet';
 import { StarsService } from './stars.service';
 import { forkJoin, Subject, ReplaySubject } from 'rxjs';
@@ -650,6 +650,87 @@ describe('FleetsService', () => {
         }
       );
     });
+  });
+
+  it('should add enemy fleets when visibility gain', (done) => {
+    
+    let travelSent = false;
+
+    quickStart((sd) => {
+      quickStart((sd2) => {
+        const homeStar1 = sd.homeStar;
+        
+        const fleet1 = sd.startingFleet;
+        const fleet2 = sd2.startingFleet;
+
+        sd2.services.notificationService.getVisibilityGainNotification().subscribe((ev) => {
+          if (ev.starId === homeStar1.id) {
+            expect(ev.orbitingFleets.length).toEqual(2);
+  
+            setTimeout(() => {
+              sd2.services.fleetsService.getFleets().subscribe(fleets => {
+                expect(fleets.size).toEqual(2);
+                expect(Array.from(fleets).find(f => f.id === fleet1.id)).toBeTruthy();
+                done();
+              });
+            }, 1);
+          }
+        });
+
+        //viajar estrella enemiga
+        if (!travelSent) {
+          sd2.services.fleetsService.startTravel(fleet2.id, fleet2.origin.id, homeStar1.id).subscribe();
+          travelSent = true;
+        }
+
+      });
+    });
+
+    
+  });
+
+  it('should remove enemy fleets when visibility lost', (done) => {
+    
+    let travel1Sent = false;
+    let travel2Sent = false;
+
+    quickStart((sd) => {
+      quickStart((sd2) => {
+        const homeStar1 = sd.homeStar;
+        const homeStar2 = sd2.homeStar;
+        
+        const fleet1 = sd.startingFleet;
+        const fleet2 = sd2.startingFleet;
+
+        sd2.services.notificationService.getVisibilityLostNotification().subscribe((ev) => {
+          if (ev.starId === homeStar1.id) {  
+            setTimeout(() => {
+              sd2.services.fleetsService.getFleets().subscribe(fleets => {
+                expect(fleets.size).toEqual(1);
+                expect(Array.from(fleets).find(f => f.id === fleet1.id)).toBeFalsy();
+                done();
+              });
+            }, 1);
+          }
+        });
+
+        if (!travel1Sent) {
+          sd2.services.fleetsService.startTravel(fleet2.id, fleet2.origin.id, homeStar1.id).subscribe();
+          travel1Sent = true;
+        }
+
+        sd2.services.notificationService.getEndTravelEvents().subscribe((ev) => {
+          if (ev.fleet.destinationId === homeStar1.id) {
+            if (!travel2Sent) {
+              sd2.services.fleetsService.startTravel(fleet2.id, homeStar1.id, homeStar2.id).subscribe();
+              travel2Sent = true;
+            }
+          }
+        });
+      });
+    });
+
+    
   });
 
 });
