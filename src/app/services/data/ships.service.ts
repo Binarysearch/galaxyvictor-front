@@ -15,4 +15,8 @@ export class ShipsService {
   public getFleetShips(fleetyId: string): Observable<ShipDto[]> {
     return this.api.request<ShipDto[]>('get-fleet-ships', fleetyId);
   }
+
+  public buildShip(colonyId: string): Observable<boolean> {
+    return this.api.request<boolean>('build-ship', colonyId);
+  }
 }

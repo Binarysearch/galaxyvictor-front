@@ -16,6 +16,7 @@ import { first } from 'rxjs/operators';
 import { PlanetsService } from './data/planets.service';
 import { NotificationService } from './notification.service';
 import { ColoniesService } from './data/colonies.service';
+import { ShipsService } from './data/ships.service';
 
 export function registerAndLogin(service: AuthService, callback: (user: string, password: string) => void) {
 
@@ -75,6 +76,7 @@ export interface ServicesAndData {
     planetsService: PlanetsService;
     notificationService: NotificationService;
     coloniesService: ColoniesService;
+    shipsService: ShipsService;
   },
   getRandomStar: () => StarSystem
 }
@@ -89,6 +91,7 @@ export function quickStart(callback: (servicesAndData: ServicesAndData) => void)
   const fleetsService = new FleetsService(starsService, apiService, authService, civilizationsService, TestBed.get(TimeService), notificationService);
   const planetsService: PlanetsService = new PlanetsService(starsService, apiService, authService, civilizationsService);
   const coloniesService: ColoniesService = new ColoniesService(apiService, authService, civilizationsService, planetsService, notificationService);
+  const shipsService: ShipsService = new ShipsService(apiService);
 
   let done = false;
   
@@ -126,6 +129,7 @@ export function quickStart(callback: (servicesAndData: ServicesAndData) => void)
                 planetsService: planetsService,
                 notificationService: notificationService,
                 coloniesService: coloniesService,
+                shipsService: shipsService,
               },
               getRandomStar: getRandomStar
             });

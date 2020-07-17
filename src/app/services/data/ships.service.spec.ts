@@ -5,11 +5,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { ApiService, PIROS_API_SERVICE_CONFIG, PirosApiService } from '@piros/api';
 import { config } from '../config';
 import { LocalStorageService } from '../local-storage.service';
-import { AuthService } from '../auth.service';
-import { CivilizationsService } from './civilizations.service';
-import { FleetsService } from './fleets.service';
-import { Fleet } from 'src/app/model/fleet';
-import { registerLoginAndCreateCivilization } from '../login-utils';
+import { quickStart } from '../login-utils';
+import { Colony } from 'src/app/model/colony';
 
 describe('ShipsService', () => {
   
@@ -31,42 +28,35 @@ describe('ShipsService', () => {
   });
 
   it('should get fleet ships', (done) => {
-    const authService = TestBed.get(AuthService);
-    const civilizationsService = TestBed.get(CivilizationsService);
-    const fleetsService: FleetsService = TestBed.get(FleetsService);
-    const shipsService: ShipsService = TestBed.get(ShipsService);
+    
+    quickStart((sd) => {
 
-    startAndGetFleet(authService, civilizationsService, fleetsService, (fleet) => {
-      
-      shipsService.getFleetShips(fleet.id).subscribe(ships => {
+      sd.services.shipsService.getFleetShips(sd.startingFleet.id).subscribe(ships => {
         expect(ships.length).toEqual(1);
         expect(ships[0].id).toBeDefined();
         done();
       });
 
     });
-
   });
-});
 
+  it('should create ships', (done) => {
+    
+    quickStart((sd) => {
 
-function startAndGetFleet(
-  authService: AuthService, 
-  civilizationsService: CivilizationsService, 
-  fleetsService: FleetsService, 
-  callback: (fleet: Fleet) => void
-) {
-  registerLoginAndCreateCivilization(authService, civilizationsService, () => {
-    fleetsService.isLoaded().subscribe(
-      loaded => {
-        if (loaded) {
-          fleetsService.getFleets().subscribe(
-            fleets => {
-              callback(fleets.values().next().value);
-            }
-          );
+      sd.services.coloniesService.getColonies().subscribe(colonies => {
+        if (colonies.size > 0) {
+          const colony: Colony = colonies.values().next().value;
+          
+          sd.services.shipsService.buildShip(colony.id).subscribe(result => {
+            expect(result).toBeTruthy();
+            done();
+          });
         }
-      }
-    );
+      });
+
+    });
   });
-}
+
+
+});

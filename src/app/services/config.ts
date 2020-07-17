@@ -17,6 +17,7 @@ export const config: PirosApiServiceConfig = {
           'get-stars-with-presence',
           'get-explored-stars',
           'create-colony',
+          'build-ship',
         ],
         channels: [
           'create-civilization',
