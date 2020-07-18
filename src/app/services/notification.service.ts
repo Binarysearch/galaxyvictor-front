@@ -9,6 +9,7 @@ import { VisibilityGainedNotificationDto } from '../dto/visibility-gained-notifi
 import { VisibilityLostNotificationDto } from '../dto/visibility-lost-notidication';
 import { CreateColonyNotificationDto } from '../dto/create-colony-notification';
 import { CreateShipNotificationDto } from '../dto/create-ship-notification';
+import { BuildingOrdersNotificationDto } from '../dto/building-orders-notification';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,7 @@ export class NotificationService {
   private visibilityLostNotificationSubject: Subject<VisibilityLostNotificationDto> = new Subject();
   private createColonyNotificationSubject: Subject<CreateColonyNotificationDto> = new Subject();
   private createShipNotificationSubject: Subject<CreateShipNotificationDto> = new Subject();
+  private buildingOrdersNotificationSubject: Subject<BuildingOrdersNotificationDto> = new Subject();
 
   constructor(
     private api: PirosApiService
@@ -33,6 +35,7 @@ export class NotificationService {
     subscribeToNotifications(this.api, 'visibility-lost-notifications', this.visibilityLostNotificationSubject);
     subscribeToNotifications(this.api, 'create-colony-notifications', this.createColonyNotificationSubject);
     subscribeToNotifications(this.api, 'create-ship-notifications', this.createShipNotificationSubject);
+    subscribeToNotifications(this.api, 'building-orders-notifications', this.buildingOrdersNotificationSubject);
   }
 
   public getStartTravelEvents(): Observable<StartTravelNotificationDto> {
@@ -61,5 +64,9 @@ export class NotificationService {
 
   public getCreateShipNotification(): Observable<CreateShipNotificationDto> {
     return this.createShipNotificationSubject.asObservable();
+  }
+
+  public getBuildingOrdersNotification(): Observable<BuildingOrdersNotificationDto> {
+    return this.buildingOrdersNotificationSubject.asObservable();
   }
 }

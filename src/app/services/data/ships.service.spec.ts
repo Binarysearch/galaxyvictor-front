@@ -7,6 +7,7 @@ import { config } from '../config';
 import { LocalStorageService } from '../local-storage.service';
 import { quickStart } from '../login-utils';
 import { Colony } from 'src/app/model/colony';
+import { BuildingOrderType } from 'src/app/dto/building-order-dto';
 
 describe('ShipsService', () => {
   
@@ -58,7 +59,48 @@ describe('ShipsService', () => {
     });
   });
 
-  fit('should receive notification when create ships', (done) => {
+  it('should receive ship building orders notification when creating ship', (done) => {
+    
+    let shipCreated;
+    let colonyId;
+
+    quickStart((sd) => {
+
+      sd.services.coloniesService.getColonies().subscribe(colonies => {
+        if (colonies.size > 0 && !shipCreated) {
+          const colony: Colony = colonies.values().next().value;
+          colonyId = colony.id;
+          sd.services.shipsService.buildShip(colonyId).subscribe(result => {
+            expect(result).toBeTruthy();
+          });
+          shipCreated = true;
+        }
+      });
+
+      let notificationNumber = 1;
+      sd.services.notificationService.getBuildingOrdersNotification().subscribe(notification => {
+        if (notificationNumber === 1) {
+          notificationNumber++;
+          expect(notification.buildingOrders.length).toEqual(1);
+          const buildingOrder = notification.buildingOrders[0];
+          expect(buildingOrder.colonyId).toEqual(colonyId);
+          expect(buildingOrder.id).toBeDefined();
+          expect(buildingOrder.type).toEqual(BuildingOrderType.SHIP);
+          expect(buildingOrder.endTime).toBeDefined();
+          expect(buildingOrder.startedTime).toBeDefined();
+        } else if (notificationNumber === 2) {
+          notificationNumber++;
+          expect(notification.buildingOrders.length).toEqual(0);
+          done();
+        } else {
+          fail('Should not receive more building order notifications')
+        }
+      });
+
+    });
+  });
+
+  it('should receive notification when create ships', (done) => {
     
     let shipCreated;
 

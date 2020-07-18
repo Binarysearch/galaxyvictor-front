@@ -29,6 +29,7 @@ export const config: PirosApiServiceConfig = {
           'explore-star-notifications',
           'create-colony-notifications',
           'create-ship-notifications',
+          'building-orders-notifications',
         ]
       }
     ]
