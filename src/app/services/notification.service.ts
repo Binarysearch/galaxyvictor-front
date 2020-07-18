@@ -7,7 +7,8 @@ import { DeleteFleetNotificationDto } from '../dto/delete-fleet-notification';
 import { subscribeToNotifications } from './channel-utils';
 import { VisibilityGainedNotificationDto } from '../dto/visibility-gained-notification';
 import { VisibilityLostNotificationDto } from '../dto/visibility-lost-notidication';
-import { CreateColonyNotificationDto } from '../dto/create-colony-notidication';
+import { CreateColonyNotificationDto } from '../dto/create-colony-notification';
+import { CreateShipNotificationDto } from '../dto/create-ship-notification';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class NotificationService {
   private visibilityGainNotificationSubject: Subject<VisibilityGainedNotificationDto> = new Subject();
   private visibilityLostNotificationSubject: Subject<VisibilityLostNotificationDto> = new Subject();
   private createColonyNotificationSubject: Subject<CreateColonyNotificationDto> = new Subject();
+  private createShipNotificationSubject: Subject<CreateShipNotificationDto> = new Subject();
 
   constructor(
     private api: PirosApiService
@@ -30,6 +32,7 @@ export class NotificationService {
     subscribeToNotifications(this.api, 'visibility-gain-notifications', this.visibilityGainNotificationSubject);
     subscribeToNotifications(this.api, 'visibility-lost-notifications', this.visibilityLostNotificationSubject);
     subscribeToNotifications(this.api, 'create-colony-notifications', this.createColonyNotificationSubject);
+    subscribeToNotifications(this.api, 'create-ship-notifications', this.createShipNotificationSubject);
   }
 
   public getStartTravelEvents(): Observable<StartTravelNotificationDto> {
@@ -54,5 +57,9 @@ export class NotificationService {
 
   public getCreateColonyNotification(): Observable<CreateColonyNotificationDto> {
     return this.createColonyNotificationSubject.asObservable();
+  }
+
+  public getCreateShipNotification(): Observable<CreateShipNotificationDto> {
+    return this.createShipNotificationSubject.asObservable();
   }
 }

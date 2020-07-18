@@ -4,7 +4,6 @@ import { StarSystem } from './star-system';
 import { FLEET_ROTATION_SPEED_MULT } from '../galaxy-constants';
 import { Civilization } from './civilization';
 import { Observable, Subject } from 'rxjs';
-import { Ship } from './ship';
 
 export class Fleet implements Entity {
 
@@ -18,6 +17,7 @@ export class Fleet implements Entity {
         public seed: number,
         public speed: number,
         public startTravelTime: number,
+        public shipCount: number,
         public origin: StarSystem,
         public destination: StarSystem,
         public civilization: Civilization,

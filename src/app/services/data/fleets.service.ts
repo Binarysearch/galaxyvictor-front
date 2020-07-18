@@ -71,6 +71,10 @@ export class FleetsService {
         }
       });
     });
+    
+    this.notificationService.getCreateShipNotification().subscribe(notification => {
+      this.updateFleet(notification.fleet);
+    });
 
   }
 
@@ -131,6 +135,7 @@ export class FleetsService {
     existing.startTravelTime = fleetDto.startTravelTime;
     existing.speed = fleetDto.speed;
     existing.seed = fleetDto.seed;
+    existing.shipCount = fleetDto.shipCount;
 
     if (fleetDto.destinationId === fleetDto.originId) {
       existing.origin.addOrbitingFleet(existing);
@@ -163,6 +168,7 @@ export class FleetsService {
       fleetDto.seed,
       fleetDto.speed,
       fleetDto.startTravelTime,
+      fleetDto.shipCount,
       this.starsService.getStarById(fleetDto.originId),
       this.starsService.getStarById(fleetDto.destinationId),
       this.civilizationsService.getCivilizationById(fleetDto.civilizationId),

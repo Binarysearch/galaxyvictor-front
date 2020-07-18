@@ -58,5 +58,41 @@ describe('ShipsService', () => {
     });
   });
 
+  fit('should receive notification when create ships', (done) => {
+    
+    let shipCreated;
+
+    quickStart((sd) => {
+
+      sd.services.coloniesService.getColonies().subscribe(colonies => {
+        if (colonies.size > 0 && !shipCreated) {
+          const colony: Colony = colonies.values().next().value;
+          sd.services.shipsService.buildShip(colony.id).subscribe(result => {
+            expect(result).toBeTruthy();
+          });
+          shipCreated = true;
+        }
+      });
+
+      sd.services.notificationService.getCreateShipNotification().subscribe(notification => {
+        expect(notification.fleet.id).toEqual(sd.startingFleet.id);
+        expect(notification.fleet.shipCount).toEqual(2);
+        expect(notification.ship).toBeDefined();
+        expect(notification.ship.id).toBeDefined();
+
+        setTimeout(() => {
+          expect(sd.startingFleet.shipCount).toEqual(2);
+
+          sd.services.shipsService.getFleetShips(sd.startingFleet.id).subscribe(ships => {
+            expect(ships.length).toEqual(2);
+            done();
+          });
+
+        }, 1);
+      });
+
+    });
+  });
+
 
 });

@@ -28,6 +28,7 @@ export const config: PirosApiServiceConfig = {
           'visibility-lost-notifications',
           'explore-star-notifications',
           'create-colony-notifications',
+          'create-ship-notifications',
         ]
       }
     ]

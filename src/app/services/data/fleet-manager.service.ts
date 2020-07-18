@@ -60,6 +60,7 @@ export class FleetManagerService {
       fleetDto.seed,
       fleetDto.speed,
       fleetDto.startTravelTime,
+      fleetDto.shipCount,
       this.starsService.getStarById(fleetDto.originId),
       this.starsService.getStarById(fleetDto.destinationId),
       this.civilizationsService.getCivilizationById(fleetDto.civilizationId),
