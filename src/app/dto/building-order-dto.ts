@@ -8,6 +8,13 @@ export interface BuildingOrderDto {
 
 }
 
+export interface FinishedBuildingOrderDto {
+
+    id: string;
+    colonyId: string;
+
+}
+
 export enum BuildingOrderType {
     SHIP = 'SHIP'
 }

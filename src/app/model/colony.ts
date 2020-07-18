@@ -8,12 +8,12 @@ export class Colony implements Entity {
 
     private changes: Subject<void> = new Subject();
     public entityType = 'colony';
+    public buildingOrders: BuildingOrder[] = [];
     
     constructor(
         public id: string,
         public planet: Planet,
         public civilization: Civilization,
-        public buildingOrder: BuildingOrder
     ){
 
     }

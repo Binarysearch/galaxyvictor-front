@@ -7,6 +7,7 @@ import { CivilizationsService } from './civilizations.service';
 import { ColonyDto } from '../../dto/colony-dto';
 import { PlanetsService } from './planets.service';
 import { NotificationService } from '../notification.service';
+import { BuildingOrder } from 'src/app/model/building-order';
 
 let i = 1;
 
@@ -71,6 +72,29 @@ export class ColoniesService {
       this.addColonies([this.mapColonyDtoToColony(notification)]);
     });
 
+    this.notificationService.getBuildingOrdersNotification().subscribe(notification => {
+      notification.buildingOrders.forEach(bo => {
+
+        const colony = this.coloniesMap.get(bo.colonyId);
+
+        const buildingOrder = new BuildingOrder(
+          bo.id,
+          colony,
+          bo.type,
+          bo.endTime,
+          bo.startedTime
+        );
+
+        colony.buildingOrders.push(buildingOrder);
+        colony.sendChanges();
+      });
+
+      notification.finishedBuildingOrders.forEach(fbo => {
+        const colony = this.coloniesMap.get(fbo.colonyId);
+        colony.buildingOrders = colony.buildingOrders.filter(b => b.id !== fbo.id);
+        colony.sendChanges();
+      });
+    });
   }
 
   public isLoaded(): Observable<boolean> {
@@ -115,8 +139,7 @@ export class ColoniesService {
     return new Colony(
       dto.id,
       this.planetsService.getPlanetById(dto.planet),
-      this.civilizationsService.getCivilizationById(dto.civilization),
-      null
+      this.civilizationsService.getCivilizationById(dto.civilization)
     );
   }
 

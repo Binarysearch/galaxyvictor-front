@@ -62,15 +62,14 @@ describe('ShipsService', () => {
   it('should receive ship building orders notification when creating ship', (done) => {
     
     let shipCreated;
-    let colonyId;
+    let colony: Colony;
 
     quickStart((sd) => {
 
       sd.services.coloniesService.getColonies().subscribe(colonies => {
         if (colonies.size > 0 && !shipCreated) {
-          const colony: Colony = colonies.values().next().value;
-          colonyId = colony.id;
-          sd.services.shipsService.buildShip(colonyId).subscribe(result => {
+          colony = colonies.values().next().value;
+          sd.services.shipsService.buildShip(colony.id).subscribe(result => {
             expect(result).toBeTruthy();
           });
           shipCreated = true;
@@ -78,22 +77,71 @@ describe('ShipsService', () => {
       });
 
       let notificationNumber = 1;
+      let buildingOrderId;
       sd.services.notificationService.getBuildingOrdersNotification().subscribe(notification => {
         if (notificationNumber === 1) {
           notificationNumber++;
           expect(notification.buildingOrders.length).toEqual(1);
+          expect(notification.finishedBuildingOrders.length).toEqual(0);
           const buildingOrder = notification.buildingOrders[0];
-          expect(buildingOrder.colonyId).toEqual(colonyId);
+          expect(buildingOrder.colonyId).toEqual(colony.id);
           expect(buildingOrder.id).toBeDefined();
+          buildingOrderId = buildingOrder.id;
           expect(buildingOrder.type).toEqual(BuildingOrderType.SHIP);
           expect(buildingOrder.endTime).toBeDefined();
           expect(buildingOrder.startedTime).toBeDefined();
         } else if (notificationNumber === 2) {
           notificationNumber++;
           expect(notification.buildingOrders.length).toEqual(0);
+          expect(notification.finishedBuildingOrders.length).toEqual(1);
+          expect(notification.finishedBuildingOrders[0].id).toEqual(buildingOrderId);
+          expect(notification.finishedBuildingOrders[0].colonyId).toEqual(colony.id);
           done();
         } else {
           fail('Should not receive more building order notifications')
+        }
+      });
+
+    });
+  });
+
+  it('should update colony with ship building orders notifications when creating ships', (done) => {
+    
+    let shipCreated;
+    let colony: Colony;
+
+    quickStart((sd) => {
+
+      sd.services.coloniesService.getColonies().subscribe(colonies => {
+        if (colonies.size > 0 && !shipCreated) {
+          colony = colonies.values().next().value;
+
+          let notificationNumber = 1;
+
+          colony.getChanges().subscribe(() => {
+            if (notificationNumber === 1) {
+              notificationNumber++;
+              expect(colony.buildingOrders.length).toEqual(1);
+              const buildingOrder = colony.buildingOrders[0];
+              expect(buildingOrder.colony).toEqual(colony);
+              expect(buildingOrder.id).toBeDefined();
+              expect(buildingOrder.type).toEqual(BuildingOrderType.SHIP);
+              expect(buildingOrder.endTime).toBeDefined();
+              expect(buildingOrder.startedTime).toBeDefined();
+              
+            } else if (notificationNumber === 2) {
+              notificationNumber++;
+              expect(colony.buildingOrders.length).toEqual(0);
+              done();
+            } else {
+              fail('Should not receive more building order colony updates')
+            }
+          });
+
+          sd.services.shipsService.buildShip(colony.id).subscribe(result => {
+            expect(result).toBeTruthy();
+          });
+          shipCreated = true;
         }
       });
 

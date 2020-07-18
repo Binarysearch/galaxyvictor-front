@@ -27,9 +27,7 @@ export class ColonyManagerService {
       const colony = new Colony(
         c.id,
         planet, 
-        this.civilizationsService.getCivilizationById(c.civilization),
-        null
-        //c.buildingOrder ? new BuildingOrder(c.buildingOrder.id) : null
+        this.civilizationsService.getCivilizationById(c.civilization)
       );
       planet.colony = colony;
       return colony;
