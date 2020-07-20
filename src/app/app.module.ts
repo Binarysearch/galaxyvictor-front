@@ -34,6 +34,7 @@ import { ModalContainerComponent } from './components/modals/modal-container/mod
 import { ModalService } from './services/modal.service-abstract';
 import { ModalServiceImpl } from './services/modal.service';
 import { config } from './services/config';
+import { BuildingOrderComponent } from './components/selected-entity/planet-info/building-order/building-order.component';
 
 
 @NgModule({
@@ -49,7 +50,8 @@ import { config } from './services/config';
     HoveredInfoComponent,
     CentralWindowComponent,
     ModalFrameComponent,
-    ModalContainerComponent
+    ModalContainerComponent,
+    BuildingOrderComponent
   ],
   imports: [
     BrowserModule,
