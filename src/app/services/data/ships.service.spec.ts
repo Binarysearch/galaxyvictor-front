@@ -10,7 +10,7 @@ import { Colony } from 'src/app/model/colony';
 import { BuildingOrderType } from 'src/app/dto/building-order-dto';
 
 describe('ShipsService', () => {
-  
+
   beforeEach((done) => {
     TestBed.configureTestingModule({
       imports: [
@@ -29,7 +29,7 @@ describe('ShipsService', () => {
   });
 
   it('should get fleet ships', (done) => {
-    
+
     quickStart((sd) => {
 
       sd.services.shipsService.getFleetShips(sd.startingFleet.id).subscribe(ships => {
@@ -42,13 +42,13 @@ describe('ShipsService', () => {
   });
 
   it('should create ships', (done) => {
-    
+
     quickStart((sd) => {
 
       sd.services.coloniesService.getColonies().subscribe(colonies => {
         if (colonies.size > 0) {
           const colony: Colony = colonies.values().next().value;
-          
+
           sd.services.shipsService.buildShip(colony.id).subscribe(result => {
             expect(result).toBeTruthy();
             done();
@@ -60,7 +60,7 @@ describe('ShipsService', () => {
   });
 
   it('should receive ship building orders notification when creating ship', (done) => {
-    
+
     let shipCreated;
     let colony: Colony;
 
@@ -106,7 +106,7 @@ describe('ShipsService', () => {
   });
 
   it('should update colony with ship building orders notifications when creating ships', (done) => {
-    
+
     let shipCreated;
     let colony: Colony;
 
@@ -128,7 +128,7 @@ describe('ShipsService', () => {
               expect(buildingOrder.type).toEqual(BuildingOrderType.SHIP);
               expect(buildingOrder.endTime).toBeDefined();
               expect(buildingOrder.startedTime).toBeDefined();
-              
+
             } else if (notificationNumber === 2) {
               notificationNumber++;
               expect(colony.buildingOrders.length).toEqual(0);
@@ -149,7 +149,7 @@ describe('ShipsService', () => {
   });
 
   it('should receive notification when create ships', (done) => {
-    
+
     let shipCreated;
 
     quickStart((sd) => {
@@ -178,6 +178,36 @@ describe('ShipsService', () => {
             done();
           });
 
+        }, 1);
+      });
+
+    });
+  });
+
+  fit('should create fleet if there is no fleet in star when creating ship', (done) => {
+
+    quickStart((sd) => {
+
+      const randomStar = sd.getRandomStar();
+
+      sd.services.fleetsService.startTravel(sd.startingFleet.id, sd.startingFleet.origin.id, randomStar.id).subscribe();
+
+      sd.services.notificationService.getEndTravelEvents().subscribe(ev => {
+
+        sd.services.coloniesService.getColonies().subscribe(colonies => {
+          if (colonies.size > 0) {
+            const colony: Colony = colonies.values().next().value;
+            sd.services.shipsService.buildShip(colony.id).subscribe();
+          }
+        });
+
+      });
+
+      sd.services.notificationService.getCreateShipNotification().subscribe(ev => {
+        expect(ev.fleet.id).not.toEqual(sd.startingFleet.id);
+        setTimeout(() => {
+          expect(sd.services.fleetsService.getFleetById(ev.fleet.id)).toBeTruthy();
+          done();
         }, 1);
       });
 
