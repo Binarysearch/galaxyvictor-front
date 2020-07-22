@@ -15,12 +15,17 @@ export class BuildingOrderComponent implements OnInit, OnDestroy {
   constructor() { }
 
   ngOnInit(): void {
+    this.calculateProgress();
     this.interval = setInterval(() => {
-      const now = Date.now();
-      const totalTime = this.buildingOrder.endTime - this.buildingOrder.startedTime;
-      const timeAdvanced = now - this.buildingOrder.startedTime;
-      this.progress = Math.round(100 * timeAdvanced / totalTime);
+      this.calculateProgress();
     }, 30);
+  }
+
+  private calculateProgress(): void {
+    const now = Date.now();
+    const totalTime = this.buildingOrder.endTime - this.buildingOrder.startedTime;
+    const timeAdvanced = now - this.buildingOrder.startedTime;
+    this.progress = Math.round(100 * timeAdvanced / totalTime);
   }
 
   ngOnDestroy(): void {
