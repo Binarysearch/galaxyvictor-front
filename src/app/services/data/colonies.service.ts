@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Colony } from 'src/app/model/colony';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, forkJoin } from 'rxjs';
 import { AuthStatus, AuthService } from '../auth.service';
 import { PirosApiService } from '@piros/api';
 import { CivilizationsService } from './civilizations.service';
 import { ColonyDto } from '../../dto/colony-dto';
 import { PlanetsService } from './planets.service';
 import { NotificationService } from '../notification.service';
-import { BuildingOrder } from 'src/app/model/building-order';
+import { BuildingOrder } from '../../model/building-order';
+import { BuildingOrderDto } from 'src/app/dto/building-order-dto';
 
 let i = 1;
 
@@ -34,9 +35,16 @@ export class ColoniesService {
       if (status === AuthStatus.SESSION_STARTED) {
         this.planetsService.isLoaded().subscribe(loaded => {
           if (loaded) {
-            this.api.request<ColonyDto[]>('get-visible-colonies').subscribe(
-              colonies => {
+            forkJoin(
+              this.api.request<ColonyDto[]>('get-visible-colonies'),
+              this.api.request<BuildingOrderDto[]>('get-building-orders'),
+            ).subscribe(
+              results => {
+                const colonies = results[0];
+                const buildingOrders = results[1];
+                
                 this.addColonies(colonies.map(c => this.mapColonyDtoToColony(c)));
+                this.addBuildingOrders(buildingOrders.map(bo => this.mapBuildingOrder(bo)));
                 this.loaded.next(true);
               }
             );
@@ -129,6 +137,12 @@ export class ColoniesService {
     this.colonies.next(this.colonies.value);
   }
 
+  private addBuildingOrders(buildingOrders: BuildingOrder[]): void {
+    buildingOrders.forEach(bo => {
+      bo.colony.buildingOrders.push(bo);
+    });
+  }
+
   private deleteColony(c: Colony) {
     c.planet.colony = null;
     this.coloniesMap.delete(c.id);
@@ -140,6 +154,16 @@ export class ColoniesService {
       dto.id,
       this.planetsService.getPlanetById(dto.planet),
       this.civilizationsService.getCivilizationById(dto.civilization)
+    );
+  }
+
+  private mapBuildingOrder(bo: BuildingOrderDto): BuildingOrder {
+    return new BuildingOrder(
+      bo.id,
+      this.coloniesMap.get(bo.colonyId),
+      bo.type,
+      bo.endTime,
+      bo.startedTime
     );
   }
 

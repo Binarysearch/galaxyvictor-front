@@ -301,4 +301,39 @@ describe('ColoniesService', () => {
 
   });
 
+  it('should get colony building orders at start', (done) => {
+
+    let shipCreated;
+
+    quickStart((sd) => {
+      sd.setSettings({
+        fleetSpeedMultiplier: 1,
+        buildTimeMultiplier: 10
+      }, () => {
+        sd.services.coloniesService.getColonies().subscribe(colonies => {
+          if (colonies.size > 0) {
+            const colony: Colony = colonies.values().next().value;
+  
+            if (!shipCreated) {
+              shipCreated = true;
+              sd.services.shipsService.buildShip(colony.id).subscribe(() => {
+                quickStart((sd2) => {
+                  sd2.services.coloniesService.getColonies().subscribe(colonies2 => {
+                    if (colonies2.size > 0) {
+                      const colony2: Colony = colonies2.values().next().value;
+                      setTimeout(() => {
+                        expect(colony2.buildingOrders.length).toEqual(1);
+                        done();
+                      }, 1);
+                    }
+                  });
+                }, sd.credentials.user, sd.credentials.password);
+              });
+            }
+          }
+        });
+      });
+    });
+  });
+
 });

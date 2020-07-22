@@ -184,7 +184,7 @@ describe('ShipsService', () => {
     });
   });
 
-  fit('should create fleet if there is no fleet in star when creating ship', (done) => {
+  it('should create fleet if there is no fleet in star when creating ship', (done) => {
 
     quickStart((sd) => {
 

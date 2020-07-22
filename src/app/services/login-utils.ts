@@ -17,6 +17,7 @@ import { PlanetsService } from './data/planets.service';
 import { NotificationService } from './notification.service';
 import { ColoniesService } from './data/colonies.service';
 import { ShipsService } from './data/ships.service';
+import { TestSettingsDto } from '../dto/test-settings-dto';
 
 export function registerAndLogin(service: AuthService, callback: (user: string, password: string) => void) {
 
@@ -35,7 +36,6 @@ export function registerAndLogin(service: AuthService, callback: (user: string, 
     service.login(user, password).subscribe();
   });
 }
-
 
 export function registerLoginAndCreateCivilization(authService: AuthService, civilizationService: CivilizationsService, callback: (user: string, password: string, civilization: Civilization) => void) {
 
@@ -62,6 +62,24 @@ export function registerLoginAndCreateCivilization(authService: AuthService, civ
   });
 }
 
+export function login(authService: AuthService, civilizationService: CivilizationsService, user: string, password: string, callback: (user: string, password: string, civilization: Civilization) => void) {
+
+  const subscription = authService.getStatus().subscribe(status => {
+    if (status === AuthStatus.SESSION_STARTED) {
+      subscription.unsubscribe();
+    }
+  });
+
+  const civSubscription = civilizationService.getCivilization().subscribe(civ => {
+    if (civ) {
+      civSubscription.unsubscribe();
+      callback(user, password, civ);
+    }
+  });
+
+  authService.login(user, password).subscribe();
+}
+
 export interface ServicesAndData {
   credentials: { user: string; password: string; };
   civilization: Civilization;
@@ -78,10 +96,11 @@ export interface ServicesAndData {
     coloniesService: ColoniesService;
     shipsService: ShipsService;
   },
-  getRandomStar: () => StarSystem
+  getRandomStar: () => StarSystem,
+  setSettings: (settings: TestSettingsDto, setSettingsCallback: () => void) => void
 }
 
-export function quickStart(callback: (servicesAndData: ServicesAndData) => void) {
+export function quickStart(callback: (servicesAndData: ServicesAndData) => void, user?: string, password?: string) {
   const apiService = createApiService();
   const notificationService: NotificationService = new NotificationService(apiService);
   TestBed.get(LocalStorageService).deleteSavedToken();
@@ -94,8 +113,7 @@ export function quickStart(callback: (servicesAndData: ServicesAndData) => void)
   const shipsService: ShipsService = new ShipsService(apiService);
 
   let done = false;
-  
-  registerLoginAndCreateCivilization(authService, civilizationsService, (user, password, civilization) => {
+  const loginCallback = (user, password, civilization) => {
 
     fleetsService.isLoaded().pipe(first(l => l)).subscribe(()=>{
       fleetsService.getFleets().subscribe(fleetSet => {
@@ -131,14 +149,24 @@ export function quickStart(callback: (servicesAndData: ServicesAndData) => void)
                 coloniesService: coloniesService,
                 shipsService: shipsService,
               },
-              getRandomStar: getRandomStar
+              getRandomStar: getRandomStar,
+              setSettings: (settings: TestSettingsDto, setSettingsCallback: () => void) => {
+                TestBed.get(PirosApiService).post('civilizations.set-settings', settings).subscribe(() => setSettingsCallback());
+              }
             });
           }
           
         });
       });
     });
-  });
+  }
+
+  if (user && password) {
+    login(authService, civilizationsService, user, password, loginCallback);
+  } else {
+    registerLoginAndCreateCivilization(authService, civilizationsService, loginCallback);
+  }
+  
 }
 
 export function createApiService(): PirosApiService {
