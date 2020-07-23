@@ -495,7 +495,7 @@ describe('FleetsService', () => {
                     travelStartSent = true;
                   }
 
-                  notificationService.getVisibilityGainNotification().subscribe((event) => {
+                  notificationService.getVisibilityGainNotifications().subscribe((event) => {
                     expect(event.starId).toEqual(star.id);
                     done();
                   });
@@ -538,7 +538,7 @@ describe('FleetsService', () => {
                     firstTravelStartSent = true;
                   }
 
-                  notificationService.getVisibilityLostNotification().subscribe((event) => {
+                  notificationService.getVisibilityLostNotifications().subscribe((event) => {
                     fail('El usuario no deberia perder la visibilidad en el sistema');
                   });
 
@@ -567,7 +567,7 @@ describe('FleetsService', () => {
         const fleet1 = sd.startingFleet;
         const fleet2 = sd2.startingFleet;
 
-        sd2.services.notificationService.getVisibilityGainNotification().subscribe((ev) => {
+        sd2.services.notificationService.getVisibilityGainNotifications().subscribe((ev) => {
           if (ev.starId === homeStar1.id) {
             expect(ev.orbitingFleets.length).toEqual(2);
   
@@ -606,7 +606,7 @@ describe('FleetsService', () => {
         const fleet1 = sd.startingFleet;
         const fleet2 = sd2.startingFleet;
 
-        sd2.services.notificationService.getVisibilityLostNotification().subscribe((ev) => {
+        sd2.services.notificationService.getVisibilityLostNotifications().subscribe((ev) => {
           if (ev.starId === homeStar1.id) {  
             setTimeout(() => {
               sd2.services.fleetsService.getFleets().subscribe(fleets => {

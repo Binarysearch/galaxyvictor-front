@@ -140,7 +140,7 @@ describe('ColoniesService', () => {
             });
             colonyCreated = true;
 
-            sd.services.notificationService.getCreateColonyNotification().subscribe(notification => {
+            sd.services.notificationService.getCreateColonyNotifications().subscribe(notification => {
               expect(notification.planet).toEqual(planetToCreateColony.id);
             });
           }
@@ -200,7 +200,7 @@ describe('ColoniesService', () => {
           }
         });
 
-        sd.services.notificationService.getCreateColonyNotification().subscribe(()=>{
+        sd.services.notificationService.getCreateColonyNotifications().subscribe(()=>{
           //comprobar la visibilidad la colonia en la civilizacion 2
           sd2.services.coloniesService.getColonies().subscribe(colonies => {
             if (!travel2Finished) {

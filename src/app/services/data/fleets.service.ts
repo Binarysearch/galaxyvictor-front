@@ -60,11 +60,11 @@ export class FleetsService {
       this.removeFleetById(notification.fleetId);
     });
 
-    this.notificationService.getVisibilityGainNotification().subscribe(notification => {
+    this.notificationService.getVisibilityGainNotifications().subscribe(notification => {
       notification.orbitingFleets.forEach(fleet => this.updateFleet(fleet))
     });
 
-    this.notificationService.getVisibilityLostNotification().subscribe(notification => {
+    this.notificationService.getVisibilityLostNotifications().subscribe(notification => {
       this.fleets.value.forEach(f => {
         if (f.destination.id === notification.starId && f.civilization.id !== this.civilization.id) {
           this.removeFleet(f);
@@ -72,7 +72,7 @@ export class FleetsService {
       });
     });
     
-    this.notificationService.getCreateShipNotification().subscribe(notification => {
+    this.notificationService.getCreateShipNotifications().subscribe(notification => {
       this.updateFleet(notification.fleet);
     });
 

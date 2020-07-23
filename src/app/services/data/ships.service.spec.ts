@@ -79,7 +79,7 @@ describe('ShipsService', () => {
 
       let notificationNumber = 1;
       let buildingOrderId;
-      sd.services.notificationService.getBuildingOrdersNotification().subscribe(notification => {
+      sd.services.notificationService.getBuildingOrdersNotifications().subscribe(notification => {
         if (notificationNumber === 1) {
           notificationNumber++;
           expect(notification.buildingOrders.length).toEqual(1);
@@ -191,11 +191,11 @@ describe('ShipsService', () => {
           }, 1);
         };
 
-        sd.services.notificationService.getCreateShipNotification().subscribe(notification => {
+        sd.services.notificationService.getCreateShipNotifications().subscribe(notification => {
           checkCreateShipNotification(notification);
         });
 
-        sd2.services.notificationService.getCreateShipNotification().subscribe(notification => {
+        sd2.services.notificationService.getCreateShipNotifications().subscribe(notification => {
           checkCreateShipNotification(notification);
         });
 
@@ -226,7 +226,7 @@ describe('ShipsService', () => {
           }
         });
 
-        sd.services.notificationService.getCreateShipNotification().subscribe(ev => {
+        sd.services.notificationService.getCreateShipNotifications().subscribe(ev => {
           expect(ev.fleet.id).not.toEqual(sd.startingFleet.id);
           expect(ev.fleet.id).not.toEqual(sd2.startingFleet.id);
           setTimeout(() => {

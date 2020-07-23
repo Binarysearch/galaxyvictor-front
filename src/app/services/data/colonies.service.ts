@@ -56,13 +56,13 @@ export class ColoniesService {
       }
     });
 
-    this.notificationService.getVisibilityGainNotification().subscribe(notificaton => {
+    this.notificationService.getVisibilityGainNotifications().subscribe(notificaton => {
       if (notificaton.colonies.length > 0) {
         this.addColonies(notificaton.colonies.map(c => this.mapColonyDtoToColony(c)));
       }
     });
 
-    this.notificationService.getVisibilityLostNotification().subscribe(notificaton => {
+    this.notificationService.getVisibilityLostNotifications().subscribe(notificaton => {
       const colonies: Set<Colony> = new Set();
 
       this.colonies.value.forEach(c => {
@@ -76,11 +76,11 @@ export class ColoniesService {
       this.colonies.next(colonies);
     });
 
-    this.notificationService.getCreateColonyNotification().subscribe(notification => {
+    this.notificationService.getCreateColonyNotifications().subscribe(notification => {
       this.addColonies([this.mapColonyDtoToColony(notification)]);
     });
 
-    this.notificationService.getBuildingOrdersNotification().subscribe(notification => {
+    this.notificationService.getBuildingOrdersNotifications().subscribe(notification => {
       notification.buildingOrders.forEach(bo => {
 
         const colony = this.coloniesMap.get(bo.colonyId);

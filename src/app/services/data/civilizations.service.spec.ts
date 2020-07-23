@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { PIROS_API_SERVICE_CONFIG, ApiService, PirosApiService, ConnectorManagerService, IdGeneratorService, RequestService, ChannelService } from '@piros/api';
 import { config } from '../config';
-import { registerAndLogin, registerLoginAndCreateCivilization } from '../login-utils';
+import { registerAndLogin, registerLoginAndCreateCivilization, quickStart } from '../login-utils';
 import { LocalStorageService } from '../local-storage.service';
 import { AuthService } from '../auth.service';
 import { AuthService as PirosAuthService } from '@piros/api';
@@ -215,7 +215,7 @@ describe('CivilizationsService', () => {
 
   });
 
-  it('should get player civiliz ations by id', (done) => {
+  it('should get player civilizations by id', (done) => {
     const authService = TestBed.get(AuthService);
     const civilizationsService: CivilizationsService = TestBed.get(CivilizationsService);
     
@@ -237,6 +237,30 @@ describe('CivilizationsService', () => {
     });
     
   });
+
+  fit('should get civilization meet notification when explore star with enemy colony', (done) => {
+
+    let travelSent;
+
+    quickStart((sd) => {
+      quickStart((sd2) => {
+
+        sd.services.notificationService.getCivilizationMeetNotifications().subscribe(notification => {
+          expect(notification.civilizations[0].id).toEqual(sd2.civilization.id);
+          expect(notification.civilizations[0].name).toEqual(sd2.civilization.name);
+          done();
+        });
+
+        if (!travelSent) {
+          travelSent = true;
+          sd.services.fleetsService.startTravel(sd.startingFleet.id, sd.startingFleet.origin.id, sd2.homeStar.id).subscribe();
+        }
+
+      });
+    });
+  });
+
+
 });
 
 

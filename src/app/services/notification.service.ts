@@ -11,6 +11,7 @@ import { CreateColonyNotificationDto } from '../dto/create-colony-notification';
 import { CreateShipNotificationDto } from '../dto/create-ship-notification';
 import { BuildingOrdersNotificationDto } from '../dto/building-orders-notification';
 import { ExploreStarNotificationDto } from '../dto/explore-star-notification';
+import { CivilizationMeetNotificationDto } from '../dto/civilization-meet-notification';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,8 @@ export class NotificationService {
   private createColonyNotificationSubject: Subject<CreateColonyNotificationDto> = new Subject();
   private createShipNotificationSubject: Subject<CreateShipNotificationDto> = new Subject();
   private buildingOrdersNotificationSubject: Subject<BuildingOrdersNotificationDto> = new Subject();
-  private exploreStarNotificationSubject: Subject<ExploreStarNotificationDto> = new Subject();
+  private exploreStarNotificationsSubject: Subject<ExploreStarNotificationDto> = new Subject();
+  private civilizationMeetNotifications: Subject<CivilizationMeetNotificationDto> = new Subject();
 
   constructor(
     private api: PirosApiService
@@ -38,7 +40,8 @@ export class NotificationService {
     subscribeToNotifications(this.api, 'create-colony-notifications', this.createColonyNotificationSubject);
     subscribeToNotifications(this.api, 'create-ship-notifications', this.createShipNotificationSubject);
     subscribeToNotifications(this.api, 'building-orders-notifications', this.buildingOrdersNotificationSubject);
-    subscribeToNotifications(this.api, 'explore-star-notifications', this.exploreStarNotificationSubject);
+    subscribeToNotifications(this.api, 'explore-star-notifications', this.exploreStarNotificationsSubject);
+    subscribeToNotifications(this.api, 'civilization-meet-notifications', this.civilizationMeetNotifications);
   }
 
   public getStartTravelEvents(): Observable<StartTravelNotificationDto> {
@@ -53,27 +56,31 @@ export class NotificationService {
     return this.deleteFleetNotificationSubject.asObservable();
   }
 
-  public getVisibilityGainNotification(): Observable<VisibilityGainedNotificationDto> {
+  public getVisibilityGainNotifications(): Observable<VisibilityGainedNotificationDto> {
     return this.visibilityGainNotificationSubject.asObservable();
   }
 
-  public getVisibilityLostNotification(): Observable<VisibilityLostNotificationDto> {
+  public getVisibilityLostNotifications(): Observable<VisibilityLostNotificationDto> {
     return this.visibilityLostNotificationSubject.asObservable();
   }
 
-  public getCreateColonyNotification(): Observable<CreateColonyNotificationDto> {
+  public getCreateColonyNotifications(): Observable<CreateColonyNotificationDto> {
     return this.createColonyNotificationSubject.asObservable();
   }
 
-  public getCreateShipNotification(): Observable<CreateShipNotificationDto> {
+  public getCreateShipNotifications(): Observable<CreateShipNotificationDto> {
     return this.createShipNotificationSubject.asObservable();
   }
 
-  public getBuildingOrdersNotification(): Observable<BuildingOrdersNotificationDto> {
+  public getBuildingOrdersNotifications(): Observable<BuildingOrdersNotificationDto> {
     return this.buildingOrdersNotificationSubject.asObservable();
   }
 
-  public getExploreStarNotification(): Observable<ExploreStarNotificationDto> {
-    return this.exploreStarNotificationSubject.asObservable();
+  public getExploreStarNotifications(): Observable<ExploreStarNotificationDto> {
+    return this.exploreStarNotificationsSubject.asObservable();
+  }
+
+  public getCivilizationMeetNotifications(): Observable<CivilizationMeetNotificationDto> {
+    return this.civilizationMeetNotifications.asObservable();
   }
 }

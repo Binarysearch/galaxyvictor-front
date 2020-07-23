@@ -48,7 +48,7 @@ export class PlanetsService {
       }
     });
 
-    this.notificationService.getExploreStarNotification().subscribe((notification) => {
+    this.notificationService.getExploreStarNotifications().subscribe((notification) => {
       this.addPlanets(notification.planets.map(p => this.mapPlanetInfoToPlanet(p)));
     });
   }
