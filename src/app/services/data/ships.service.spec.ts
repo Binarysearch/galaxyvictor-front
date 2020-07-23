@@ -8,6 +8,7 @@ import { LocalStorageService } from '../local-storage.service';
 import { quickStart } from '../login-utils';
 import { Colony } from 'src/app/model/colony';
 import { BuildingOrderType } from 'src/app/dto/building-order-dto';
+import { CreateShipNotificationDto } from 'src/app/dto/create-ship-notification';
 
 describe('ShipsService', () => {
 
@@ -153,34 +154,52 @@ describe('ShipsService', () => {
     let shipCreated;
 
     quickStart((sd) => {
+      quickStart((sd2) => {
 
-      sd.services.coloniesService.getColonies().subscribe(colonies => {
-        if (colonies.size > 0 && !shipCreated) {
-          const colony: Colony = colonies.values().next().value;
-          sd.services.shipsService.buildShip(colony.id).subscribe(result => {
-            expect(result).toBeTruthy();
+        sd2.services.fleetsService.startTravel(sd2.startingFleet.id, sd2.startingFleet.origin.id, sd.homeStar.id).subscribe();
+        
+        sd.services.notificationService.getEndTravelEvents().subscribe(ev => {
+          sd.services.coloniesService.getColonies().subscribe(colonies => {
+            if (colonies.size > 0 && !shipCreated) {
+              const colony: Colony = colonies.values().next().value;
+              sd.services.shipsService.buildShip(colony.id).subscribe(result => {
+                expect(result).toBeTruthy();
+              });
+              shipCreated = true;
+            }
           });
-          shipCreated = true;
-        }
+        });
+
+        let notificationCount = 0;
+        const checkCreateShipNotification = (notification: CreateShipNotificationDto) => {
+          expect(notification.fleet.id).toEqual(sd.startingFleet.id);
+          expect(notification.fleet.shipCount).toEqual(2);
+          expect(notification.ship).toBeDefined();
+          expect(notification.ship.id).toBeDefined();
+
+          setTimeout(() => {
+            expect(sd.startingFleet.shipCount).toEqual(2);
+
+            sd.services.shipsService.getFleetShips(sd.startingFleet.id).subscribe(ships => {
+              expect(ships.length).toEqual(2);
+              notificationCount++;
+              if (notificationCount === 2) {
+                done();
+              }
+            });
+
+          }, 1);
+        };
+
+        sd.services.notificationService.getCreateShipNotification().subscribe(notification => {
+          checkCreateShipNotification(notification);
+        });
+
+        sd2.services.notificationService.getCreateShipNotification().subscribe(notification => {
+          checkCreateShipNotification(notification);
+        });
+
       });
-
-      sd.services.notificationService.getCreateShipNotification().subscribe(notification => {
-        expect(notification.fleet.id).toEqual(sd.startingFleet.id);
-        expect(notification.fleet.shipCount).toEqual(2);
-        expect(notification.ship).toBeDefined();
-        expect(notification.ship.id).toBeDefined();
-
-        setTimeout(() => {
-          expect(sd.startingFleet.shipCount).toEqual(2);
-
-          sd.services.shipsService.getFleetShips(sd.startingFleet.id).subscribe(ships => {
-            expect(ships.length).toEqual(2);
-            done();
-          });
-
-        }, 1);
-      });
-
     });
   });
 
