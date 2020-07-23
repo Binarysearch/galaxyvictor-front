@@ -9,6 +9,7 @@ import { AuthService, AuthStatus } from '../auth.service';
 import { CivilizationsService } from './civilizations.service';
 import { subscribeToNotifications } from '../channel-utils';
 import { ExploreStarNotificationDto } from 'src/app/dto/explore-star-notification';
+import { NotificationService } from '../notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,13 +22,13 @@ export class PlanetsService {
   private unknownPlanet: Planet = new Planet('', PLANET_TYPES[0], PLANET_SIZES[0], 0, StarsService.unknownStarSystem);
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  private exploreStarNotificationSubject: Subject<ExploreStarNotificationDto> = new Subject();
 
   constructor(
     private starsService: StarsService,
     private api: PirosApiService,
     private authService: AuthService,
-    private civilizationsService: CivilizationsService
+    private civilizationsService: CivilizationsService,
+    private notificationService: NotificationService,
   ) {
     this.authService.getStatus().subscribe(status => {
       if (status === AuthStatus.SESSION_STARTED) {
@@ -47,9 +48,7 @@ export class PlanetsService {
       }
     });
 
-    subscribeToNotifications(this.api, 'explore-star-notifications', this.exploreStarNotificationSubject);
-
-    this.exploreStarNotificationSubject.subscribe((notification) => {
+    this.notificationService.getExploreStarNotification().subscribe((notification) => {
       this.addPlanets(notification.planets.map(p => this.mapPlanetInfoToPlanet(p)));
     });
   }

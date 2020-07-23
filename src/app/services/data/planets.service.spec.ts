@@ -11,6 +11,7 @@ import { AuthService } from '../auth.service';
 import { MapStateService } from '../map-state.service';
 import { EventService } from '../event.service';
 import { StarsService } from './stars.service';
+import { NotificationService } from '../notification.service';
 
 describe('PlanetsService', () => {
 
@@ -86,9 +87,10 @@ describe('PlanetsService', () => {
     const service: PlanetsService = TestBed.get(PlanetsService);
     
     const apiService2 = createApiService();
+    const notificationService2: NotificationService = new NotificationService(apiService2);
     const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
     const civilizationsService2 = new CivilizationsService(apiService2, authService2);
-    const service2: PlanetsService = new PlanetsService(TestBed.get(StarsService), apiService2, authService2, civilizationsService2);
+    const service2: PlanetsService = new PlanetsService(TestBed.get(StarsService), apiService2, authService2, civilizationsService2, notificationService2);
 
     registerLoginAndCreateCivilization(authService, civilizationsService, () => {
       service.isLoaded().subscribe(

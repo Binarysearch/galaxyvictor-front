@@ -168,7 +168,7 @@ describe('FleetsService', () => {
     const civilizationsService2 = new CivilizationsService(apiService2, authService2);
     const starsService2: StarsService = new StarsService(apiService2, authService2);
     const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService), notificationService);
-    const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2);
+    const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2, notificationService);
 
     let travelStartSent = false;
     let travelStartReceived = false;
@@ -287,7 +287,7 @@ describe('FleetsService', () => {
     const civilizationsService2 = new CivilizationsService(apiService2, authService2);
     const starsService2: StarsService = new StarsService(apiService2, authService2);
     const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService), notificationService2);
-    const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2);
+    const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2, notificationService2);
 
     let travelStartSent = false;
     let travelStartReceived = false;
@@ -372,7 +372,7 @@ describe('FleetsService', () => {
     const civilizationsService2 = new CivilizationsService(apiService2, authService2);
     const starsService2: StarsService = new StarsService(apiService2, authService2);
     const fleetsService2 = new FleetsService(starsService2, apiService2, authService2, civilizationsService2, TestBed.get(TimeService), notificationService2);
-    const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2);
+    const planetsService2: PlanetsService = new PlanetsService(starsService2, apiService2, authService2, civilizationsService2, notificationService2);
 
     let travelStartSent = false;
     let fleetId;
