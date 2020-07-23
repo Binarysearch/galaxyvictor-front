@@ -184,33 +184,42 @@ describe('ShipsService', () => {
     });
   });
 
-  it('should create fleet if there is no fleet in star when creating ship', (done) => {
+  it('should create fleet if there is no fleet from same civilization in star when creating ship', (done) => {
 
+    let endedTravels: number = 0;
     quickStart((sd) => {
+      quickStart((sd2) => {
 
-      const randomStar = sd.getRandomStar();
+        const randomStar = sd.getRandomStar();
 
-      sd.services.fleetsService.startTravel(sd.startingFleet.id, sd.startingFleet.origin.id, randomStar.id).subscribe();
+        sd2.services.fleetsService.startTravel(sd2.startingFleet.id, sd2.startingFleet.origin.id, sd.homeStar.id).subscribe();
+        sd.services.fleetsService.startTravel(sd.startingFleet.id, sd.startingFleet.origin.id, randomStar.id).subscribe();
 
-      sd.services.notificationService.getEndTravelEvents().subscribe(ev => {
-
-        sd.services.coloniesService.getColonies().subscribe(colonies => {
-          if (colonies.size > 0) {
-            const colony: Colony = colonies.values().next().value;
-            sd.services.shipsService.buildShip(colony.id).subscribe();
+        sd.services.notificationService.getEndTravelEvents().subscribe(ev => {
+          endedTravels++;
+          if (endedTravels === 2) {
+            sd.services.coloniesService.getColonies().subscribe(colonies => {
+              if (colonies.size > 0) {
+                const colony: Colony = colonies.values().next().value;
+                sd.services.shipsService.buildShip(colony.id).subscribe();
+              }
+            });
           }
         });
 
-      });
+        sd.services.notificationService.getCreateShipNotification().subscribe(ev => {
+          expect(ev.fleet.id).not.toEqual(sd.startingFleet.id);
+          expect(ev.fleet.id).not.toEqual(sd2.startingFleet.id);
+          setTimeout(() => {
+            expect(sd.services.fleetsService.getFleetById(ev.fleet.id)).toBeTruthy();
+            expect(sd.homeStar.orbitingFleets.size).toEqual(2);
+            expect(sd.homeStar.hasAlliedFleets).toBeTruthy();
+            expect(sd.homeStar.hasEnemyFleets).toBeTruthy();
+            done();
+          }, 1);
+        });
 
-      sd.services.notificationService.getCreateShipNotification().subscribe(ev => {
-        expect(ev.fleet.id).not.toEqual(sd.startingFleet.id);
-        setTimeout(() => {
-          expect(sd.services.fleetsService.getFleetById(ev.fleet.id)).toBeTruthy();
-          done();
-        }, 1);
       });
-
     });
   });
 
