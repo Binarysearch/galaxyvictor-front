@@ -292,6 +292,73 @@ describe('CivilizationsService', () => {
     });
   });
 
+  it('should get civilization meet notification when enemy fleet starts travel to star system with presence', (done) => {
+
+    let travelSent;
+
+    quickStart((sd) => {
+      quickStart((sd2) => {
+
+        sd2.services.notificationService.getCivilizationMeetNotifications().subscribe(notification => {
+          expect(notification.civilizations[0].id).toEqual(sd.civilization.id);
+          expect(notification.civilizations[0].name).toEqual(sd.civilization.name);
+          done();
+        });
+
+        if (!travelSent) {
+          travelSent = true;
+          sd.services.fleetsService.startTravel(sd.startingFleet.id, sd.startingFleet.origin.id, sd2.homeStar.id).subscribe();
+        }
+
+      });
+    });
+  });
+
+  it('should get known civilizations at login', (done) => {
+
+    let travelSent;
+
+    quickStart((sd) => {
+      quickStart((sd2) => {
+
+        sd2.services.notificationService.getCivilizationMeetNotifications().subscribe(notification => {
+          expect(notification.civilizations[0].id).toEqual(sd.civilization.id);
+          
+          setTimeout(() => {
+            quickStart((sd1_2) => {
+              sd1_2.services.civilizationsService.getCivilizations().subscribe(civilizations => {
+                civilizations.forEach(civ => {
+                  if (civ.id === sd2.civilization.id && civ.name === sd2.civilization.name) {
+                    // Probar con el otro usuario
+
+                    quickStart((sd2_2) => {
+                      sd2_2.services.civilizationsService.getCivilizations().subscribe(civilizations => {
+                        civilizations.forEach(civ => {
+                          if (civ.id === sd.civilization.id && civ.name === sd.civilization.name) {
+                            done();
+                          }
+                        });
+                      });
+          
+                    }, sd2.credentials.user, sd2.credentials.password);
+
+                  }
+                });
+              });
+  
+            }, sd.credentials.user, sd.credentials.password);
+          }, 300);
+        });
+
+        if (!travelSent) {
+          travelSent = true;
+          sd.services.fleetsService.startTravel(sd.startingFleet.id, sd.startingFleet.origin.id, sd2.homeStar.id).subscribe();
+        }
+
+      });
+    });
+  });
+
 
 });
 

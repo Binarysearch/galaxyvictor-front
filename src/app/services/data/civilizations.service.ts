@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { CivilizationDto } from '../../dto/civilization/civilization-dto';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, forkJoin } from 'rxjs';
 import { PirosApiService } from '@piros/api';
 import { AuthService, AuthStatus } from '../auth.service';
 import { Civilization } from '../../model/civilization';
 import { NotificationService } from '../notification.service';
+import { EnemyCivilizationDto } from 'src/app/dto/civilization/enemy-civilization-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -23,15 +24,29 @@ export class CivilizationsService {
   ) {
     this.authService.getStatus().subscribe((status) => {
       if (status === AuthStatus.SESSION_STARTED) {
-        this.api.request<CivilizationDto>('civilizations.get-civilization').subscribe(civ => {
+        forkJoin(
+          this.api.request<CivilizationDto>('civilizations.get-civilization'),
+          this.api.request<EnemyCivilizationDto[]>('civilizations.get-known-civilizations')
+        ).subscribe(results => {
+          const civ = results[0];
+          const knownCivs = results[1];
+          const civilizations = new Set(knownCivs.map(c => new Civilization(c.id, c.name, false, null)));
+
+          civilizations.forEach(c => {
+            this.civilizationMap.set(c.id, c);
+          });
+
           if (civ) {
             const civilization = new Civilization(civ.id, civ.name, true, civ.homeworld);
             this.civilizationMap.set(civilization.id, civilization);
             this.civilization.next(civilization);
+            civilizations.add(civilization);
           } else {
             this.civilization.next(null);
           }
           
+          this.civilizations.next(civilizations);
+
           this.loaded.next(true);
         }, (err) => {
           console.log(err);
