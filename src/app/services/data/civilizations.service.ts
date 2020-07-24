@@ -15,7 +15,6 @@ export class CivilizationsService {
   private civilizations: BehaviorSubject<Set<Civilization>> = new BehaviorSubject(new Set());
   private civilization: BehaviorSubject<Civilization> = new BehaviorSubject(null);
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  private unknownCivilization: Civilization = new Civilization('', 'Desconocida', false, null);
 
   constructor(
     private api: PirosApiService,
@@ -55,9 +54,14 @@ export class CivilizationsService {
     
     this.notificationService.getCivilizationMeetNotifications().subscribe(notification => {
       notification.civilizations.forEach(civilizationDto => {
-        const civilization = new Civilization(civilizationDto.id, civilizationDto.name, false, null);
-        this.civilizationMap.set(civilization.id, civilization);
-        this.civilizations.value.add(civilization);
+        if (this.civilizationMap.has(civilizationDto.id)) {
+          const civilization = this.civilizationMap.get(civilizationDto.id);
+          civilization.name = civilizationDto.name;
+        } else {
+          const civilization = new Civilization(civilizationDto.id, civilizationDto.name, false, null);
+          this.civilizationMap.set(civilization.id, civilization);
+          this.civilizations.value.add(civilization);
+        }
       });
       
       this.civilizations.next(this.civilizations.value);
@@ -84,7 +88,11 @@ export class CivilizationsService {
     if (this.civilizationMap.has(id)) {
       return this.civilizationMap.get(id);
     } else {
-      return this.unknownCivilization;
+      const civilization: Civilization = new Civilization(id, 'Desconocida', false, null);
+      this.civilizationMap.set(civilization.id, civilization);
+      this.civilizations.value.add(civilization);
+      this.civilizations.next(this.civilizations.value);
+      return civilization;
     }
   }
 }

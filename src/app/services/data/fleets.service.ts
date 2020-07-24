@@ -131,7 +131,7 @@ export class FleetsService {
 
     existing.origin = this.starsService.getStarById(fleetDto.originId);
     existing.destination = this.starsService.getStarById(fleetDto.destinationId);
-    existing.civilizationId = fleetDto.civilizationId;
+    existing.civilization = this.civilizationsService.getCivilizationById(fleetDto.civilizationId);
     existing.startTravelTime = fleetDto.startTravelTime;
     existing.speed = fleetDto.speed;
     existing.seed = fleetDto.seed;
@@ -171,8 +171,7 @@ export class FleetsService {
       fleetDto.shipCount,
       this.starsService.getStarById(fleetDto.originId),
       this.starsService.getStarById(fleetDto.destinationId),
-      this.civilizationsService,
-      fleetDto.civilizationId,
+      this.civilizationsService.getCivilizationById(fleetDto.civilizationId),
       this.timeService
     );
 

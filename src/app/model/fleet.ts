@@ -21,8 +21,7 @@ export class Fleet implements Entity {
         public shipCount: number,
         public origin: StarSystem,
         public destination: StarSystem,
-        public civilizationsService: CivilizationsService,
-        public civilizationId: string,
+        public civilization: Civilization,
         private timeService: TimeService
     ) {
         
@@ -77,10 +76,6 @@ export class Fleet implements Entity {
 
     get isTravelling(): boolean {
         return this.destination.id !== this.origin.id && this.travelPercent < 1;
-    }
-
-    get civilization(): Civilization {
-        return this.civilizationsService.getCivilizationById(this.civilizationId);
     }
 
     get name(): string {
