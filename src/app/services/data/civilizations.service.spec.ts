@@ -9,6 +9,7 @@ import { AuthService } from '../auth.service';
 import { AuthService as PirosAuthService } from '@piros/api';
 import { CivilizationsService } from './civilizations.service';
 import { MapStateService } from '../map-state.service';
+import { NotificationService } from '../notification.service';
 
 describe('CivilizationsService', () => {
 
@@ -170,8 +171,9 @@ describe('CivilizationsService', () => {
     const service: CivilizationsService = TestBed.get(CivilizationsService);
 
     const apiService2 = createApiService();
+    const notificationService2 = new NotificationService(apiService2);
     const authService2 = new AuthService(apiService2, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
-    const service2: CivilizationsService = new CivilizationsService(apiService2, authService2);
+    const service2: CivilizationsService = new CivilizationsService(apiService2, authService2, notificationService2);
 
     const civilizationName = 'civilization-' + Math.random();
 
@@ -238,7 +240,7 @@ describe('CivilizationsService', () => {
     
   });
 
-  fit('should get civilization meet notification when explore star with enemy colony', (done) => {
+  it('should get civilization meet notification when explore star with enemies', (done) => {
 
     let travelSent;
 
@@ -249,6 +251,36 @@ describe('CivilizationsService', () => {
           expect(notification.civilizations[0].id).toEqual(sd2.civilization.id);
           expect(notification.civilizations[0].name).toEqual(sd2.civilization.name);
           done();
+        });
+
+        if (!travelSent) {
+          travelSent = true;
+          sd.services.fleetsService.startTravel(sd.startingFleet.id, sd.startingFleet.origin.id, sd2.homeStar.id).subscribe();
+        }
+
+      });
+    });
+  });
+
+  it('should update enemy fleet civilization when explore star with enemies', (done) => {
+
+    let travelSent;
+
+    quickStart((sd) => {
+      quickStart((sd2) => {
+
+        sd.services.notificationService.getCivilizationMeetNotifications().subscribe(notification => {
+          expect(notification.civilizations[0].id).toEqual(sd2.civilization.id);
+          expect(notification.civilizations[0].name).toEqual(sd2.civilization.name);
+          sd.services.fleetsService.getFleets().subscribe(fleets => {
+            fleets.forEach(fleet => {
+              if (fleet.id !== sd.startingFleet.id) {
+                expect(fleet.civilization.id).toEqual(notification.civilizations[0].id);
+                expect(fleet.civilization.name).toEqual(notification.civilizations[0].name);
+                done();
+              }
+            });
+          });
         });
 
         if (!travelSent) {

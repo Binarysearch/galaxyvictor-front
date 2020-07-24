@@ -105,7 +105,7 @@ export function quickStart(callback: (servicesAndData: ServicesAndData) => void,
   const notificationService: NotificationService = new NotificationService(apiService);
   TestBed.get(LocalStorageService).deleteSavedToken();
   const authService = new AuthService(apiService, TestBed.get(LocalStorageService), TestBed.get(MapStateService));
-  const civilizationsService = new CivilizationsService(apiService, authService);
+  const civilizationsService = new CivilizationsService(apiService, authService, notificationService);
   const starsService: StarsService = new StarsService(apiService, authService);
   const fleetsService = new FleetsService(starsService, apiService, authService, civilizationsService, TestBed.get(TimeService), notificationService);
   const planetsService: PlanetsService = new PlanetsService(starsService, apiService, authService, civilizationsService, notificationService);

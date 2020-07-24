@@ -1,12 +1,9 @@
-import { Component, ElementRef, AfterViewInit, ViewChildren, QueryList, HostListener, ViewChild, ViewContainerRef, OnInit } from '@angular/core';
+import { Component, ElementRef, AfterViewInit, ViewChildren, QueryList, HostListener, OnInit } from '@angular/core';
 import { DsConfig, TopbarPosition } from '@piros/dashboard';
 import { GalaxyMapService } from './services/galaxy-map.service';
 import { Store } from './services/data/store';
-import { EventManagerService } from './services/events/event-manager.service';
 import { WindowManagerService } from './services/window-manager.service-abstract';
-import { GvApiService } from './services/gv-api.service';
 import { CivilizationsService } from './services/data/civilizations.service';
-import { CivilizationDto } from './dto/civilization/civilization-dto';
 import { AuthService, AuthStatus } from './services/auth.service';
 import { PlanetsService } from './services/data/planets.service';
 import { Civilization } from './model/civilization';
@@ -52,13 +49,11 @@ export class AppComponent implements AfterViewInit, OnInit {
   }
 
   constructor(
-    private api: GvApiService,
     private authService: AuthService,
     private civilizationsService: CivilizationsService,
     private planetsService: PlanetsService,
     private galaxyMap: GalaxyMapService,
     private store: Store,
-    private eventManagerService: EventManagerService,
     private windowManagerService: WindowManagerService
   ) {
     this.authService.getStatus().subscribe(

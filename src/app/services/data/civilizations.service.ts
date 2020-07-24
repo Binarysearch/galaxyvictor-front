@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { PirosApiService } from '@piros/api';
 import { AuthService, AuthStatus } from '../auth.service';
 import { Civilization } from '../../model/civilization';
+import { NotificationService } from '../notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,13 +12,15 @@ import { Civilization } from '../../model/civilization';
 export class CivilizationsService {
 
   private civilizationMap: Map<string, Civilization> = new Map();
+  private civilizations: BehaviorSubject<Set<Civilization>> = new BehaviorSubject(new Set());
   private civilization: BehaviorSubject<Civilization> = new BehaviorSubject(null);
   private loaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private unknownCivilization: Civilization = new Civilization('', 'Desconocida', false, null);
 
   constructor(
     private api: PirosApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService,
   ) {
     this.authService.getStatus().subscribe((status) => {
       if (status === AuthStatus.SESSION_STARTED) {
@@ -49,6 +52,16 @@ export class CivilizationsService {
         this.civilizationMap.clear();
       }
     });
+    
+    this.notificationService.getCivilizationMeetNotifications().subscribe(notification => {
+      notification.civilizations.forEach(civilizationDto => {
+        const civilization = new Civilization(civilizationDto.id, civilizationDto.name, false, null);
+        this.civilizationMap.set(civilization.id, civilization);
+        this.civilizations.value.add(civilization);
+      });
+      
+      this.civilizations.next(this.civilizations.value);
+    });
   }
 
   public isLoaded(): Observable<boolean> {
@@ -57,6 +70,10 @@ export class CivilizationsService {
 
   public getCivilization(): Observable<Civilization> {
     return this.civilization.asObservable();
+  }
+
+  public getCivilizations(): Observable<Set<Civilization>> {
+    return this.civilizations.asObservable();
   }
 
   public createCivilization(name: string): Observable<string> {
